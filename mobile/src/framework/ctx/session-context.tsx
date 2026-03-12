@@ -29,7 +29,15 @@ const SessionContext = createContext<SessionContextValue | undefined>(undefined)
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthModule.LoginResponse | null>(null);
   const [hydrated, setHydrated] = useState(false);
-  const queryClient = useQueryClient();
+  
+  // Safe queryClient access
+  let queryClient;
+  try {
+    queryClient = useQueryClient();
+  } catch {
+    // QueryClient not available yet, create dummy
+    queryClient = { clear: () => {} };
+  }
 
   useEffect(() => {
     tokenManager.setAccessToken(session?.tokens.accessToken ?? null);
