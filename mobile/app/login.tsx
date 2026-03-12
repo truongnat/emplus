@@ -4,7 +4,7 @@ import { Redirect } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
-import { YStack, XStack } from 'react-native';
+import { YStack, XStack, View, ActivityIndicator } from 'react-native';
 
 import { 
   AppButton, AppScreen, AppText, AppCheckbox, 
@@ -17,8 +17,20 @@ import { dependencies } from "@/src/framework/di/dependencies";
 import { toDisplayError } from "@/src/core/api/to-display-error";
 
 export default function LoginScreen() {
-  const { setSession, hydrated, isAuthenticated, session } = useSession();
-  const { showToast } = useToast();
+  const sessionCtx = useSession();
+  const toastCtx = useToast();
+  
+  // Safety check during hydration
+  if (!sessionCtx || !toastCtx) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator color={palette.primary} />
+      </View>
+    );
+  }
+  
+  const { setSession, hydrated, isAuthenticated, session } = sessionCtx;
+  const { showToast } = toastCtx;
   const [showPassword, setShowPassword] = useState(false);
 
   const authForm = useForm<AuthFlowFields>({
