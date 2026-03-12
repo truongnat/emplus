@@ -5,8 +5,8 @@
 
 import React, { memo } from 'react';
 import { View, Text, Image, StyleSheet, ViewStyle } from 'react-native';
-import { tokens } from './tokens';
-import { useTheme } from './theme-provider';
+import { tokens } from '../tokens';
+import { useTheme } from '../theme-provider';
 
 interface AvatarProps {
   src?: string;

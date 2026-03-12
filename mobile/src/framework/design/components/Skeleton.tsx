@@ -5,8 +5,8 @@
 
 import React, { memo } from 'react';
 import { View, Animated, StyleSheet, ViewStyle, Easing } from 'react-native';
-import { tokens } from './tokens';
-import { useTheme } from './theme-provider';
+import { tokens } from '../tokens';
+import { useTheme } from '../theme-provider';
 import { useEffect, useRef } from 'react';
 
 interface SkeletonProps {

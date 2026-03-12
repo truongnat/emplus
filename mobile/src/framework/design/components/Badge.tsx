@@ -5,8 +5,8 @@
 
 import React, { memo } from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
-import { tokens } from './tokens';
-import { useTheme } from './theme-provider';
+import { tokens } from '../tokens';
+import { useTheme } from '../theme-provider';
 
 type BadgeVariant = 'default' | 'secondary' | 'outline' | 'destructive' | 'success' | 'warning';
 

@@ -5,8 +5,8 @@
 
 import React, { memo } from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import { tokens } from './tokens';
-import { useTheme } from './theme-provider';
+import { tokens } from '../tokens';
+import { useTheme } from '../theme-provider';
 
 interface SeparatorProps {
   orientation?: 'horizontal' | 'vertical';

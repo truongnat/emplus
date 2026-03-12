@@ -11,8 +11,8 @@ import {
   StyleSheet,
   ViewStyle,
 } from 'react-native';
-import { tokens } from './tokens';
-import { useTheme } from './theme-provider';
+import { tokens } from '../tokens';
+import { useTheme } from '../theme-provider';
 
 interface SwitchProps {
   checked: boolean;

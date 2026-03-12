@@ -5,8 +5,8 @@
 
 import React, { memo } from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
-import { tokens } from './tokens';
-import { useTheme } from './theme-provider';
+import { tokens } from '../tokens';
+import { useTheme } from '../theme-provider';
 import { Ionicons } from '@expo/vector-icons';
 
 type AlertVariant = 'default' | 'destructive' | 'success' | 'warning' | 'info';
