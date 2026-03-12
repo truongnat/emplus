@@ -9,6 +9,14 @@ import { DesignProvider } from "@/src/framework/design/design-provider";
 import { palette } from "@/src/theme";
 import { AppText } from "@/src/ui-kit";
 import { tws } from "@/src/utils/tws";
+import {
+  BeVietnamPro_400Regular,
+  BeVietnamPro_500Medium,
+  BeVietnamPro_600SemiBold,
+  BeVietnamPro_700Bold,
+  BeVietnamPro_800ExtraBold,
+} from "@expo-google-fonts/be-vietnam-pro";
+import { RobotoMono_400Regular, RobotoMono_700Bold } from "@expo-google-fonts/roboto-mono";
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
