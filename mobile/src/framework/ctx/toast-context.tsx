@@ -18,17 +18,12 @@ interface ToastContextType {
   showToast: (message: string, type?: ToastType, duration?: number) => void;
 }
 
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
+const ToastContext = createContext<ToastContextType>({
+  showToast: () => {},
+});
 
 export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    // Return dummy functions during SSR/hydration to prevent crash
-    return {
-      showToast: () => {},
-    };
-  }
-  return context;
+  return useContext(ToastContext);
 };
 
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {

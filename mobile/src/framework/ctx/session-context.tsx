@@ -22,7 +22,15 @@ interface SessionContextValue {
   withAccessToken: <T>(operation: (accessToken: string) => Promise<T>) => Promise<T>;
 }
 
-const SessionContext = createContext<SessionContextValue | undefined>(undefined);
+const SessionContext = createContext<SessionContextValue>({
+  session: null,
+  hydrated: false,
+  isAuthenticated: false,
+  setSession: () => {},
+  clearSession: async () => {},
+  refreshAuth: async () => false,
+  withAccessToken: async (op: any) => op(''),
+});
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthModule.LoginResponse | null>(null);
@@ -120,17 +128,5 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 }
 
 export const useSession = () => {
-  const context = useContext(SessionContext);
-  if (!context) {
-    return {
-      session: null,
-      hydrated: false,
-      isAuthenticated: false,
-      setSession: () => {},
-      clearSession: async () => {},
-      refreshAuth: async () => false,
-      withAccessToken: async (op: any) => op(''),
-    };
-  }
-  return context;
+  return useContext(SessionContext);
 };
