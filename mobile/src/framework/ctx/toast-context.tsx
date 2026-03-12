@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useRef, ReactNode, useMemo } from "react";
-import { View, StyleSheet, Platform } from "react-native";
+import { View, StyleSheet, Platform, Text } from "react-native";
 import { BlurView } from "expo-blur";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, {
@@ -10,7 +10,6 @@ import Animated, {
   runOnJS,
   Easing
 } from "react-native-reanimated";
-import { AppText } from "../../ui-kit";
 import { palette, radii } from "../../theme";
 
 export type ToastType = "success" | "error" | "warning" | "info";
@@ -139,14 +138,12 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                   color={(palette as any)[currentStyle.color as any] || "#000"}
                 />
               </View>
-              <AppText
-                variant="captionBold"
-                color={currentStyle.color as any}
-                style={styles.text}
+              <Text
+                style={[styles.text, { color: (palette as any)[currentStyle.color as any] || "#000" }]}
                 numberOfLines={2}
               >
                 {toast.message}
-              </AppText>
+              </Text>
             </BlurView>
           </Animated.View>
         </View>
