@@ -84,3 +84,6 @@ export default function ApiContext({ children }: PropsWithChildren) {
     </PersistQueryClientProvider>
   );
 }
+
+// Export as ApiProvider for consistency
+export const ApiProvider = ApiContext;

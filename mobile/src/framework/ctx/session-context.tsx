@@ -1,7 +1,6 @@
 import { AppState } from "react-native";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 
 import { storage } from "@/src/core/common/storage";
 import appConfig from "@/src/core/config/app-config";
@@ -20,7 +19,6 @@ interface SessionContextValue {
   setSession: (session: AuthModule.LoginResponse | null) => void;
   clearSession: () => void;
   refreshAuth: () => Promise<boolean>;
-  /** @deprecated use UseCases or direct API calls, token is managed automatically */
   withAccessToken: <T>(operation: (accessToken: string) => Promise<T>) => Promise<T>;
 }
 
@@ -29,15 +27,6 @@ const SessionContext = createContext<SessionContextValue | undefined>(undefined)
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthModule.LoginResponse | null>(null);
   const [hydrated, setHydrated] = useState(false);
-  
-  // Safe queryClient access
-  let queryClient;
-  try {
-    queryClient = useQueryClient();
-  } catch {
-    // QueryClient not available yet, create dummy
-    queryClient = { clear: () => {} };
-  }
 
   useEffect(() => {
     tokenManager.setAccessToken(session?.tokens.accessToken ?? null);
@@ -45,9 +34,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const clearSession = useCallback(async () => {
     setSession(null);
-    queryClient.clear();
     await storage.clearAllSession();
-  }, [queryClient]);
+  }, []);
 
   const refreshAuth = useCallback(async (): Promise<string | null> => {
     const currentTokens = await storage.auth.getTokens();
@@ -70,7 +58,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     tokenManager.setRefreshHandler(refreshAuth);
   }, [refreshAuth]);
 
-  /** Compatibility: withAccessToken passthrough */
   const withAccessToken = useCallback(async <T,>(operation: (token: string) => Promise<T>): Promise<T> => {
     const token = session?.tokens.accessToken || "";
     return operation(token);
@@ -135,7 +122,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 export const useSession = () => {
   const context = useContext(SessionContext);
   if (!context) {
-    // Return default value during SSR/hydration to prevent crash
     return {
       session: null,
       hydrated: false,
