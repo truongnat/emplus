@@ -1,20 +1,19 @@
-import { TamaguiProvider, Theme } from 'tamagui'
-import { PropsWithChildren } from 'react'
-import config from './tamagui.config'
-import { useColorScheme } from 'react-native'
+/**
+ * Design Provider - Integrates the design system into the application
+ * Combines ThemeProvider with other design system providers
+ */
+
+import { PropsWithChildren } from 'react';
+import { ThemeProvider } from './theme-provider';
 
 /**
- * DesignProvider tích hợp Tamagui vào ứng dụng.
- * Tự động phát hiện và áp dụng Light/Dark theme từ hệ thống.
+ * DesignProvider integrates the design system into the application.
+ * Provides theme context (light/dark mode) to all child components.
  */
 export function DesignProvider({ children }: PropsWithChildren) {
-    const colorScheme = useColorScheme()
-
-    return (
-        <TamaguiProvider config={config} defaultTheme={colorScheme === 'dark' ? 'dark' : 'light'}>
-            <Theme name={colorScheme === 'dark' ? 'dark' : 'light'}>
-                {children}
-            </Theme>
-        </TamaguiProvider>
-    )
+  return (
+    <ThemeProvider>
+      {children}
+    </ThemeProvider>
+  );
 }

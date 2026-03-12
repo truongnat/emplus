@@ -1,4 +1,3 @@
-import "@tamagui/native/setup-zeego";
 import { tws } from "@/src/utils/tws";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useFonts } from "expo-font";

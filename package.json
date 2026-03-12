@@ -4,7 +4,8 @@
   "private": true,
   "workspaces": [
     "mobile",
-    "api"
+    "api",
+    "design-builder"
   ],
   "scripts": {
     "dev": "bash ./scripts/dev-local.sh",
@@ -18,7 +19,10 @@
     "db:up": "docker compose -f docker-compose.yml up -d postgres postgres-slave redis minio minio-init mailpit",
     "db:down": "docker compose -f docker-compose.yml down",
     "dev:mobile": "bun run --cwd mobile dev",
+    "dev:builder": "bun run --cwd design-builder dev",
+    "build:builder": "bun run --cwd design-builder build",
     "typecheck:mobile": "bun run --cwd mobile typecheck",
+    "typecheck:builder": "bun run --cwd design-builder typecheck",
     "logging:up": "docker compose -f api/docker-compose.logging.yml up -d",
     "logging:down": "docker compose -f api/docker-compose.logging.yml down",
     "ports": "bash ./scripts/ports.sh",
@@ -31,13 +35,8 @@
     "api:sync": "cd api && bun run scripts/export-openapi.ts && cd ../mobile && bun run scripts/sync-api.ts"
   },
   "dependencies": {
-    "@tamagui/animations-react-native": "2.0.0-rc.25",
-    "@tamagui/config": "2.0.0-rc.25",
-    "@tamagui/shorthands": "2.0.0-rc.25",
-    "@tamagui/themes": "2.0.0-rc.25",
     "clsx": "2.1.1",
-    "tailwind-merge": "3.5.0",
-    "tamagui": "2.0.0-rc.25"
+    "tailwind-merge": "3.5.0"
   },
   "devDependencies": {
     "openapi-typescript": "7.13.0",
