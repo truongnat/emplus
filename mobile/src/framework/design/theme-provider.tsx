@@ -144,7 +144,19 @@ export function ThemeProvider({ children }: PropsWithChildren) {
 export function useTheme(): ThemeContextValue {
   const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    // Return default theme during SSR/hydration to prevent crash
+    const colorScheme = Appearance.getColorScheme();
+    const themeName = colorScheme === 'dark' ? 'dark' : 'light';
+    return {
+      theme: themes[themeName],
+      themeName,
+      allThemes: themes,
+      isDark: themeName === 'dark',
+      toggleTheme: () => {},
+      setTheme: () => {},
+      cssVariables: {},
+      getColor: () => '#000000',
+    };
   }
   return context;
 }
