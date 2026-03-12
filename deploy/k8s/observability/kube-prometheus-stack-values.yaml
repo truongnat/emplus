@@ -1,0 +1,36 @@
+alertmanager:
+  enabled: false
+
+kubeControllerManager:
+  enabled: false
+
+kubeScheduler:
+  enabled: false
+
+kubeEtcd:
+  enabled: false
+
+kubeProxy:
+  enabled: false
+
+grafana:
+  adminPassword: admin123
+  defaultDashboardsTimezone: Asia/Ho_Chi_Minh
+  service:
+    type: NodePort
+    nodePort: 30090
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      access: proxy
+      url: http://loki-gateway.observability.svc.cluster.local
+      jsonData:
+        maxLines: 5000
+
+prometheus:
+  service:
+    type: NodePort
+    nodePort: 30091
+  prometheusSpec:
+    retention: 12h
+    scrapeInterval: 30s

@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - secret.yaml
+  - configmap-api.yaml
+  - postgres.yaml
+  - redis.yaml
+  - mailpit.yaml
+  - minio.yaml
+  - api.yaml

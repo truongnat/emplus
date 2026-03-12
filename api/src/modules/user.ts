@@ -1,0 +1,44 @@
+import { Hono } from "hono";
+import type { AppEnv } from "../app-env.ts";
+import { requireAuth } from "../middleware/auth.ts";
+import { getUserProfile, updateUserProfile } from "../services/user.service.ts";
+import { validateUpdateProfileInput } from "../dto/user.dto.ts";
+import { readJson, success } from "../utils/http.ts";
+
+export const userRoutes = new Hono<AppEnv>();
+
+userRoutes.use("*", requireAuth);
+
+// Get current user profile
+userRoutes.get("/me", async (context) => {
+  const user = context.get("user");
+  const profile = await getUserProfile(user.id);
+
+  if (!profile) {
+    const error = new Error("Không tìm thấy người dùng.") as Error & { status: number; code: string };
+    error.status = 404;
+    error.code = "USER_NOT_FOUND";
+    throw error;
+  }
+
+  return success(context, profile);
+});
+
+// Update current user profile
+userRoutes.put("/me", async (context) => {
+  const user = context.get("user");
+  const body = await readJson<Record<string, unknown>>(context);
+
+  const input = validateUpdateProfileInput(body);
+
+  const profile = await updateUserProfile(user.id, {
+    fullName: input.fullName,
+    nickname: input.nickname,
+    avatarUrl: input.avatarUrl,
+    gender: input.gender,
+    dob: input.dob,
+    timezone: input.timezone,
+  });
+
+  return success(context, profile);
+});

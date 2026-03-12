@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-init
+  namespace: emplus-local
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: db-init
+          image: emplus-api:local
+          imagePullPolicy: IfNotPresent
+          workingDir: /app/api
+          envFrom:
+            - configMapRef:
+                name: emplus-api-config
+            - secretRef:
+                name: emplus-secrets
+          command: ["bun", "src/db/migrate.ts"]

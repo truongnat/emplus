@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings &amp; Notifications</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ef40d8",
+                        "background-light": "#f8f6f8",
+                        "background-dark": "#22101f",
+                    },
+                    fontFamily: {
+                        "display": ["Be Vietnam Pro"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom Toggle Switch Style */
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #ef40d8;
+        }
+        .toggle-checkbox:checked + .toggle-label .toggle-dot {
+            transform: translateX(100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex min-h-screen w-full flex-col max-w-[430px] mx-auto bg-white dark:bg-background-dark shadow-2xl overflow-x-hidden">
+<!-- Header -->
+<div class="flex items-center bg-white dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10 border-b border-primary/10">
+<button class="text-slate-900 dark:text-slate-100 flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Settings &amp; Security</h2>
+<div class="size-12"></div> <!-- Spacer for symmetry -->
+</div>
+<div class="flex-1 overflow-y-auto pb-24">
+<!-- Account Section -->
+<h3 class="text-primary text-sm font-bold uppercase tracking-wider px-6 pb-2 pt-6">Account</h3>
+<div class="mx-4 bg-background-light/50 dark:bg-slate-800/20 rounded-2xl overflow-hidden border border-primary/5">
+<div class="flex items-center gap-4 px-4 min-h-16 justify-between hover:bg-primary/5 cursor-pointer border-b border-primary/5">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-full bg-primary/10 shrink-0 size-10">
+<span class="material-symbols-outlined">person</span>
+</div>
+<p class="text-slate-900 dark:text-slate-100 text-base font-medium leading-normal flex-1">Edit Profile</p>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</div>
+<div class="flex items-center gap-4 px-4 min-h-16 justify-between hover:bg-primary/5 cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10 border-2 border-primary/20" data-alt="User profile avatar placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA36mLnlUG4McC9PIXKbVg1_x-CGndJp5ATkDHadJbLJ0dG2UXfzxAecrJfGV8VLMkcL41kKKQO1dbb9TrgNh6TllX-qAFvCNy0ge-8UQPTRv_j1UAMKshvhSalABgJTLuCPQUCU_q4kloWALMYeoO0yvQaZWg7JPbhFyD3XWIGd5oQnHSzQG84Ut0duZezpYuNnOlLUi29AAn6PgbfCpZp5piFFLSzl1zo_Y_8RhHds8h22P_W7kGiq5PDByfK-xHfilVmqEX19C8");'></div>
+<div class="flex flex-col">
+<p class="text-slate-900 dark:text-slate-100 text-base font-medium leading-tight">Linked Partner</p>
+<p class="text-primary text-sm font-medium">@Alex92</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">link</span>
+</div>
+</div>
+<!-- Notifications Section -->
+<h3 class="text-primary text-sm font-bold uppercase tracking-wider px-6 pb-2 pt-8">Notifications</h3>
+<div class="mx-4 bg-background-light/50 dark:bg-slate-800/20 rounded-2xl overflow-hidden border border-primary/5">
+<!-- Toggle 1 -->
+<div class="flex items-center gap-4 px-4 min-h-16 justify-between border-b border-primary/5">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-full bg-primary/10 shrink-0 size-10">
+<span class="material-symbols-outlined">favorite</span>
+</div>
+<p class="text-slate-900 dark:text-slate-100 text-base font-medium">Anniversary Reminders</p>
+</div>
+<div class="relative inline-block w-12 h-6 transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-0 h-0 opacity-0" id="toggle-anniversary" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer transition-colors duration-200" for="toggle-anniversary">
+<span class="toggle-dot block h-6 w-6 rounded-full bg-white shadow-md transform transition-transform duration-200"></span>
+</label>
+</div>
+</div>
+<!-- Toggle 2 -->
+<div class="flex items-center gap-4 px-4 min-h-16 justify-between border-b border-primary/5">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-full bg-primary/10 shrink-0 size-10">
+<span class="material-symbols-outlined">water_drop</span>
+</div>
+<p class="text-slate-900 dark:text-slate-100 text-base font-medium">Period Start Alerts</p>
+</div>
+<div class="relative inline-block w-12 h-6 transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-0 h-0 opacity-0" id="toggle-period" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer transition-colors duration-200" for="toggle-period">
+<span class="toggle-dot block h-6 w-6 rounded-full bg-white shadow-md transform transition-transform duration-200"></span>
+</label>
+</div>
+</div>
+<!-- Toggle 3 -->
+<div class="flex items-center gap-4 px-4 min-h-16 justify-between">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-full bg-primary/10 shrink-0 size-10">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<p class="text-slate-900 dark:text-slate-100 text-base font-medium">Ovulation Notifications</p>
+</div>
+<div class="relative inline-block w-12 h-6 transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-0 h-0 opacity-0" id="toggle-ovulation" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer transition-colors duration-200" for="toggle-ovulation">
+<span class="toggle-dot block h-6 w-6 rounded-full bg-white shadow-md transform transition-transform duration-200"></span>
+</label>
+</div>
+</div>
+</div>
+<!-- Security Section -->
+<h3 class="text-primary text-sm font-bold uppercase tracking-wider px-6 pb-2 pt-8">Security</h3>
+<div class="mx-4 bg-background-light/50 dark:bg-slate-800/20 rounded-2xl overflow-hidden border border-primary/5">
+<div class="flex items-center gap-4 px-4 min-h-16 justify-between">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-full bg-primary/10 shrink-0 size-10">
+<span class="material-symbols-outlined">face_unlock</span>
+</div>
+<p class="text-slate-900 dark:text-slate-100 text-base font-medium">FaceID / PIN Lock</p>
+</div>
+<div class="relative inline-block w-12 h-6 transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-0 h-0 opacity-0" id="toggle-security" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-300 dark:bg-slate-600 cursor-pointer transition-colors duration-200" for="toggle-security">
+<span class="toggle-dot block h-6 w-6 rounded-full bg-white shadow-md transform transition-transform duration-200"></span>
+</label>
+</div>
+</div>
+</div>
+<!-- Shared Status -->
+<div class="mt-12 flex flex-col items-center gap-3 px-6 text-center">
+<div class="flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full border border-primary/10">
+<span class="material-symbols-outlined text-primary text-sm">hub</span>
+<p class="text-slate-600 dark:text-slate-400 text-xs font-semibold">Shared with Alex</p>
+</div>
+<p class="text-slate-400 dark:text-slate-500 text-[10px] leading-relaxed">
+                    Some settings are synced with your partner to ensure harmony in your journey together.
+                </p>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<div class="absolute bottom-0 w-full flex gap-2 border-t border-primary/10 bg-white/90 dark:bg-background-dark/90 backdrop-blur-md px-4 pb-6 pt-2">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">water_drop</span>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Cycle</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Calendar</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">groups</span>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Community</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<p class="text-xs font-bold leading-normal tracking-[0.015em]">Settings</p>
+</a>
+</div>
+</div>
+</body></html>

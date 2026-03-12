@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Her Cycle - Sweet Harmony</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e96382",
+                        "primary-light": "#FFD1DC", 
+                        "secondary": "#B2EBF2",
+                        "background-light": "#FFFDD0",
+                        "background-dark": "#211115",
+                        "text-main": "#5D535E",
+                        "text-muted": "#9E949E",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"],
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "2xl": "2.5rem", "full": "9999px"},
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+        
+        /* Custom Water Drop Shape for Active Day */
+        .water-drop {
+            border-radius: 0% 50% 50% 50%;
+            transform: rotate(45deg);
+        }
+        .water-drop-content {
+            transform: rotate(-45deg);
+        }
+
+        /* Hide scrollbar for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-main min-h-screen relative overflow-x-hidden selection:bg-primary/30">
+<!-- Ambient Background Gradients -->
+<div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-[60%] h-[50%] rounded-full bg-[#FDE4E1] blur-[80px] opacity-80"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[50%] rounded-full bg-[#E0F2F1] blur-[80px] opacity-80"></div>
+<div class="absolute top-[40%] left-[20%] w-[30%] h-[30%] rounded-full bg-primary/10 blur-[60px]"></div>
+</div>
+<div class="relative flex flex-col h-full min-h-screen w-full max-w-md mx-auto">
+<!-- Header -->
+<header class="flex items-center justify-between px-6 py-6 pt-12">
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-white/50 hover:bg-white transition-colors">
+<span class="material-symbols-outlined text-text-main">arrow_back</span>
+</button>
+<h1 class="font-serif italic font-bold text-2xl text-text-main">Her Cycle</h1>
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-white/50 hover:bg-white transition-colors relative">
+<span class="material-symbols-outlined text-text-main">notifications</span>
+<span class="absolute top-2 right-2.5 w-2 h-2 bg-primary rounded-full border border-white"></span>
+</button>
+</header>
+<!-- Main Content Scroll Area -->
+<main class="flex-1 px-4 pb-24 overflow-y-auto no-scrollbar space-y-6">
+<!-- Calendar Section -->
+<section class="glass rounded-xl p-6 shadow-glass relative overflow-hidden">
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-primary/10 rounded-full blur-xl"></div>
+<div class="flex justify-between items-baseline mb-6">
+<h2 class="text-xl font-bold text-text-main">October 2023</h2>
+<button class="text-sm font-medium text-primary hover:text-primary/80">View Calendar</button>
+</div>
+<!-- Week Row -->
+<div class="flex justify-between items-center relative z-10">
+<!-- Day 1 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<span class="text-xs font-medium text-text-muted">M</span>
+<div class="w-10 h-10 flex items-center justify-center rounded-full text-text-main hover:bg-white/50 transition-colors">12</div>
+</div>
+<!-- Day 2 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<span class="text-xs font-medium text-text-muted">T</span>
+<div class="w-10 h-10 flex items-center justify-center rounded-full text-text-main hover:bg-white/50 transition-colors">13</div>
+</div>
+<!-- Day 3 (Active) -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<span class="text-xs font-bold text-primary">W</span>
+<div class="w-12 h-12 flex items-center justify-center water-drop bg-secondary shadow-lg shadow-secondary/30 transition-transform hover:scale-105">
+<span class="water-drop-content text-text-main font-bold text-lg">14</span>
+</div>
+</div>
+<!-- Day 4 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<span class="text-xs font-medium text-text-muted">T</span>
+<div class="w-10 h-10 flex items-center justify-center rounded-full text-text-main hover:bg-white/50 transition-colors">15</div>
+</div>
+<!-- Day 5 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<span class="text-xs font-medium text-text-muted">F</span>
+<div class="w-10 h-10 flex items-center justify-center rounded-full text-text-main hover:bg-white/50 transition-colors">16</div>
+</div>
+<!-- Day 6 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<span class="text-xs font-medium text-text-muted">S</span>
+<div class="w-10 h-10 flex items-center justify-center rounded-full text-text-main hover:bg-white/50 transition-colors">17</div>
+</div>
+<!-- Day 7 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<span class="text-xs font-medium text-text-muted">S</span>
+<div class="w-10 h-10 flex items-center justify-center rounded-full text-text-main hover:bg-white/50 transition-colors">18</div>
+</div>
+</div>
+</section>
+<!-- Cycle Status Card -->
+<section class="glass rounded-xl p-8 shadow-glass text-center relative overflow-hidden">
+<!-- Decorative background elements -->
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+<div class="absolute bottom-0 right-0 w-32 h-32 bg-secondary/20 rounded-full blur-2xl translate-y-1/2 translate-x-1/4"></div>
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/60 mb-4 shadow-sm">
+<span class="material-symbols-outlined text-primary text-3xl">water_drop</span>
+</div>
+<h3 class="font-serif text-2xl font-bold text-text-main mb-1">Follicular Phase</h3>
+<p class="text-primary font-medium mb-3">Day 5 of Cycle</p>
+<p class="text-text-muted text-sm leading-relaxed max-w-[260px] mx-auto">
+                    Your energy is rising. It's a great time to start new projects or get active together.
+                </p>
+<div class="mt-6 flex justify-center gap-2">
+<span class="h-1.5 w-1.5 rounded-full bg-primary/20"></span>
+<span class="h-1.5 w-6 rounded-full bg-primary"></span>
+<span class="h-1.5 w-1.5 rounded-full bg-primary/20"></span>
+<span class="h-1.5 w-1.5 rounded-full bg-primary/20"></span>
+</div>
+</section>
+<!-- Symptom Logger -->
+<section class="space-y-4">
+<div class="flex items-center justify-between px-2">
+<h3 class="font-serif italic text-lg text-text-main">How are you feeling?</h3>
+<span class="text-xs font-medium text-text-muted uppercase tracking-wider">Today</span>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Physical Symptoms -->
+<div class="flex gap-3 overflow-x-auto no-scrollbar px-1 pb-2">
+<!-- Active Chip -->
+<button class="flex items-center gap-2 px-4 py-2.5 rounded-full bg-primary text-white shadow-md shadow-primary/20 whitespace-nowrap transition-transform active:scale-95">
+<span class="material-symbols-outlined text-[18px]">sentiment_satisfied</span>
+<span class="text-sm font-semibold">Happy</span>
+</button>
+<!-- Inactive Chip -->
+<button class="flex items-center gap-2 px-4 py-2.5 rounded-full glass hover:bg-white/80 text-text-main whitespace-nowrap border border-white/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+<span class="text-sm font-medium">Energetic</span>
+</button>
+<!-- Inactive Chip -->
+<button class="flex items-center gap-2 px-4 py-2.5 rounded-full glass hover:bg-white/80 text-text-main whitespace-nowrap border border-white/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px]">sentiment_neutral</span>
+<span class="text-sm font-medium">Calm</span>
+</button>
+<!-- Inactive Chip -->
+<button class="flex items-center gap-2 px-4 py-2.5 rounded-full glass hover:bg-white/80 text-text-main whitespace-nowrap border border-white/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px] fill">favorite</span>
+<span class="text-sm font-medium">Loving</span>
+</button>
+</div>
+<!-- Body Symptoms -->
+<div class="flex gap-3 overflow-x-auto no-scrollbar px-1 pb-2">
+<!-- Inactive Chip -->
+<button class="flex items-center gap-2 px-4 py-2.5 rounded-full glass hover:bg-white/80 text-text-main whitespace-nowrap border border-white/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px]">water_drop</span>
+<span class="text-sm font-medium">Flow: Light</span>
+</button>
+<!-- Active Chip (Negative) -->
+<button class="flex items-center gap-2 px-4 py-2.5 rounded-full glass bg-primary/10 border-primary/30 text-primary whitespace-nowrap transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px]">healing</span>
+<span class="text-sm font-semibold">Cramps</span>
+</button>
+<!-- Inactive Chip -->
+<button class="flex items-center gap-2 px-4 py-2.5 rounded-full glass hover:bg-white/80 text-text-main whitespace-nowrap border border-white/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px]">hotel</span>
+<span class="text-sm font-medium">Tired</span>
+</button>
+<!-- Inactive Chip -->
+<button class="flex items-center gap-2 px-4 py-2.5 rounded-full glass hover:bg-white/80 text-text-main whitespace-nowrap border border-white/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px]">restaurant</span>
+<span class="text-sm font-medium">Cravings</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Log Button -->
+<div class="pt-2 px-2">
+<button class="w-full py-4 rounded-xl bg-text-main text-background-light font-bold tracking-wide uppercase text-sm shadow-lg shadow-text-main/20 hover:bg-text-main/90 transition-all active:scale-[0.98]">
+                    Save Daily Log
+                </button>
+</div>
+</main>
+<!-- Bottom Navigation (From Component List but styled) -->
+<nav class="fixed bottom-0 left-0 w-full glass border-t border-white/50 pb-safe pt-2 px-2 z-50 rounded-t-2xl">
+<div class="flex justify-around items-end pb-2">
+<a class="flex flex-1 flex-col items-center gap-1 group" href="#">
+<div class="text-text-muted group-hover:text-primary transition-colors flex h-8 w-8 items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">favorite</span>
+</div>
+<span class="text-[10px] font-medium text-text-muted group-hover:text-primary">Dash</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 group" href="#">
+<div class="text-text-muted group-hover:text-primary transition-colors flex h-8 w-8 items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">photo_library</span>
+</div>
+<span class="text-[10px] font-medium text-text-muted group-hover:text-primary">Memory</span>
+</a>
+<!-- Active Tab -->
+<a class="flex flex-1 flex-col items-center gap-1 -mt-6 relative" href="#">
+<div class="h-14 w-14 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/40 border-4 border-[#FFFDD0]">
+<span class="material-symbols-outlined text-[28px] fill-1">water_drop</span>
+</div>
+<span class="text-[10px] font-bold text-primary">Cycle</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 group" href="#">
+<div class="text-text-muted group-hover:text-primary transition-colors flex h-8 w-8 items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">lightbulb</span>
+</div>
+<span class="text-[10px] font-medium text-text-muted group-hover:text-primary">Guide</span>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 group" href="#">
+<div class="text-text-muted group-hover:text-primary transition-colors flex h-8 w-8 items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">person</span>
+</div>
+<span class="text-[10px] font-medium text-text-muted group-hover:text-primary">Profile</span>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html class="" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sweet Harmony - Love Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100..900;1,100..900&amp;family=Playfair+Display:ital,wght@0,700;1,700&amp;family=Nunito:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#FFD1DC",
+                        "primary-dark": "#ef40d8",
+                        "background-light": "#FFFDD0",
+                        "background-dark": "#22101f",
+                        "accent-cyan": "#B2EBF2",
+                        "warm-charcoal": "#5D535E",
+                        "dusty-lilac": "#9E949E"
+                    },
+                    fontFamily: {
+                        "display": ["Be Vietnam Pro", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"],
+                        "sans": ["Nunito", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "24px", "xl": "32px", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .glass {
+                @apply bg-white/65 backdrop-blur-xl border border-white/80;
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            }
+            .bg-dreamy {
+                background: linear-gradient(135deg, #FDE4E1 0%, #E0F2F1 100%);
+                min-height: 100vh;
+            }
+            .text-glow {
+                text-shadow: 0 0 15px rgba(255, 209, 220, 0.8);
+            }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-sans antialiased text-warm-charcoal bg-background-light selection:bg-primary/40">
+<div class="relative flex h-full min-h-screen w-full flex-col bg-dreamy overflow-x-hidden">
+<header class="relative z-10 flex items-center justify-between px-6 py-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-dark" style="font-size: 28px; font-variation-settings: 'FILL' 1;">favorite</span>
+<h1 class="font-serif text-2xl italic font-bold text-warm-charcoal">Sweet Harmony</h1>
+</div>
+<button class="p-2 rounded-full glass hover:bg-white/80 transition-colors text-warm-charcoal">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</header>
+<main class="relative z-10 flex-1 flex flex-col items-center px-6 gap-6 pb-32">
+<div class="w-full max-w-sm flex flex-col gap-3">
+<div class="glass rounded-xl p-5 relative overflow-hidden flex items-center gap-5">
+<div class="relative flex-shrink-0 w-24 h-24">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-primary/30" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-width="6"></circle>
+<circle class="text-primary-dark rounded-full" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="60" stroke-width="6"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center p-2">
+<div class="relative w-full h-full rounded-full overflow-hidden border-2 border-white">
+<img alt="Couple" class="absolute inset-0 w-full h-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4VkCG8UXhQkup2mvsJdMcTR46ekLK9T-oRQa3ZhP12Jhv4ah9leoiOsXdpGzpRsfqmYTrDFD8uenwcb3HU923DUUY9FEJxZVNuslbyLe4_oXHbkJ8XL2ziShQ9dTB2SCEIxWXma-9pH-pFKHf6OAtKN7SL4md18ZnvYjVrECtcUXP_cpFu-jgXSmwXB6Y3pi9ZtI7CEICfzZj0qW4pYZWKsUNzSBrnYL3q58SkFX-6FzhWxgqWzxeQ3yl06x3wtuDD2znGJfvCs0"/>
+<div class="absolute inset-0 bg-primary/20"></div>
+</div>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<span class="text-[11px] uppercase tracking-widest font-bold text-dusty-lilac">Countdown</span>
+<h2 class="text-xl font-bold text-warm-charcoal mt-0.5">15 days</h2>
+<p class="text-sm text-dusty-lilac font-medium">to our 2nd Anniversary</p>
+</div>
+<button class="absolute top-4 right-4 bg-primary hover:bg-primary/80 text-warm-charcoal w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-transform active:scale-90">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+</div>
+</div>
+<div class="w-full flex justify-center py-2">
+<div class="relative">
+<div class="relative flex flex-col items-center justify-center w-56 h-56 rounded-full glass border-white/60 shadow-lg text-center">
+<span class="text-[10px] font-bold uppercase tracking-[0.2em] text-dusty-lilac mb-1">Together For</span>
+<div class="text-6xl font-bold text-warm-charcoal leading-none tracking-tighter">365</div>
+<span class="font-serif text-lg italic text-warm-charcoal mt-2">Days of Us</span>
+</div>
+</div>
+</div>
+<div class="w-full max-w-sm glass rounded-xl p-4 flex items-center justify-between gap-4">
+<div class="flex -space-x-3 overflow-hidden pl-2">
+<div class="relative inline-block">
+<img alt="Partner A" class="h-12 w-12 rounded-full ring-2 ring-white object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4VkCG8UXhQkup2mvsJdMcTR46ekLK9T-oRQa3ZhP12Jhv4ah9leoiOsXdpGzpRsfqmYTrDFD8uenwcb3HU923DUUY9FEJxZVNuslbyLe4_oXHbkJ8XL2ziShQ9dTB2SCEIxWXma-9pH-pFKHf6OAtKN7SL4md18ZnvYjVrECtcUXP_cpFu-jgXSmwXB6Y3pi9ZtI7CEICfzZj0qW4pYZWKsUNzSBrnYL3q58SkFX-6FzhWxgqWzxeQ3yl06x3wtuDD2znGJfvCs0"/>
+<span class="absolute bottom-0.5 right-0.5 block h-3 w-3 rounded-full ring-2 ring-white bg-green-400"></span>
+</div>
+<div class="relative inline-block">
+<img alt="Partner B" class="h-12 w-12 rounded-full ring-2 ring-white object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAblYZbyLeuddkkV3-digbYnjH4-0msMXxGk5Dut3Y4sJArFU9eyyHsqDoBv9q9xYHICOpj6f4qE8CDgcz2sIPyuRzAsg3rsDoKVJqDMKSs_QeaMryC63m1Vs2HJd2XaiOkUUvleNhOkMHBPZL0aKsiDSlh231dbR74o0rWF2nH6lonAWZSOZxYQ8sFNGRE01Ip-EWKjWrAHcpmpMWfEswZsgMwzZhYCMsvv4sx0xM9MpJiqRPQM8e-NRQqfxQ4-MZ4ycEEEPmDxnQ"/>
+<span class="absolute bottom-0.5 right-0.5 block h-3 w-3 rounded-full ring-2 ring-white bg-green-400"></span>
+</div>
+</div>
+<div class="flex-1 flex flex-col items-end pr-2">
+<span class="text-[10px] text-primary-dark font-bold uppercase tracking-wider">Status</span>
+<p class="text-sm text-warm-charcoal font-medium italic">"Thinking of you..."</p>
+</div>
+</div>
+<div class="w-full max-w-sm glass rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden group">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-accent-cyan/30 flex items-center justify-center text-warm-charcoal">
+<span class="material-symbols-outlined">sunny</span>
+</div>
+<div>
+<h3 class="font-bold text-warm-charcoal text-lg">Today's Whisper</h3>
+<p class="text-xs text-dusty-lilac">A little nudge for today</p>
+</div>
+</div>
+<p class="text-warm-charcoal text-sm leading-relaxed">
+                Send a voice note before bed to share your favorite moment of the day.
+            </p>
+<button class="w-full bg-primary-dark hover:bg-primary-dark/90 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all uppercase tracking-widest text-xs shadow-lg shadow-primary-dark/20 active:scale-95">
+<span class="material-symbols-outlined text-lg">mic</span>
+<span>Record Note</span>
+</button>
+</div>
+<div class="w-full max-w-sm grid grid-cols-2 gap-4">
+<div class="glass rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-center">
+<span class="material-symbols-outlined text-accent-cyan" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+<span class="text-[10px] font-bold text-dusty-lilac uppercase tracking-wider">Her Cycle</span>
+<span class="text-sm font-bold text-warm-charcoal">Follicular Phase</span>
+</div>
+<div class="glass rounded-xl p-4 flex flex-col items-center justify-center gap-2 text-center">
+<span class="material-symbols-outlined text-primary-dark" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="text-[10px] font-bold text-dusty-lilac uppercase tracking-wider">Next Date</span>
+<span class="text-sm font-bold text-warm-charcoal">Fri, 8:00 PM</span>
+</div>
+</div>
+</main>
+<nav class="fixed bottom-0 left-0 w-full z-50 glass border-t border-white/50 px-6 pb-8 pt-3 rounded-t-xl">
+<div class="flex justify-between items-center max-w-md mx-auto">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary-dark" href="#">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">home</span>
+<p class="text-[10px] font-bold tracking-wide uppercase">Home</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-dusty-lilac hover:text-primary-dark transition-colors" href="#">
+<span class="material-symbols-outlined text-[28px]">photo_library</span>
+<p class="text-[10px] font-bold tracking-wide uppercase">Memories</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-dusty-lilac hover:text-primary-dark transition-colors" href="#">
+<span class="material-symbols-outlined text-[28px]">spa</span>
+<p class="text-[10px] font-bold tracking-wide uppercase">Guide</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-dusty-lilac hover:text-primary-dark transition-colors" href="#">
+<span class="material-symbols-outlined text-[28px]">favorite</span>
+<p class="text-[10px] font-bold tracking-wide uppercase">Us</p>
+</a>
+</div>
+</nav>
+</div>
+
+</body></html>

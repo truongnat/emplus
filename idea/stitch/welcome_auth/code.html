@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sweet Harmony - Welcome &amp; Auth</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,700&amp;family=Nunito:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e96382",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#211115",
+                        // Custom Pastel Palette derived from primary hue for harmony
+                        "pastel-pink": "#FFD1DC", 
+                        "pastel-cream": "#FFFDD0",
+                        "soft-rose": "#FDE4E1",
+                        "mint-breeze": "#E0F2F1",
+                        "charcoal": "#5D535E",
+                        "dusty-lilac": "#9E949E",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"],
+                        "body": ["Nunito", "sans-serif"],
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                    backgroundImage: {
+                        'gradient-pastel': 'linear-gradient(135deg, #FDE4E1 0%, #E0F2F1 100%)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+        }
+        
+        .input-underline {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #FFD1DC;
+            border-radius: 0;
+            padding-left: 0;
+            padding-right: 0;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-underline:focus {
+            ring: 0;
+            outline: none;
+            box-shadow: none;
+            border-bottom-color: #e96382;
+        }
+
+        /* Abstract Hands Illustration Stroke Animation (Optional enhancement) */
+        .hand-stroke {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 0;
+            animation: dash 5s linear forwards;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-gradient-pastel dark:bg-background-dark min-h-screen flex items-center justify-center p-4 font-body antialiased selection:bg-primary/20 selection:text-primary">
+<div class="w-full max-w-md flex flex-col items-center">
+<!-- Hero Section -->
+<div class="mb-8 flex flex-col items-center animate-fade-in text-center">
+<!-- Abstract Hands Illustration -->
+<div class="w-48 h-48 mb-4 relative opacity-80 mix-blend-multiply dark:mix-blend-screen">
+<svg class="w-full h-full" data-alt="Abstract line drawing of two hands gently touching" fill="none" viewbox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+<path class="hand-stroke" d="M60 160C60 160 50 120 80 100C110 80 100 50 100 50" stroke="#5D535E" stroke-linecap="round" stroke-width="1.5"></path>
+<path class="hand-stroke" d="M140 160C140 160 150 120 120 100C90 80 100 50 100 50" stroke="#5D535E" stroke-linecap="round" stroke-width="1.5"></path>
+<circle class="opacity-50" cx="100" cy="50" r="40" stroke="#FFD1DC" stroke-width="1.5"></circle>
+<path d="M85 140 C 95 130, 105 130, 115 140" stroke="#e96382" stroke-linecap="round" stroke-width="1.5"></path>
+</svg>
+</div>
+<!-- Title -->
+<h1 class="font-serif italic font-bold text-[32px] text-charcoal dark:text-slate-100 leading-tight mb-2">
+                Sweet Harmony
+            </h1>
+<p class="text-charcoal/80 dark:text-slate-300 font-body text-base">
+                Sync your hearts.
+            </p>
+</div>
+<!-- Auth Card -->
+<div class="glass-card w-full rounded-[32px] p-8 md:p-10 relative overflow-hidden group">
+<!-- Soft gradient blob inside card for depth -->
+<div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
+<form action="#" class="space-y-8 relative z-10">
+<div class="space-y-1">
+<label class="sr-only" for="email">Email Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-0 bottom-3 text-dusty-lilac text-[20px]">
+                            favorite
+                        </span>
+<input class="input-underline w-full pl-8 pb-2 text-charcoal dark:text-slate-100 placeholder-dusty-lilac bg-transparent focus:border-primary text-lg" id="email" placeholder="your@email.com" required="" type="email"/>
+</div>
+</div>
+<div class="space-y-1">
+<label class="sr-only" for="password">Password</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-0 bottom-3 text-dusty-lilac text-[20px]">
+                            lock
+                        </span>
+<input class="input-underline w-full pl-8 pb-2 text-charcoal dark:text-slate-100 placeholder-dusty-lilac bg-transparent focus:border-primary text-lg tracking-widest" id="password" placeholder="••••••••" required="" type="password"/>
+</div>
+<div class="flex justify-end pt-2">
+<a class="text-sm text-dusty-lilac hover:text-primary transition-colors font-body" href="#">Forgot password?</a>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="pt-4 flex flex-col gap-4">
+<button class="w-full bg-primary hover:bg-[#d64d6e] text-white font-bold font-body text-base py-4 rounded-full shadow-[0_4px_14px_0_rgba(233,99,130,0.39)] hover:shadow-[0_6px_20px_rgba(233,99,130,0.23)] hover:-translate-y-0.5 transition-all duration-200 uppercase tracking-wide" type="submit">
+                        Begin Journey
+                    </button>
+<button class="w-full text-charcoal/70 dark:text-slate-300 font-semibold font-body text-sm hover:text-primary transition-colors" type="button">
+                        Create a shared space
+                    </button>
+</div>
+</form>
+</div>
+<!-- Footer Note -->
+<div class="mt-8 flex items-center justify-center space-x-2 text-dusty-lilac/80 dark:text-slate-400 text-xs">
+<span class="material-symbols-outlined text-[14px]">
+                security
+            </span>
+<span>Securely encrypted for your eyes only</span>
+</div>
+</div>
+</body></html>

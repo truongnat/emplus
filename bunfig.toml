@@ -1,0 +1,9 @@
+[install]
+# Strictly enforce Bun as the package manager
+# Disallow using npm or yarn
+exact = true
+frozenLockfile = false
+
+[run]
+# Use bun for running package.json scripts
+bun = true

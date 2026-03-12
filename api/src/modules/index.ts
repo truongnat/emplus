@@ -1,0 +1,11 @@
+export { adminRoutes } from "./admin.ts";
+export { authRoutes } from "./auth.ts";
+export { budgetRoutes } from "./budget.ts";
+export { careRoutes } from "./care.ts";
+export { couplesRoutes } from "./couples.ts";
+export { dashboardRoutes } from "./dashboard.ts";
+export { debugRoutes } from "./debug.ts";
+export { liveRoutes } from "./live.ts";
+export { systemRoutes } from "./system.ts";
+export { timelineRoutes } from "./timeline.ts";
+export { userRoutes } from "./user.ts";

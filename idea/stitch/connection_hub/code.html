@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Connection Hub - Sweet Harmony</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e96382",
+                        "primary-soft": "#FFD1DC",
+                        "background-light": "#FFFDD0", 
+                        "background-dark": "#211115",
+                        "surface-glass": "rgba(255, 255, 255, 0.45)",
+                        "text-main": "#5D535E",
+                        "text-muted": "#9E949E",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"],
+                        "mono": ["Courier Prime", "monospace"], // For the code
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "2xl": "2.5rem", "full": "9999px"},
+                    backgroundImage: {
+                        'pastel-gradient': 'linear-gradient(135deg, #FDE4E1 0%, #FFFDD0 50%, #E0F2F1 100%)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.4);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: #e96382;
+            outline: none;
+        }
+        .dashed-border-anim {
+            background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='24' ry='24' stroke='%23E96382FF' stroke-width='2' stroke-dasharray='12%2c 12' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-pastel-gradient min-h-screen font-display text-text-main antialiased selection:bg-primary selection:text-white">
+<div class="relative flex min-h-screen w-full flex-col max-w-md mx-auto overflow-hidden shadow-2xl bg-white/30">
+<!-- Decorative Background Elements -->
+<div class="absolute top-[-10%] left-[-10%] w-64 h-64 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-cyan-100/40 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Top Navigation -->
+<div class="relative z-10 flex items-center p-6 justify-between">
+<button aria-label="Go back" class="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-white/50 transition-colors text-text-main group">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">arrow_back</span>
+</button>
+<h2 class="text-text-main text-lg font-semibold tracking-wide uppercase opacity-70">Pairing</h2>
+<div class="size-10"></div> <!-- Spacer for visual balance -->
+</div>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col items-center px-6 pt-4 pb-12 relative z-10">
+<!-- Hero Header -->
+<div class="text-center mb-8 animate-fade-in-up">
+<div class="inline-flex items-center justify-center p-3 bg-white/60 rounded-full mb-4 shadow-sm">
+<span class="material-symbols-outlined text-primary text-3xl">favorite</span>
+</div>
+<h1 class="font-serif italic font-bold text-4xl text-text-main mb-3 leading-tight">Link Your World</h1>
+<p class="text-text-muted text-base px-4 leading-relaxed">
+                    Share this unique code with your person<br/>to sync your hearts together.
+                </p>
+</div>
+<!-- Love Code Card -->
+<div class="w-full max-w-sm relative group cursor-pointer mb-10 transition-transform hover:scale-[1.02] duration-300">
+<div class="glass-card rounded-2xl p-8 flex flex-col items-center justify-center relative overflow-hidden">
+<!-- Dashed Border Overlay using SVG background for cleaner dash rendering -->
+<div class="absolute inset-2 rounded-[20px] dashed-border-anim pointer-events-none opacity-60"></div>
+<span class="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-4 bg-white/80 px-3 py-1 rounded-full">Your Code</span>
+<div class="flex items-center gap-3 relative z-10">
+<div class="font-mono text-4xl sm:text-5xl font-bold text-text-main tracking-widest select-all" id="love-code">
+                            LOVE-24
+                        </div>
+</div>
+<button class="mt-6 flex items-center gap-2 text-sm font-medium text-text-muted hover:text-primary transition-colors group/copy">
+<span class="material-symbols-outlined text-lg group-hover/copy:scale-110 transition-transform">content_copy</span>
+<span>Tap to copy</span>
+</button>
+</div>
+<!-- Toast Notification (Hidden by default, simulated visual) -->
+<!-- Ideally visible via JS logic, styled here for completeness -->
+<div class="absolute -bottom-12 left-1/2 -translate-x-1/2 bg-text-main text-white text-xs py-2 px-4 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none shadow-lg whitespace-nowrap">
+                    Code copied to heart ✨
+                </div>
+</div>
+<!-- Divider -->
+<div class="flex items-center w-full max-w-xs gap-4 mb-10 opacity-60">
+<div class="h-px bg-text-muted flex-1"></div>
+<span class="font-serif italic text-text-muted">or</span>
+<div class="h-px bg-text-muted flex-1"></div>
+</div>
+<!-- Partner Input Section -->
+<div class="w-full max-w-sm space-y-4">
+<label class="block text-center text-sm font-semibold text-text-main tracking-wide" for="partner-code">
+                    Enter Partner's Code
+                </label>
+<div class="relative">
+<input class="glass-input w-full h-14 rounded-full text-center text-lg font-medium text-text-main placeholder:text-text-muted/70 shadow-sm focus:ring-0" id="partner-code" placeholder="Paste code here..." type="text"/>
+<div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-primary opacity-50">
+<span class="material-symbols-outlined">favorite_border</span>
+</div>
+</div>
+<button class="w-full h-14 mt-4 bg-primary hover:bg-[#d64d6e] text-white rounded-full font-bold text-lg shadow-lg shadow-primary/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2 group">
+<span>Connect Hearts</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</main>
+<!-- Bottom abstract graphic -->
+<div class="h-6 w-full relative overflow-hidden mt-auto">
+<div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white/40 to-transparent"></div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ef40d8",
+                        "background-light": "#f8f6f8",
+                        "background-dark": "#22101f",
+                    },
+                    fontFamily: {
+                        "display": ["Be Vietnam Pro"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>Sweet Harmony Chat</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex h-screen max-w-md mx-auto flex-col bg-background-light dark:bg-background-dark overflow-hidden">
+<!-- TopAppBar -->
+<header class="flex items-center bg-white/80 dark:bg-background-dark/80 backdrop-blur-md p-4 pb-2 justify-between sticky top-0 z-10 border-b border-primary/10">
+<div class="text-primary flex size-12 shrink-0 items-center justify-start cursor-pointer">
+<span class="material-symbols-outlined text-3xl">chevron_left</span>
+</div>
+<div class="flex flex-col items-center flex-1">
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">Sweet Harmony</h2>
+<div class="flex items-center gap-1">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+<p class="text-slate-500 dark:text-slate-400 text-xs">Alex is online</p>
+</div>
+</div>
+<div class="flex w-12 items-center justify-end">
+<button class="flex items-center justify-center rounded-full h-12 w-12 hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-primary">favorite</span>
+</button>
+</div>
+</header>
+<!-- Chat History -->
+<main class="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+<p class="text-slate-400 dark:text-slate-500 text-[11px] font-medium uppercase tracking-widest text-center">Today</p>
+<!-- Incoming Message -->
+<div class="flex items-end gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-9 shrink-0 border-2 border-primary/20" data-alt="Profile photo of a smiling man with a beard" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCP68KRbOfmNV2CuhtNd3N8l0dqhq_gf-jyVbAiqq68JEeWxV17XFkNxQSJmg5EYVoCeDdICqzGB7gUO7SkvErTeBI5_9bf4UutJvV8AGMkAT5syKSC5VQytohxjEsXmVYF6h81egGw_C4LTZUfEtMIDoWfypUdpz9EjK6TH1HrmVEH-m84wi7pmgBl9Gn1yNC9qBpbLu7IdDK22tPXi3UScPgWlxdHxAuQvEKxcUViEe4smdCacLE-kyUzyC2Gh_VvLNBRO5f33bk");'></div>
+<div class="flex flex-1 flex-col gap-1 items-start">
+<div class="flex items-baseline gap-2">
+<p class="text-primary/70 dark:text-primary/90 text-[12px] font-semibold">Alex</p>
+<p class="text-slate-400 dark:text-slate-500 text-[10px]">10:24 AM</p>
+</div>
+<div class="text-sm font-normal leading-relaxed max-w-[80%] rounded-2xl rounded-bl-none px-4 py-3 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-sm border border-primary/5">
+                        How are you feeling today, love? Thinking about you!
+                    </div>
+</div>
+</div>
+<!-- Outgoing Message -->
+<div class="flex items-end gap-3 justify-end">
+<div class="flex flex-1 flex-col gap-1 items-end">
+<div class="flex items-baseline gap-2">
+<p class="text-slate-400 dark:text-slate-500 text-[10px]">10:26 AM</p>
+<p class="text-primary/70 dark:text-primary/90 text-[12px] font-semibold">Me</p>
+</div>
+<div class="text-sm font-normal leading-relaxed max-w-[80%] rounded-2xl rounded-br-none px-4 py-3 bg-primary text-white shadow-md shadow-primary/20">
+                        A bit tired, but better now that you messaged! ❤️
+                    </div>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-9 shrink-0 border-2 border-primary/20" data-alt="Profile photo of a woman with long hair" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC1cnNwOSEjizPa3nuxdm3vtwmHME-egmrKsvnBGoyIFEw46dcIX3P00T9nKRc6HSwyGvbtYfsXfHUX2qcRgLYoaHTa7rJqRrYACEQpOIcCi2_mpR3wCmTyNDmctRuAchSGX1lAS6opmN2XGCXFmmdbUT5v2AQndLsh2b6m0pHN6Z3vvwzyybZJl9xUG9Dw-UYW_nwPyWzJ8AUZ6Fqe0Jxe1YJbBpW3zCk0mmitXYaQbsCz1LdumCONji6-3yxkkjbdciiHBdJsyTo");'></div>
+</div>
+<!-- Sticker Message -->
+<div class="flex items-end gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-9 shrink-0 border-2 border-primary/20" data-alt="Profile photo of a smiling man" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuARmXyQtu1hUQM1WQOhOZhCXcjv2xliKCHP_MQRGLa7vOsFOMgZ_1MLRPtrGo_Kkq2xoHioI8po6zLzlfa9fuDrJAi-COP56DHtWL2XzTCfk8RsPRAlkdMoHufi-p5_3TwsLzCNUvmMS82FyBsD6ps-TePV-7S2nNBwONYVrEqI9smf1xNyH7KvvUgCZjlMU0-osiW_YvgZusDQj5NYXXj_jVyWmVHIeHOSFn7f5JItrCFgDp8hlN3-t7ub93LmV1S593JEpAtfUHc");'></div>
+<div class="flex flex-1 flex-col gap-1 items-start">
+<div class="flex items-baseline gap-2">
+<p class="text-primary/70 dark:text-primary/90 text-[12px] font-semibold">Alex</p>
+<p class="text-slate-400 dark:text-slate-500 text-[10px]">10:28 AM</p>
+</div>
+<div class="bg-primary/10 dark:bg-primary/20 p-4 rounded-2xl rounded-bl-none flex flex-col items-center border border-primary/20">
+<span class="material-symbols-outlined text-5xl text-primary">fastfood</span>
+<p class="text-primary font-bold text-xs mt-2 uppercase tracking-wider">Hungry!</p>
+</div>
+<div class="text-sm font-normal leading-relaxed max-w-[80%] rounded-2xl rounded-bl-none px-4 py-3 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-sm border border-primary/5 mt-1">
+                        I'm coming home early. Should we order that sushi place?
+                    </div>
+</div>
+</div>
+</main>
+<!-- Mood Sticker Tray & Input -->
+<footer class="bg-white dark:bg-background-dark p-4 pt-2 border-t border-primary/10">
+<!-- Sticker Tray -->
+<div class="flex overflow-x-auto gap-3 pb-4 no-scrollbar">
+<button class="flex flex-col items-center gap-1 shrink-0 group">
+<div class="w-14 h-14 rounded-xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center text-pink-500 group-hover:scale-110 transition-transform border border-pink-200 dark:border-pink-800">
+<span class="material-symbols-outlined text-2xl">sentiment_satisfied</span>
+</div>
+<span class="text-[10px] font-medium text-slate-500 dark:text-slate-400">Need Hug</span>
+</button>
+<button class="flex flex-col items-center gap-1 shrink-0 group">
+<div class="w-14 h-14 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform border border-orange-200 dark:border-orange-800">
+<span class="material-symbols-outlined text-2xl">restaurant</span>
+</div>
+<span class="text-[10px] font-medium text-slate-500 dark:text-slate-400">Hungry</span>
+</button>
+<button class="flex flex-col items-center gap-1 shrink-0 group">
+<div class="w-14 h-14 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-500 group-hover:scale-110 transition-transform border border-indigo-200 dark:border-indigo-800">
+<span class="material-symbols-outlined text-2xl">block</span>
+</div>
+<span class="text-[10px] font-medium text-slate-500 dark:text-slate-400">Quiet Time</span>
+</button>
+<button class="flex flex-col items-center gap-1 shrink-0 group">
+<div class="w-14 h-14 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform border border-purple-200 dark:border-purple-800">
+<span class="material-symbols-outlined text-2xl">celebration</span>
+</div>
+<span class="text-[10px] font-medium text-slate-500 dark:text-slate-400">Let's Go Out</span>
+</button>
+<button class="flex flex-col items-center gap-1 shrink-0 group">
+<div class="w-14 h-14 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform border border-blue-200 dark:border-blue-800">
+<span class="material-symbols-outlined text-2xl">bedtime</span>
+</div>
+<span class="text-[10px] font-medium text-slate-500 dark:text-slate-400">Tired</span>
+</button>
+</div>
+<!-- Input Bar -->
+<div class="flex items-center gap-2">
+<button class="text-primary p-2">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<div class="flex-1 relative">
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-full px-5 py-3 text-sm focus:ring-2 focus:ring-primary/50 text-slate-800 dark:text-slate-200" placeholder="Type a message..." type="text"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-primary">
+<span class="material-symbols-outlined">mood</span>
+</button>
+</div>
+<button class="bg-primary text-white size-10 flex items-center justify-center rounded-full shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+<!-- iOS Home Indicator Spacing -->
+<div class="h-6"></div>
+</footer>
+</div>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

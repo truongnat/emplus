@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "Em Plus",
+    "slug": "emplus",
+    "scheme": "emplus",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#fff7f3"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {},
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Memory Lane - Sweet Harmony</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Nunito:wght@200..1000&amp;family=Work+Sans:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e96382",
+                        "primary-light": "#FFD1DC",
+                        "background-light": "#FFFDD0",
+                        "background-dark": "#211115",
+                        "text-main": "#5D535E",
+                        "text-muted": "#9E949E",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans", "Nunito", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"],
+                        "sans": ["Nunito", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "2xl": "2.5rem", "full": "9999px"},
+                    backgroundImage: {
+                        'pastel-gradient': 'linear-gradient(135deg, #FDE4E1 0%, #FFFDD0 50%, #E0F2F1 100%)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-sans text-text-main antialiased selection:bg-primary selection:text-white">
+<div class="relative min-h-screen w-full overflow-hidden bg-pastel-gradient">
+<!-- Header -->
+<header class="fixed top-0 z-50 w-full glass px-4 py-4 shadow-sm transition-all duration-300">
+<div class="flex items-center justify-between">
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-white/50 text-text-main transition-transform hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined text-xl">arrow_back</span>
+</button>
+<h1 class="font-serif text-2xl font-bold italic text-text-main">Memory Lane</h1>
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-white/50 text-text-main transition-transform hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined text-xl">filter_list</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="relative z-10 px-4 pb-28 pt-24">
+<!-- Central Timeline Line -->
+<div class="absolute left-1/2 top-0 h-full w-[2px] -translate-x-1/2 border-l-2 border-dashed border-primary/40 z-0"></div>
+<div class="flex flex-col space-y-12">
+<!-- Memory Item 1 (Left) -->
+<div class="relative z-10 grid grid-cols-2 gap-4">
+<div class="flex flex-col items-end pr-4 text-right">
+<div class="group relative aspect-square w-full overflow-hidden rounded-2xl shadow-lg transition-transform hover:scale-[1.02]">
+<img alt="Beach Day" class="h-full w-full object-cover" data-alt="Couple holding hands walking on a beach at sunset" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAFzDFM1nm9QMEKJ9erbhviX9jEotYQyaikOWMTFW8_zjSmbKCdYLaKQqvB0dy69faw9yN379yRJro3_xV3ulOSqSrWXCWlae1VPdpG6Eftq4gClNzkIBnN70Q5ot9eGEolvQxPJ-JoQRbP8DfDorPfUM_b1CE45oyV85ea_N7txIis6hPhuVug9VQiMjaXSlehy3KrEOMQcvSatBUPI7LEpAy5fySoclD03fUP5nzTi_xPffkL4OJjQVuIJSEl5j7zXPeSdA6RJ0"/>
+<div class="absolute bottom-2 right-2 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-primary shadow-sm backdrop-blur-sm">
+                                Aug 12
+                            </div>
+</div>
+<h3 class="mt-3 font-serif text-lg font-bold italic text-text-main">First Beach Trip</h3>
+<p class="text-sm text-text-muted">The waves were perfect.</p>
+</div>
+<div class="flex items-center pt-12 pl-1">
+<!-- Connector Dot -->
+<div class="absolute left-1/2 h-4 w-4 -translate-x-1/2 rounded-full border-4 border-white bg-primary shadow-md"></div>
+</div>
+</div>
+<!-- Memory Item 2 (Right) -->
+<div class="relative z-10 grid grid-cols-2 gap-4">
+<div class="flex items-center justify-end pt-12 pr-1">
+<!-- Connector Dot -->
+<div class="absolute left-1/2 h-4 w-4 -translate-x-1/2 rounded-full border-4 border-white bg-primary shadow-md"></div>
+</div>
+<div class="flex flex-col items-start pl-4">
+<div class="group relative aspect-square w-full overflow-hidden rounded-2xl shadow-lg transition-transform hover:scale-[1.02]">
+<img alt="Coffee Date" class="h-full w-full object-cover" data-alt="Two coffee cups on a wooden table with latte art" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZBCOuKWA4_0noZbkoQNaMQif1kL1hCtv-HPoH1c8ZiEga3a1OtY01NUTpwQwM0gN3wDxmWhIrX5UiLLjDc5Zw9HrSFWO-wEoEI5ZKxYmWoMASZtQ7OZIB3p0ZR5E7DcwbYWElBYo88M64WDKUsxjVj8-OorNbP9akUT5R3znREXJxuzx0ovGjRCDPBcm99SvENvgyhOcThghN5rz5R6XrKldAeR-sypmPzNDJRdQ5gh_e7JGN1J1G5dWdOhOu1Esz5xguO09MJAE"/>
+<div class="absolute bottom-2 left-2 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-primary shadow-sm backdrop-blur-sm">
+                                Sep 01
+                            </div>
+</div>
+<h3 class="mt-3 font-serif text-lg font-bold italic text-text-main">Sunday Rituals</h3>
+<p class="text-sm text-text-muted">Best latte in town.</p>
+</div>
+</div>
+<!-- Memory Item 3 (Left) -->
+<div class="relative z-10 grid grid-cols-2 gap-4">
+<div class="flex flex-col items-end pr-4 text-right">
+<div class="group relative aspect-square w-full overflow-hidden rounded-2xl shadow-lg transition-transform hover:scale-[1.02]">
+<img alt="New Puppy" class="h-full w-full object-cover" data-alt="Cute puppy looking at camera with head tilted" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCd59375Y0yRySXuulBStXLqLo4LQfShnkyZ2MhXoQKReW4wjuRTdOM0b0-95Dv4q_zPgk6PbgApQEY_4iI9F03O_B-B1x-q_V4dYALFPcflZ_xVgoJWMShzTOulaKYNJicbBagMaex2wvTZfqvB098_AT8RyzhEpUDIBfrlyxemUs2leUsl7N2fVbx0s2jbpPoBADM_mqMfLgqFRDj4pqMJMqJ3LC-5EzkGIgGG2yVlsYGCMqAhcEtnZHSpdXdIfrCo0bvNl5wR6g"/>
+<div class="absolute bottom-2 right-2 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-primary shadow-sm backdrop-blur-sm">
+                                Oct 15
+                            </div>
+</div>
+<h3 class="mt-3 font-serif text-lg font-bold italic text-text-main">Welcome Luna!</h3>
+<p class="text-sm text-text-muted">Our little fur baby.</p>
+</div>
+<div class="flex items-center pt-12 pl-1">
+<!-- Connector Dot -->
+<div class="absolute left-1/2 h-4 w-4 -translate-x-1/2 rounded-full border-4 border-white bg-primary shadow-md"></div>
+</div>
+</div>
+<!-- Memory Item 4 (Right) -->
+<div class="relative z-10 grid grid-cols-2 gap-4">
+<div class="flex items-center justify-end pt-12 pr-1">
+<!-- Connector Dot -->
+<div class="absolute left-1/2 h-4 w-4 -translate-x-1/2 rounded-full border-4 border-white bg-primary shadow-md"></div>
+</div>
+<div class="flex flex-col items-start pl-4">
+<div class="group relative aspect-square w-full overflow-hidden rounded-2xl shadow-lg transition-transform hover:scale-[1.02]">
+<img alt="Anniversary" class="h-full w-full object-cover" data-alt="Silhouette of couple looking at city lights at night" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRPQCbC1P4Z4d9V-zz4sZoJF-6vI7_LO6ow8kkeAGFk1Njk8QgO39rMog3KgJJ2eRlSoBm7xjQhKAPzhXqMSgNDp9tNgggo0bqQHZ8FMr7cfWOqjUYRLMG01dqm-_ALHw1dJgEq2woz6pW9tTbbAFQQuL0jkD395Tvz6ikt2pE9F7dNHgRBIpdm4K_GsXujrpVXFk_gy6sRZFkhtz4P4V1YMWDY-p7G9sdAfdIn0kNW17zY5mg59pCIFZZA590MxdBG_7SkSJJh3A"/>
+<div class="absolute bottom-2 left-2 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-primary shadow-sm backdrop-blur-sm">
+                                Nov 22
+                            </div>
+</div>
+<h3 class="mt-3 font-serif text-lg font-bold italic text-text-main">1 Year Anniversary</h3>
+<p class="text-sm text-text-muted">To many more years.</p>
+</div>
+</div>
+<!-- End of timeline indicator -->
+<div class="flex justify-center pt-8">
+<div class="flex flex-col items-center gap-2 opacity-60">
+<span class="material-symbols-outlined text-primary-light">favorite</span>
+<p class="font-serif text-sm italic text-text-muted">Where it all began</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/30 transition-transform hover:scale-110 hover:shadow-xl active:scale-95">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 z-50 w-full pb-4 px-4">
+<div class="glass flex h-16 w-full items-center justify-around rounded-2xl shadow-lg shadow-black/5">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-text-muted transition-colors hover:text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">photo_library</span>
+<span class="text-[10px] font-medium">Memories</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-text-muted transition-colors hover:text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">calendar_month</span>
+<span class="text-[10px] font-medium">Her Cycle</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-text-muted transition-colors hover:text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</div>
+</nav>
+<!-- Decorative background blurs -->
+<div class="pointer-events-none fixed -left-20 top-20 h-64 w-64 rounded-full bg-primary/20 blur-3xl filter"></div>
+<div class="pointer-events-none fixed -right-20 bottom-40 h-80 w-80 rounded-full bg-[#B2EBF2]/30 blur-3xl filter"></div>
+</div>
+</body></html>
