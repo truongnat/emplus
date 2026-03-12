@@ -24,7 +24,10 @@ import { DesignProvider } from "@/src/framework/design/design-provider";
  * AuthGuard handles the conditional routing based on authentication and pairing status.
  */
 function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { session, hydrated, isAuthenticated } = useSession();
+  const sessionCtx = useSession();
+  const session = sessionCtx.session;
+  const hydrated = sessionCtx.hydrated;
+  const isAuthenticated = sessionCtx.isAuthenticated;
   const segments = useSegments();
   const router = useRouter();
 
