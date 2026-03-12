@@ -82,11 +82,11 @@ export default function RootLayout() {
     }
 
     return (
-      <ApiContext>
-        <SafeAreaProvider>
-          <SessionProvider>
-            <AuthGuard>
-              <ToastProvider>
+      <SafeAreaProvider>
+        <SessionProvider>
+          <ToastProvider>
+            <ApiContext>
+              <AuthGuard>
                 <StatusBar style="auto" />
                 <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right', gestureEnabled: true }}>
                   <Stack.Screen name="index" />
@@ -95,11 +95,11 @@ export default function RootLayout() {
                   <Stack.Screen name="(tabs)" />
                   <Stack.Screen name="add-expense" />
                 </Stack>
-              </ToastProvider>
-            </AuthGuard>
-          </SessionProvider>
-        </SafeAreaProvider>
-      </ApiContext>
+              </AuthGuard>
+            </ApiContext>
+          </ToastProvider>
+        </SessionProvider>
+      </SafeAreaProvider>
     );
   };
 

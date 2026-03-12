@@ -42,7 +42,7 @@ const THEME_STORAGE_KEY = '@emplus:theme-preference';
 const storage = {
   getItem: async (key: string): Promise<string | null> => {
     try {
-      const AsyncStorage = await import('@react-native-async-storage/async-storage').catch(() => null);
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
       if (AsyncStorage) {
         return await AsyncStorage.getItem(key);
       }
@@ -51,10 +51,10 @@ const storage = {
     }
     return null;
   },
-  
+
   setItem: async (key: string, value: string): Promise<void> => {
     try {
-      const AsyncStorage = await import('@react-native-async-storage/async-storage').catch(() => null);
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
       if (AsyncStorage) {
         await AsyncStorage.setItem(key, value);
       }
