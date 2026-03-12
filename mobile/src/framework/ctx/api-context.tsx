@@ -28,13 +28,13 @@ const asyncStoragePersister = createAsyncStoragePersister({
 });
 
 /**
- * Custom hook to manage QueryClient with global error feedback and persistence.
+ * Custom hook to manage QueryClient with global error feedback.
  */
 function useConfiguredQueryClient() {
   const { showToast } = useToast();
 
   return useMemo(() => {
-    return new QueryClient({
+    const queryClient = new QueryClient({
       queryCache: new QueryCache({
         onError: (error) => {
           if (error instanceof ApiError) {
@@ -63,6 +63,8 @@ function useConfiguredQueryClient() {
         },
       },
     });
+    
+    return queryClient;
   }, [showToast]);
 }
 
