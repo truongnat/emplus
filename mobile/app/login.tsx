@@ -4,7 +4,7 @@ import { Redirect } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Ionicons } from "@expo/vector-icons";
-import { YStack, XStack } from 'tamagui';
+import { YStack, XStack } from 'react-native';
 
 import { 
   AppButton, AppScreen, AppText, AppCheckbox, 

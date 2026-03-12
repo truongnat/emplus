@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Image, Keyboard } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, useRouter } from "expo-router";
-import { YStack, XStack, Spinner } from 'tamagui';
+import { YStack, XStack, ActivityIndicator } from 'react-native';
 import QRCodeStyled from "react-native-qrcode-styled";
 import Animated from "react-native-reanimated";
 
@@ -82,7 +82,7 @@ export default function PairingScreen() {
                     <Image source={QR_HEART_IMAGE} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
                   </YStack>
                 </>
-              ) : <Spinner size="large" color="$primary" />}
+              ) : <ActivityIndicator color="#ec1334" />}
             </YStack>
           </YStack>
 
@@ -122,7 +122,7 @@ export default function PairingScreen() {
         </XStack>
         <AppButton onPress={() => joinMutation.mutate(joinCode)} disabled={joinMutation.isPending}>
           <XStack alignItems="center" gap="$2">
-            {joinMutation.isPending ? <Spinner color="white" /> : <><AppText color="white" fontWeight="700">Kết nối trái tim</AppText><Ionicons name="heart" size={18} color="white" /></>}
+            {joinMutation.isPending ? <ActivityIndicator color="white" /> : <><AppText color="white" fontWeight="700">Kết nối trái tim</AppText><Ionicons name="heart" size={18} color="white" /></>}
           </XStack>
         </AppButton>
       </YStack>

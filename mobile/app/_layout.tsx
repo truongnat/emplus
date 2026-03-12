@@ -83,9 +83,9 @@ export default function RootLayout() {
 
     return (
       <SafeAreaProvider>
-        <SessionProvider>
-          <ToastProvider>
-            <ApiContext>
+        <ApiContext>
+          <SessionProvider>
+            <ToastProvider>
               <AuthGuard>
                 <StatusBar style="auto" />
                 <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right', gestureEnabled: true }}>
@@ -96,9 +96,9 @@ export default function RootLayout() {
                   <Stack.Screen name="add-expense" />
                 </Stack>
               </AuthGuard>
-            </ApiContext>
-          </ToastProvider>
-        </SessionProvider>
+            </ToastProvider>
+          </SessionProvider>
+        </ApiContext>
       </SafeAreaProvider>
     );
   };
