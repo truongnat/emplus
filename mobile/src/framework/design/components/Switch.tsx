@@ -11,8 +11,6 @@ import {
   StyleSheet,
   ViewStyle,
 } from 'react-native';
-import { tokens } from '../tokens';
-import { useTheme } from '../theme-provider';
 
 interface SwitchProps {
   checked: boolean;
@@ -23,12 +21,18 @@ interface SwitchProps {
   testID?: string;
 }
 
+// Hardcoded colors to avoid circular dependency
+const COLORS = {
+  primary: '#ec1334',
+  background: '#ffffff',
+  border: '#e2e8f0',
+  text: '#0f172a',
+};
+
 export const Switch = memo(forwardRef<View, SwitchProps>(function Switch(
   { checked, onCheckedChange, disabled = false, size = 'md', style, testID },
   ref
 ) {
-  const { theme } = useTheme();
-  
   const sizeValues = {
     sm: { width: 36, height: 20, thumb: 16 },
     md: { width: 44, height: 24, thumb: 20 },
@@ -36,7 +40,7 @@ export const Switch = memo(forwardRef<View, SwitchProps>(function Switch(
   };
 
   const { width, height, thumb: thumbSize } = sizeValues[size];
-  
+
   const animatedValue = useRef(new Animated.Value(checked ? 1 : 0)).current;
 
   useEffect(() => {
@@ -69,8 +73,8 @@ export const Switch = memo(forwardRef<View, SwitchProps>(function Switch(
       width: thumbSize,
       height: thumbSize,
       borderRadius: thumbSize / 2,
-      backgroundColor: theme.colors.background,
-      shadowColor: theme.colors.text,
+      backgroundColor: COLORS.background,
+      shadowColor: COLORS.text,
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.2,
       shadowRadius: 2,
@@ -81,7 +85,7 @@ export const Switch = memo(forwardRef<View, SwitchProps>(function Switch(
   // Dynamic background color based on state
   const containerStyle = {
     ...styles.container,
-    backgroundColor: checked ? theme.colors.primary : theme.colors.border,
+    backgroundColor: checked ? COLORS.primary : COLORS.border,
   };
 
   return (

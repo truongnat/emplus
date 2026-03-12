@@ -40,8 +40,8 @@ export default function RootLayout() {
 
   return (
     <DesignProvider>
-      <ToastProvider>
-        <SessionProvider>
+      <SessionProvider>
+        <ToastProvider>
           <ApiProvider>
             <>
               <StatusBar style="auto" />
@@ -61,8 +61,8 @@ export default function RootLayout() {
               </Stack>
             </>
           </ApiProvider>
-        </SessionProvider>
-      </ToastProvider>
+        </ToastProvider>
+      </SessionProvider>
     </DesignProvider>
   );
 }
