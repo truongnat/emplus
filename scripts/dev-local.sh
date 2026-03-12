@@ -24,7 +24,13 @@ echo -e "${YELLOW}🔄 Đang kiểm tra Database Migration...${NC}"
 cd api && bun run db:migrate && cd ..
 
 # 4. Hiển thị bảng cổng dịch vụ
-bash ./scripts/ports.sh
+if [ -f "./scripts/ports.sh" ]; then
+    bash ./scripts/ports.sh
+elif [ -f "../scripts/ports.sh" ]; then
+    bash ../scripts/ports.sh
+else
+    echo "⚠️  Không tìm thấy scripts/ports.sh"
+fi
 
 # 5. Khởi động Backend API
 echo -e "${GREEN}✨ Backend API đang khởi động...${NC}"
