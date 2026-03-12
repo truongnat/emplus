@@ -126,6 +126,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
 export const useSession = () => {
   const context = useContext(SessionContext);
-  if (!context) throw new Error("useSession must be used within SessionProvider");
+  if (!context) {
+    // Return default value during SSR/hydration to prevent crash
+    return {
+      session: null,
+      hydrated: false,
+      isAuthenticated: false,
+      setSession: () => {},
+      clearSession: async () => {},
+      refreshAuth: async () => false,
+      withAccessToken: async (op: any) => op(''),
+    };
+  }
   return context;
 };
