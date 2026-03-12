@@ -1,3 +1,4 @@
+import "@tamagui/native/setup-zeego";
 import { tws } from "@/src/utils/tws";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useFonts } from "expo-font";
@@ -71,17 +72,17 @@ export default function RootLayout() {
     RobotoMono_700Bold,
   });
 
-  if (!fontsLoaded) {
-    return (
-      <View style={tws("flex-1 bg-slate-50 items-center justify-center gap-3")}>
-        <ActivityIndicator color={(palette as any).primary} />
-        <AppText variant="caption" color="slate-500">Đang tải Em Plus...</AppText>
-      </View>
-    );
-  }
+  const content = () => {
+    if (!fontsLoaded) {
+      return (
+        <View style={tws("flex-1 bg-slate-50 items-center justify-center gap-3")}>
+          <ActivityIndicator color={(palette as any).primary} />
+          <AppText variant="caption" color="slate-500">Đang tải Em Plus...</AppText>
+        </View>
+      );
+    }
 
-  return (
-    <DesignProvider>
+    return (
       <ApiContext>
         <SafeAreaProvider>
           <SessionProvider>
@@ -100,6 +101,12 @@ export default function RootLayout() {
           </SessionProvider>
         </SafeAreaProvider>
       </ApiContext>
+    );
+  };
+
+  return (
+    <DesignProvider>
+      {content()}
     </DesignProvider>
   );
 }
