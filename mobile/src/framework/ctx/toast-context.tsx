@@ -10,7 +10,14 @@ import Animated, {
   runOnJS,
   Easing
 } from "react-native-reanimated";
-import { palette, radii } from "../../theme";
+
+// Hardcoded colors to avoid circular dependency
+const TOAST_COLORS = {
+  success: { bg: "#F0FDF4", border: "#22C55E", text: "#16A34A" },
+  error: { bg: "#FEF2F2", border: "#EF4444", text: "#DC2626" },
+  warning: { bg: "#FFFBEB", border: "#F59E0B", text: "#D97706" },
+  info: { bg: "#EFF6FF", border: "#3B82F6", text: "#2563EB" },
+};
 
 export type ToastType = "success" | "error" | "warning" | "info";
 
@@ -78,39 +85,15 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const currentStyle = useMemo(() => {
     const type = toast?.type || "success";
-    const colors = palette as any;
-    switch (type) {
-      case "success":
-        return {
-          bg: colors['success-bg'] || "#F0FDF4",
-          border: colors.success || "#22C55E",
-          color: "success",
-          icon: "checkmark-circle" as const,
-        };
-      case "error":
-        return {
-          bg: colors['danger-bg'] || "#FEF2F2",
-          border: colors.danger || "#EF4444",
-          color: "danger",
-          icon: "alert-circle" as const,
-        };
-      case "warning":
-        return {
-          bg: colors['warning-bg'] || "#FFFBEB",
-          border: colors.warning || "#F59E0B",
-          color: "warning",
-          icon: "warning" as const,
-        };
-      case "info":
-        return {
-          bg: colors['info-bg'] || "#EFF6FF",
-          border: colors.info || "#3B82F6",
-          color: "info",
-          icon: "information-circle" as const,
-        };
-      default:
-        return { bg: "#F0FDF4", border: "#22C55E", color: "success", icon: "checkmark-circle" as const };
-    }
+    const colors = TOAST_COLORS[type as keyof typeof TOAST_COLORS] || TOAST_COLORS.success;
+    return {
+      bg: colors.bg,
+      border: colors.border,
+      text: colors.text,
+      icon: type === "success" ? "checkmark-circle" : 
+            type === "error" ? "alert-circle" : 
+            type === "warning" ? "warning" : "information-circle"
+    };
   }, [toast?.type]);
 
   return (
@@ -126,15 +109,15 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                 borderColor: currentStyle.border,
               }
             ]}>
-              <View style={[styles.iconContainer, { backgroundColor: (palette as any)[currentStyle.color as any] + "20" || "#00000015" }]}>
+              <View style={[styles.iconContainer, { backgroundColor: currentStyle.text + "20" || "#00000015" }]}>
                 <Ionicons
                   name={currentStyle.icon}
                   size={20}
-                  color={(palette as any)[currentStyle.color as any] || "#000"}
+                  color={currentStyle.text || "#000"}
                 />
               </View>
               <Text
-                style={[styles.text, { color: (palette as any)[currentStyle.color as any] || "#000" }]}
+                style={[styles.text, { color: currentStyle.text || "#000" }]}
                 numberOfLines={2}
               >
                 {toast.message}
@@ -154,6 +137,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 20,
     zIndex: 999999,
   },
@@ -166,7 +150,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: radii?.xl || 16,
+    borderRadius: 16,
     borderWidth: 1,
     gap: 12,
     shadowColor: "#000",
