@@ -4,7 +4,7 @@
  */
 
 import React, { ReactNode } from "react";
-import { View, StyleSheet, ViewStyle } from "react-native";
+import { View, StyleSheet, ViewStyle, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/src/theme";
 
@@ -24,18 +24,20 @@ export function AppScreen({
   const insets = useSafeAreaInsets();
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          paddingTop: insets.top,
-          backgroundColor: theme.colors.background.default,
-        },
-        style,
-      ]}
-    >
-      <View style={[styles.content, contentContainerStyle]}>{children}</View>
-    </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View
+        style={[
+          styles.container,
+          {
+            paddingTop: insets.top,
+            backgroundColor: theme.colors.background.default,
+          },
+          style,
+        ]}
+      >
+        <View style={[styles.content, contentContainerStyle]}>{children}</View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 

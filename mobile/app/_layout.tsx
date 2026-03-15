@@ -2,6 +2,11 @@ import { Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync().catch(() => {
+  /* reloading the app might cause some errors here */
+});
 import { ActivityIndicator, View, StyleSheet } from "react-native";
 import { useEffect } from "react";
 import { ThemeProvider } from "@/src/theme";
@@ -62,8 +67,8 @@ export default function RootLayout() {
     <GestureHandlerRootView style={styles.container}>
       <ThemeModeProvider>
         <ThemeProvider>
-          <SessionProvider>
-            <ToastProvider>
+          <ToastProvider>
+            <SessionProvider>
               <ApiProvider>
                 <>
                   <StatusBar style="auto" />
@@ -88,8 +93,8 @@ export default function RootLayout() {
                   </Stack>
                 </>
               </ApiProvider>
-            </ToastProvider>
-          </SessionProvider>
+            </SessionProvider>
+          </ToastProvider>
         </ThemeProvider>
       </ThemeModeProvider>
     </GestureHandlerRootView>

@@ -1,313 +1,178 @@
 /**
  * theme/themes.ts
  * ─────────────────────────────────────────────────────────────────────────────
- * Pre-built brand theme pairs.
- * Mỗi theme chỉ override những gì khác với default.
- * Pattern: createThemePair({ light: {...}, dark: {...} })
+ * Brand Theme Definitions.
+ * Focus: Premium Aura Theme (Romantic & Luxury)
  */
 
-import { createThemePair } from "./engine";
+import { createThemePair } from "./theme-builder";
 import { auraPalette } from "./aura-colors";
 
-// ─── Aura (rose/warm brand) - ROMANTIC & WARM ──────────────────────────────────
+// ─── Aura Theme (Premium Romantic Rose & Champagne Gold) ─────────────────────
 
 export const auraTheme = createThemePair({
   light: {
     colors: {
       background: {
-        default: auraPalette.blushLight,
-        subtle: auraPalette.ivoryWhite,
+        default: auraPalette.lightBg,
+        subtle: auraPalette.taupe50,
+        inverse: auraPalette.taupe900,
       },
       surface: {
-        default: auraPalette.ivoryWhite,
-        sunken: auraPalette.blushMid,
+        default: "#FFFFFF",
+        raised: "#FFFFFF",
+        overlay: "#FFFFFF",
+        sunken: auraPalette.taupe100,
       },
       text: {
-        primary: auraPalette.inkWarm,
-        secondary: auraPalette.dustyRose,
-        tertiary: auraPalette.ashRose,
-        link: auraPalette.rose400,
+        primary: auraPalette.taupe900,
+        secondary: auraPalette.taupe500,
+        tertiary: auraPalette.rose400,
+        disabled: auraPalette.taupe300,
+        inverse: "#FFFFFF",
+        link: auraPalette.rose600,
+        onBrand: "#FFFFFF",
       },
       brand: {
-        default: auraPalette.rose400,
-        subtle: auraPalette.rose200,
+        default: auraPalette.rose500,
+        subtle: auraPalette.rose100,
         muted: auraPalette.rose50,
-        strong: auraPalette.rose600,
-        text: auraPalette.rose400,
+        strong: auraPalette.rose800,
+        text: auraPalette.rose600,
       },
       border: {
-        default: "rgba(232, 84, 122, 0.10)",
-        subtle: "rgba(232, 84, 122, 0.05)",
-        strong: auraPalette.rose400,
+        default: auraPalette.taupe200,
+        subtle: auraPalette.taupe100,
+        strong: auraPalette.rose200,
+        inverse: auraPalette.taupe900,
       },
       interactive: {
-        primary: auraPalette.rose400,
-        primaryHovered: auraPalette.rose200,
+        primary: auraPalette.rose500,
+        primaryHovered: auraPalette.rose400,
         primaryPressed: auraPalette.rose600,
+        primaryDisabled: auraPalette.rose100,
+        ghost: "transparent",
+        ghostHovered: auraPalette.rose50,
+      },
+      status: {
+        error: { bg: "#FFF1F2", text: "#E11D48", border: "#FDA4AF", icon: "#E11D48" },
+        warning: { bg: "#FFFBEB", text: "#D97706", border: "#FCD34D", icon: "#D97706" },
+        success: { bg: "#ECFDF5", text: "#047857", border: "#A7F3D0", icon: "#10B981" },
+        info: { bg: "#F3E8FF", text: "#7E22CE", border: "#E9D5FF", icon: "#A855F7" },
       },
     },
   },
   dark: {
     colors: {
       background: {
-        default: auraPalette.warmBlack,
-        subtle: auraPalette.warmSurface,
+        default: auraPalette.darkBg,
+        subtle: auraPalette.taupe900,
+        inverse: auraPalette.taupe50,
       },
       surface: {
-        default: auraPalette.warmSurface,
-        sunken: auraPalette.warmPressed,
+        default: auraPalette.darkSurf,
+        raised: "#2F2327",
+        overlay: "rgba(38, 28, 32, 0.8)",
+        sunken: "#120D0F",
       },
       text: {
-        primary: auraPalette.creamWhite,
-        secondary: auraPalette.softCream,
-        tertiary: auraPalette.mutedRose,
+        primary: "#F4F0E6",
+        secondary: auraPalette.taupe400,
+        tertiary: auraPalette.rose400,
+        disabled: auraPalette.taupe600,
+        inverse: auraPalette.taupe900,
         link: auraPalette.rose400,
+        onBrand: "#FFFFFF",
       },
       brand: {
-        default: auraPalette.rose400,
-        subtle: auraPalette.rose200,
-        muted: "rgba(232, 84, 122, 0.15)",
-        strong: auraPalette.rose600,
+        default: auraPalette.rose500,
+        subtle: auraPalette.rose800,
+        muted: auraPalette.rose900,
+        strong: auraPalette.rose300,
         text: auraPalette.rose400,
       },
       border: {
-        default: "rgba(232, 84, 122, 0.20)",
-        subtle: "rgba(232, 84, 122, 0.10)",
-        strong: auraPalette.rose400,
+        default: auraPalette.darkBord,
+        subtle: "#2A2024",
+        strong: auraPalette.rose500,
+        inverse: auraPalette.taupe200,
       },
       interactive: {
-        primary: auraPalette.rose400,
-        primaryHovered: auraPalette.rose200,
+        primary: auraPalette.rose500,
+        primaryHovered: auraPalette.rose400,
         primaryPressed: auraPalette.rose600,
+        primaryDisabled: auraPalette.rose900,
+        ghost: "transparent",
+        ghostHovered: "rgba(244, 63, 94, 0.1)",
+      },
+      status: {
+        error: { bg: "#450a0a", text: "#fecaca", border: "#7f1d1d", icon: "#f87171" },
+        warning: { bg: "#451a03", text: "#fef3c7", border: "#78350f", icon: "#fbbf24" },
+        success: { bg: "#064e3b", text: "#d1fae5", border: "#065f46", icon: "#34d399" },
+        info: { bg: "#2E1065", text: "#E9D5FF", border: "#581C87", icon: "#C084FC" },
       },
     },
   },
 });
 
-// ─── Ocean (blue/cyan brand) - CALM & TRUST ───────────────────────────────────
+// ─── Telegram Theme (Classic Blue & Gray) ───────────────────────────────────
 
-export const oceanTheme = createThemePair({
+export const telegramTheme = createThemePair({
   light: {
     colors: {
       brand: {
-        default: "#0EA5E9", // sky-500: Clear ocean blue
-        subtle: "#38BDF8", // sky-400: Bright foam
-        muted: "#E0F2FE", // sky-100: Light water tint
-        strong: "#0369A1", // sky-700: Deep ocean
-        text: "#0284C7", // sky-600: Clear water
-      },
-      border: {
-        strong: "#0EA5E9",
-      },
-      text: {
-        link: "#0284C7",
+        default: "#0088CC",
+        subtle: "#0099DD",
+        muted: "#E1F5FE",
+        strong: "#0077BB",
+        text: "#0088CC",
       },
       interactive: {
-        primary: "#0EA5E9",
-        primaryHovered: "#38BDF8",
-        primaryPressed: "#0284C7",
+        primary: "#0088CC",
+        primaryHovered: "#0099DD",
+        primaryPressed: "#0077BB",
+      },
+      border: {
+        strong: "#0088CC",
+      },
+      text: {
+        link: "#0088CC",
       },
     },
   },
   dark: {
     colors: {
+      background: {
+        default: "#17212B",
+        subtle: "#0E1621",
+      },
+      surface: {
+        default: "#17212B",
+        raised: "#242F3D",
+        sunken: "#0E1621",
+      },
       brand: {
-        default: "#38BDF8", // sky-400: Glowing bioluminescence
-        subtle: "#7DD3FC", // sky-300: Soft glow
-        muted: "#082F49", // sky-950: Deep sea
-        strong: "#7DD3FC", // sky-300: Bright accent
-        text: "#38BDF8", // sky-400: Visible on dark
-      },
-      border: {
-        strong: "#38BDF8",
-      },
-      text: {
-        link: "#38BDF8",
+        default: "#2EA6FF",
+        subtle: "#54B9FF",
+        muted: "#1D354E",
+        strong: "#1D7EDD",
+        text: "#2EA6FF",
       },
       interactive: {
-        primary: "#38BDF8",
-        primaryHovered: "#7DD3FC",
-        primaryPressed: "#0EA5E9",
-      },
-    },
-  },
-});
-
-// ─── Rose (pink/red brand) - DEFAULT ──────────────────────────────────────────
-
-export const roseTheme = createThemePair({
-  light: {
-    colors: {
-      brand: {
-        default: "#F43F5E", // rose-500: Vibrant romantic red
-        subtle: "#FB7185", // rose-400: Soft hover
-        muted: "#FFE4E6", // rose-100: Light background tint
-        strong: "#BE123C", // rose-700: Deep pressed
-        text: "#E11D48", // rose-600: Text on light
+        primary: "#2EA6FF",
+        primaryHovered: "#54B9FF",
+        primaryPressed: "#1D7EDD",
       },
       border: {
-        strong: "#F43F5E",
+        default: "#0E1621",
+        subtle: "#101921",
+        strong: "#2EA6FF",
       },
       text: {
-        link: "#E11D48",
-      },
-      interactive: {
-        primary: "#F43F5E",
-        primaryHovered: "#FB7185",
-        primaryPressed: "#E11D48",
-      },
-    },
-  },
-  dark: {
-    colors: {
-      brand: {
-        default: "#FB7185", // rose-400: Brighter on dark
-        subtle: "#FDA4AF", // rose-300: Soft hover
-        muted: "#4C0519", // rose-950: Deep background
-        strong: "#FDA4AF", // rose-300: Bright pressed
-        text: "#FB7185", // rose-400: Readable on dark
-      },
-      border: {
-        strong: "#FB7185",
-      },
-      text: {
-        link: "#FB7185",
-      },
-      interactive: {
-        primary: "#FB7185",
-        primaryHovered: "#FDA4AF",
-        primaryPressed: "#F43F5E",
-      },
-    },
-  },
-});
-
-// ─── Emerald (green brand) ────────────────────────────────────────────────────
-
-export const emeraldTheme = createThemePair({
-  light: {
-    colors: {
-      brand: {
-        default: "#10B981",
-        subtle: "#34D399",
-        muted: "#D1FAE5",
-        strong: "#047857",
-        text: "#059669",
-      },
-      border: { strong: "#10B981" },
-      text: { link: "#059669" },
-      interactive: {
-        primary: "#10B981",
-        primaryHovered: "#34D399",
-        primaryPressed: "#059669",
-      },
-    },
-  },
-  dark: {
-    colors: {
-      brand: {
-        default: "#34D399",
-        subtle: "#6EE7B7",
-        muted: "#022C22",
-        strong: "#6EE7B7",
-        text: "#34D399",
-      },
-      border: { strong: "#34D399" },
-      text: { link: "#34D399" },
-      interactive: {
-        primary: "#34D399",
-        primaryHovered: "#6EE7B7",
-        primaryPressed: "#10B981",
-      },
-    },
-  },
-});
-
-// ─── Sunset (orange/coral brand) - WARM & ENERGETIC ───────────────────────────
-
-export const sunsetTheme = createThemePair({
-  light: {
-    colors: {
-      brand: {
-        default: "#F97316", // orange-500: Vibrant sunset
-        subtle: "#FB923C", // orange-400: Soft glow
-        muted: "#FFEDD5", // orange-100: Warm light
-        strong: "#C2410C", // orange-700: Deep ember
-        text: "#EA580C", // orange-600: Warm accent
-      },
-      border: {
-        strong: "#F97316",
-      },
-      text: {
-        link: "#EA580C",
-      },
-      interactive: {
-        primary: "#F97316",
-        primaryHovered: "#FB923C",
-        primaryPressed: "#EA580C",
-      },
-    },
-  },
-  dark: {
-    colors: {
-      brand: {
-        default: "#FB923C", // orange-400: Glowing ember
-        subtle: "#FDBA74", // orange-300: Soft warmth
-        muted: "#431407", // orange-950: Deep night
-        strong: "#FDBA74", // orange-300: Bright flare
-        text: "#FB923C", // orange-400: Warm on dark
-      },
-      border: {
-        strong: "#FB923C",
-      },
-      text: {
-        link: "#FB923C",
-      },
-      interactive: {
-        primary: "#FB923C",
-        primaryHovered: "#FDBA74",
-        primaryPressed: "#F97316",
-      },
-    },
-  },
-});
-
-// ─── High contrast (accessibility) ───────────────────────────────────────────
-
-export const highContrastTheme = createThemePair({
-  light: {
-    colors: {
-      text: {
-        primary: "#000000",
-        secondary: "#1A1A1A",
-        tertiary: "#333333",
-        disabled: "#767676", // WCAG AA minimum
-      },
-      border: {
-        default: "#767676",
-        strong: "#000000",
-      },
-      brand: {
-        default: "#0000EE",
-        text: "#0000EE",
-      },
-    },
-  },
-  dark: {
-    colors: {
-      text: {
-        primary: "#FFFFFF",
-        secondary: "#E5E5E5",
-        tertiary: "#CCCCCC",
-        disabled: "#888888",
-      },
-      border: {
-        default: "#888888",
-        strong: "#FFFFFF",
-      },
-      brand: {
-        default: "#6699FF",
-        text: "#99BBFF",
+        primary: "#F5F5F5",
+        secondary: "#8193A3",
+        tertiary: "#5B6C7B",
+        link: "#2EA6FF",
       },
     },
   },
@@ -316,14 +181,8 @@ export const highContrastTheme = createThemePair({
 // ─── Theme registry ───────────────────────────────────────────────────────────
 
 export const themeRegistry = {
-  default: null, // use built-in (rose)
-  telegram: roseTheme, // Telegram uses Rose as default in this implementation
   aura: auraTheme,
-  rose: roseTheme,
-  ocean: oceanTheme,
-  sunset: sunsetTheme,
-  emerald: emeraldTheme,
-  highContrast: highContrastTheme,
+  telegram: telegramTheme,
 } as const;
 
 export type ThemeName = keyof typeof themeRegistry;

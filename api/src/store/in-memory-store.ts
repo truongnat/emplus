@@ -389,6 +389,10 @@ export class InMemoryStore implements DataStore {
     return data.count;
   }
 
+  async deleteRateLimitCount(key: string): Promise<void> {
+    this.rateLimits.delete(key);
+  }
+
   async listAllUsers(): Promise<User[]> {
     return Array.from(this.users.values());
   }

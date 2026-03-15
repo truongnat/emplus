@@ -7,7 +7,13 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  TextInput,
+  Keyboard,
+  Platform,
+  KeyboardAvoidingView,
+  ScrollView,
 } from "react-native";
+
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
@@ -15,48 +21,26 @@ import { Button } from "@/src/components/atoms/Button";
 import { Input } from "@/src/components/atoms/Input";
 import { Text } from "@/src/components/atoms/Text";
 import { AuthFlowSchema, AuthFlowFields } from "@/src/forms";
-import { useAuth } from "@/src/presentation/hooks/auth";
+import { useLogin } from "@/src/presentation/hooks/auth/useLogin";
+import { useSession } from "@/src/framework/ctx/session-context";
+import { useThemeColors } from "@/src/theme";
 import { palette } from "@/src/theme/tokens";
 import { Ionicons } from "@expo/vector-icons";
-
-const APP_VERSION = "1.0.0";
-const TAP_THRESHOLD = 5;
-const TAP_RESET_TIME = 2000;
 
 export default function LoginScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const passwordRef = useRef<TextInput>(null);
 
-  // Version tap handler for developer showcase
-  const [tapCount, setTapCount] = useState(0);
-  const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { isAuthenticated, hydrated: isHydrated, session } = useSession();
+  const loginMutation = useLogin();
 
-  const handleVersionTap = useCallback(() => {
-    const newCount = tapCount + 1;
-    setTapCount(newCount);
+  const login = loginMutation.mutate;
+  const isLoggingIn = loginMutation.isPending;
+  const resetLoginError = loginMutation.reset;
 
-    if (newCount >= TAP_THRESHOLD) {
-      router.push("/theme-showcase");
-      setTapCount(0);
-      if (tapTimeoutRef.current) clearTimeout(tapTimeoutRef.current);
-    } else {
-      if (tapTimeoutRef.current) clearTimeout(tapTimeoutRef.current);
-      tapTimeoutRef.current = setTimeout(() => {
-        setTapCount(0);
-      }, TAP_RESET_TIME);
-    }
-  }, [tapCount, router]);
 
-  const {
-    isAuthenticated,
-    isHydrated,
-    session,
-    login,
-    isLoggingIn,
-    loginError: error,
-    resetLoginError,
-  } = useAuth();
-
+  const colors = useThemeColors();
   const [showPassword, setShowPassword] = useState(false);
 
   const authForm = useForm<AuthFlowFields>({
@@ -71,7 +55,9 @@ export default function LoginScreen() {
 
   const handleLogin = useMemo(() => {
     return authForm.handleSubmit((data) => {
+      Keyboard.dismiss();
       resetLoginError();
+
       login(data, {
         onSuccess: () => {
           console.log("Login successful");
@@ -84,8 +70,10 @@ export default function LoginScreen() {
     return (
       <AppScreen>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator color={palette.violet600} size="large" />
-          <Text style={styles.loadingText}>Đang tải Em Plus...</Text>
+          <ActivityIndicator color={colors.brand.default} size="large" />
+          <Text style={[styles.loadingText, { color: colors.text.tertiary }]}>
+            Đang tải Em Plus...
+          </Text>
         </View>
       </AppScreen>
     );
@@ -97,7 +85,7 @@ export default function LoginScreen() {
   }
 
   return (
-    <AppScreen scroll={false}>
+    <AppScreen style={styles.appScreen}>
       <KeyboardAwareScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -106,37 +94,40 @@ export default function LoginScreen() {
         ]}
         showsVerticalScrollIndicator={false}
         enableOnAndroid={true}
-        keyboardOpeningTime={250}
-        extraScrollHeight={20}
-        extraHeight={80}
-        bounces={false}
         keyboardShouldPersistTaps="handled"
-        automaticallyAdjustKeyboardInsets
-      >
-        {/* Header with Version Badge */}
-        <View style={styles.header}>
-          {/* Version Badge - Tap 5 times for developer showcase */}
-          <TouchableOpacity
-            style={styles.versionBadge}
-            onPress={handleVersionTap}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.versionText}>v{APP_VERSION}</Text>
-            {tapCount > 0 && (
-              <Text style={styles.tapCounter}>
-                {tapCount}/{TAP_THRESHOLD}
-              </Text>
-            )}
-          </TouchableOpacity>
+        automaticallyAdjustKeyboardInsets={true}
+        enableAutomaticScroll={true}
+        extraScrollHeight={20}
+        extraHeight={50}
+        keyboardOpeningTime={0}
 
-          <View style={styles.logoContainer}>
-            <View style={styles.logoIcon}>
-              <Ionicons name="heart" size={40} color={palette.violet600} />
+      >
+        <View style={styles.header}>
+          <View
+            style={[
+              styles.logoContainer,
+              {
+                backgroundColor: colors.brand.muted,
+                shadowColor: colors.brand.default,
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.logoIcon,
+                { backgroundColor: colors.surface.default },
+              ]}
+            >
+              <Ionicons name="heart" size={40} color={colors.brand.default} />
             </View>
           </View>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>Em Plus</Text>
-            <Text style={styles.subtitle}>Cùng nhau xây dựng tổ ấm</Text>
+            <Text style={[styles.title, { color: colors.text.primary }]}>
+              Em Plus
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
+              Cùng nhau xây dựng tổ ấm
+            </Text>
           </View>
         </View>
 
@@ -155,6 +146,9 @@ export default function LoginScreen() {
                 keyboardType="email-address"
                 autoComplete="email"
                 error={error?.message}
+                returnKeyType="next"
+                onSubmitEditing={() => passwordRef.current?.focus()}
+                blurOnSubmit={false}
               />
             )}
           />
@@ -164,20 +158,26 @@ export default function LoginScreen() {
             name="password"
             render={({ field: { onChange, value }, fieldState: { error } }) => (
               <Input
+                ref={passwordRef}
                 label="Mật khẩu"
                 placeholder="••••••••"
                 value={value}
                 onChangeText={onChange}
                 secureTextEntry={!showPassword}
                 error={error?.message}
+                autoComplete="password"
+                returnKeyType="go"
+                onSubmitEditing={handleLogin}
                 rightElement={
                   <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
                     style={{ padding: 4 }}
                   >
-                    <Text style={styles.passwordToggle}>
-                      {showPassword ? "🙈" : "👁"}
-                    </Text>
+                    <Ionicons
+                      name={showPassword ? "eye-off-outline" : "eye-outline"}
+                      size={20}
+                      color={colors.text.tertiary}
+                    />
                   </TouchableOpacity>
                 }
               />
@@ -187,11 +187,15 @@ export default function LoginScreen() {
           {/* Forgot Password Link */}
           <TouchableOpacity
             onPress={() => {
-              router.push("/verify-otp?flow=reset-password");
+              router.push("/forgot-password");
             }}
             style={styles.forgotPassword}
           >
-            <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
+            <Text
+              style={[styles.forgotPasswordText, { color: colors.brand.text }]}
+            >
+              Quên mật khẩu?
+            </Text>
           </TouchableOpacity>
 
           <Button
@@ -203,26 +207,31 @@ export default function LoginScreen() {
             size="lg"
           />
 
-          {error && (
-            <View style={styles.errorContainer}>
-              <Ionicons name="alert-circle" size={16} color={palette.red500} />
-              <Text style={styles.errorText}>{error.message}</Text>
-            </View>
-          )}
-
           {/* Sign Up Link */}
-          <View style={styles.signUpContainer}>
-            <Text style={styles.signUpLabel}>Chưa có tài khoản?</Text>
+          <View
+            style={[
+              styles.signUpContainer,
+              { borderTopColor: colors.border.subtle },
+            ]}
+          >
+            <Text
+              style={[styles.signUpLabel, { color: colors.text.secondary }]}
+            >
+              Chưa có tài khoản?
+            </Text>
             <TouchableOpacity
               onPress={() => {
-                router.push("/verify-otp?flow=register");
+                router.push("/register");
               }}
             >
-              <Text style={styles.signUpText}>Đăng ký ngay</Text>
+              <Text style={[styles.signUpText, { color: colors.brand.text }]}>
+                Đăng ký ngay
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
       </KeyboardAwareScrollView>
+
 
       {isLoggingIn && (
         <View style={styles.loadingOverlay}>
@@ -235,6 +244,15 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
+  appScreen: {
+    flex: 1,
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  navHeader: {
+    height: 56,
+  },
   loadingContainer: {
     flex: 1,
     alignItems: "center",
@@ -259,39 +277,14 @@ const styles = StyleSheet.create({
     position: "relative",
     width: "100%",
   },
-  versionBadge: {
-    position: "absolute",
-    top: 0,
-    left: 24,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: palette.violet100,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: palette.violet200,
-    zIndex: 10,
-  },
-  versionText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: palette.violet600,
-  },
-  tapCounter: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: palette.violet500,
-    textAlign: "center",
-    marginTop: 2,
-  },
+
   logoContainer: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: palette.violet100,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 24,
-    shadowColor: palette.violet600,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
@@ -330,25 +323,8 @@ const styles = StyleSheet.create({
     color: palette.violet600,
     fontWeight: "600",
   },
-  passwordToggle: {
-    fontSize: 20,
-  },
-  errorContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: palette.red50,
-    borderRadius: 12,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: palette.red500,
-  },
-  errorText: {
-    flex: 1,
-    fontSize: 13,
-    color: palette.red600,
-    fontWeight: "500",
-  },
+
+
   signUpContainer: {
     flexDirection: "row",
     justifyContent: "center",

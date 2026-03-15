@@ -5,7 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { type MemoryItem } from "@/src/api";
-import { palette } from "@/src/theme";
+import { useThemeColors, useThemeMode } from "@/src/theme";
 import { PressableScale, AppText } from "@/src/ui-kit";
 import {
   parseMediaUrls,
@@ -36,10 +36,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.6)",
   },
   paymentTextContainer: { flex: 1 },
-  paymentAmount: { fontSize: 17, fontWeight: "bold", color: palette.zinc900 },
+  paymentAmount: { fontSize: 17, fontWeight: "bold" },
   paymentMeta: { flexDirection: "row", alignItems: "center", gap: 6 },
   taskCard: { padding: 18 },
   taskHeader: {
@@ -55,7 +54,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.6)",
   },
   taskTextContainer: { flex: 1 },
   taskMeta: {
@@ -86,12 +84,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 16,
   },
-  axisLine: { flex: 1, height: 2, backgroundColor: "rgba(255,255,255,0.3)" },
+  axisLine: { flex: 1, height: 2 },
   axisTextContainer: { paddingHorizontal: 12, alignItems: "center" },
   axisText: {
     fontSize: 11,
     fontWeight: "bold",
-    color: palette.zinc400,
     textTransform: "uppercase",
     letterSpacing: 1,
   },
@@ -102,6 +99,10 @@ export const TimelineItem = React.memo(function TimelineItem({
   showAxis = false,
   onImagePress,
 }: TimelineItemProps) {
+  const colors = useThemeColors();
+  const { colorScheme } = useThemeMode();
+  const isDark = colorScheme === "dark";
+
   const mediaUrls = useMemo(
     () => parseMediaUrls(item.mediaUrls),
     [item.mediaUrls],
@@ -124,11 +125,16 @@ export const TimelineItem = React.memo(function TimelineItem({
         <View style={styles.paymentCard}>
           <View style={styles.paymentHeader}>
             <View style={styles.paymentLeft}>
-              <View style={styles.paymentIcon}>
+              <View
+                style={[
+                  styles.paymentIcon,
+                  { backgroundColor: colors.surface.sunken },
+                ]}
+              >
                 <Ionicons
                   name="card-outline"
                   size={22}
-                  color={palette.violet600}
+                  color={colors.brand.default}
                 />
               </View>
               <View style={styles.paymentTextContainer}>
@@ -137,14 +143,14 @@ export const TimelineItem = React.memo(function TimelineItem({
                   style={{
                     fontSize: 15,
                     fontWeight: "bold",
-                    color: palette.zinc900,
+                    color: colors.text.primary,
                   }}
                 >
                   {item.title}
                 </AppText>
                 <AppText
                   numberOfLines={1}
-                  style={{ fontSize: 13, color: palette.zinc400 }}
+                  style={{ fontSize: 13, color: colors.text.tertiary }}
                 >
                   Hoạt động thanh toán
                 </AppText>
@@ -154,7 +160,7 @@ export const TimelineItem = React.memo(function TimelineItem({
               style={{
                 fontSize: 11,
                 fontWeight: "bold",
-                color: palette.zinc400,
+                color: colors.text.tertiary,
                 letterSpacing: -0.5,
                 textTransform: "uppercase",
               }}
@@ -166,15 +172,19 @@ export const TimelineItem = React.memo(function TimelineItem({
             <View
               style={{
                 marginTop: 4,
-                backgroundColor: "rgba(255,255,255,0.4)",
+                backgroundColor: colors.surface.sunken,
                 padding: 14,
                 borderRadius: 16,
                 borderWidth: 1,
-                borderColor: "rgba(255,255,255,0.5)",
+                borderColor: colors.border.subtle,
               }}
             >
               <AppText
-                style={{ fontSize: 13, color: palette.zinc600, lineHeight: 19 }}
+                style={{
+                  fontSize: 13,
+                  color: colors.text.secondary,
+                  lineHeight: 19,
+                }}
               >
                 {item.description}
               </AppText>
@@ -189,11 +199,16 @@ export const TimelineItem = React.memo(function TimelineItem({
         <View style={styles.taskCard}>
           <View style={styles.taskHeader}>
             <View style={styles.taskLeft}>
-              <View style={styles.taskIcon}>
+              <View
+                style={[
+                  styles.taskIcon,
+                  { backgroundColor: colors.surface.sunken },
+                ]}
+              >
                 <Ionicons
                   name="checkmark-done"
                   size={22}
-                  color={palette.green500}
+                  color={colors.status.success.text}
                 />
               </View>
               <View style={styles.taskTextContainer}>
@@ -202,14 +217,14 @@ export const TimelineItem = React.memo(function TimelineItem({
                   style={{
                     fontSize: 15,
                     fontWeight: "bold",
-                    color: palette.zinc900,
+                    color: colors.text.primary,
                   }}
                 >
                   {item.title}
                 </AppText>
                 <AppText
                   numberOfLines={1}
-                  style={{ fontSize: 13, color: palette.zinc400 }}
+                  style={{ fontSize: 13, color: colors.text.tertiary }}
                 >
                   Nhiệm vụ hoàn tất
                 </AppText>
@@ -225,10 +240,14 @@ export const TimelineItem = React.memo(function TimelineItem({
                 gap: 6,
               }}
             >
-              <Ionicons name="time-outline" size={14} color={palette.zinc600} />
+              <Ionicons
+                name="time-outline"
+                size={14}
+                color={colors.text.tertiary}
+              />
               <AppText
                 numberOfLines={1}
-                style={{ fontSize: 13, color: palette.zinc600 }}
+                style={{ fontSize: 13, color: colors.text.secondary }}
               >
                 {item.description}
               </AppText>
@@ -267,15 +286,19 @@ export const TimelineItem = React.memo(function TimelineItem({
               style={{
                 fontSize: 15,
                 fontWeight: "bold",
-                color: palette.zinc900,
+                color: colors.text.primary,
                 lineHeight: 22,
               }}
             >
               {item.title}
             </AppText>
             <View style={styles.taskMeta}>
-              <Ionicons name="time-outline" size={14} color={palette.zinc600} />
-              <AppText style={{ fontSize: 13, color: palette.zinc600 }}>
+              <Ionicons
+                name="time-outline"
+                size={14}
+                color={colors.text.tertiary}
+              />
+              <AppText style={{ fontSize: 13, color: colors.text.secondary }}>
                 {item.description || getMemoryTime(item.createdAt)}
               </AppText>
             </View>
@@ -291,7 +314,7 @@ export const TimelineItem = React.memo(function TimelineItem({
           style={{
             fontSize: 15,
             fontWeight: "bold",
-            color: palette.zinc900,
+            color: colors.text.primary,
             lineHeight: 22,
           }}
         >
@@ -302,7 +325,7 @@ export const TimelineItem = React.memo(function TimelineItem({
             numberOfLines={3}
             style={{
               fontSize: 13,
-              color: palette.zinc600,
+              color: colors.text.secondary,
               lineHeight: 20,
               marginTop: 6,
             }}
@@ -311,8 +334,12 @@ export const TimelineItem = React.memo(function TimelineItem({
           </AppText>
         )}
         <View style={styles.taskMeta}>
-          <Ionicons name="time-outline" size={14} color={palette.zinc600} />
-          <AppText style={{ fontSize: 13, color: palette.zinc600 }}>
+          <Ionicons
+            name="time-outline"
+            size={14}
+            color={colors.text.tertiary}
+          />
+          <AppText style={{ fontSize: 13, color: colors.text.secondary }}>
             {getMemoryTime(item.createdAt)}
           </AppText>
         </View>
@@ -326,27 +353,51 @@ export const TimelineItem = React.memo(function TimelineItem({
     item,
     mediaUrls,
     handleImagePress,
+    colors,
   ]);
 
   const gradientColors = useMemo<[string, string]>(() => {
-    if (isPayment) return ["rgba(139,92,246,0.08)", "rgba(255,255,255,0.02)"];
-    if (isTask) return ["rgba(34,197,94,0.08)", "rgba(255,255,255,0.02)"];
-    return ["rgba(255,255,255,0.5)", "rgba(255,255,255,0.3)"];
-  }, [isPayment, isTask]);
+    if (isPayment) {
+      return [
+        colors.brand.muted,
+        isDark ? colors.background.default : "#FFFFFF",
+      ];
+    }
+    if (isTask) {
+      return [
+        colors.status.success.bg,
+        isDark ? colors.background.default : "#FFFFFF",
+      ];
+    }
+    return [
+      colors.surface.default,
+      isDark ? colors.background.subtle : "#FFFFFF",
+    ];
+  }, [isPayment, isTask, colors, isDark]);
 
   return (
     <>
       {showAxis && (
         <View style={styles.axisContainer}>
-          <View style={styles.axisLine} />
+          <View
+            style={[styles.axisLine, { backgroundColor: colors.border.subtle }]}
+          />
           <View style={styles.axisTextContainer}>
-            <AppText style={styles.axisText}>{getAxisMonthYear(item)}</AppText>
+            <AppText style={[styles.axisText, { color: colors.text.tertiary }]}>
+              {getAxisMonthYear(item)}
+            </AppText>
           </View>
-          <View style={styles.axisLine} />
+          <View
+            style={[styles.axisLine, { backgroundColor: colors.border.subtle }]}
+          />
         </View>
       )}
 
-      <BlurView intensity={25} tint="light" style={styles.card}>
+      <BlurView
+        intensity={isDark ? 40 : 25}
+        tint={isDark ? "dark" : "light"}
+        style={styles.card}
+      >
         <LinearGradient
           colors={gradientColors}
           start={{ x: 0, y: 0 }}

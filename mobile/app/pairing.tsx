@@ -304,6 +304,11 @@ export default function PairingScreen() {
               setJoinCode(t.toUpperCase());
               if (t.length === 6) joinMutation.mutate(t.toUpperCase());
             }}
+            returnKeyType="done"
+            onSubmitEditing={() => {
+              Keyboard.dismiss();
+              joinMutation.mutate(joinCode);
+            }}
           />
           <Ionicons name="heart-outline" size={22} color="#ec1334" />
         </View>

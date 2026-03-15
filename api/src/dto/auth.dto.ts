@@ -32,6 +32,16 @@ const verifyOtpSchema = z.object({
   otp: requiredTrimmedString("Mã OTP là bắt buộc"),
 });
 
+const forgotPasswordSchema = z.object({
+  email: emailSchema,
+});
+
+const resetPasswordSchema = z.object({
+  email: emailSchema,
+  otp: requiredTrimmedString("Mã OTP là bắt buộc"),
+  newPassword: passwordSchema,
+});
+
 const logoutSchema = z.object({
   accessToken: optionalTrimmedString(),
   refreshToken: optionalTrimmedString(),
@@ -41,6 +51,8 @@ export type RegisterDto = z.infer<typeof registerSchema>;
 export type LoginDto = z.infer<typeof loginSchema>;
 export type RefreshTokenDto = z.infer<typeof refreshTokenSchema>;
 export type VerifyOtpDto = z.infer<typeof verifyOtpSchema>;
+export type ForgotPasswordDto = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;
 export type LogoutDto = z.infer<typeof logoutSchema>;
 
 export function validateRegisterInput(input: unknown): RegisterDto {
@@ -64,6 +76,18 @@ export function validateRefreshTokenInput(input: unknown): RefreshTokenDto {
 export function validateVerifyOtpInput(input: unknown): VerifyOtpDto {
   return parseWithSchema(verifyOtpSchema, input, {
     message: "Dữ liệu xác minh OTP không hợp lệ.",
+  });
+}
+
+export function validateForgotPasswordInput(input: unknown): ForgotPasswordDto {
+  return parseWithSchema(forgotPasswordSchema, input, {
+    message: "Dữ liệu yêu cầu quên mật khẩu không hợp lệ.",
+  });
+}
+
+export function validateResetPasswordInput(input: unknown): ResetPasswordDto {
+  return parseWithSchema(resetPasswordSchema, input, {
+    message: "Dữ liệu đặt lại mật khẩu không hợp lệ.",
   });
 }
 

@@ -46,6 +46,9 @@ export default function AddExpenseScreen() {
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const amountInputRef = useRef<TextInput>(null);
+  const descriptionInputRef = useRef<TextInput>(null);
+  const dateInputRef = useRef<TextInput>(null);
+
 
   const { mutate: createExpense, isPending } = useMutation({
     mutationFn: (data: any) =>
@@ -101,9 +104,13 @@ export default function AddExpenseScreen() {
               onChangeText={setAmount}
               placeholder="0 ₫"
               placeholderTextColor={palette.zinc400}
-              keyboardType="decimal-pad"
-              returnKeyType="done"
-              blurOnSubmit={true}
+              keyboardType="numeric"
+              returnKeyType="next"
+              onSubmitEditing={() => {
+                // Focus description after clicking next on amount
+                descriptionInputRef.current?.focus();
+              }}
+              blurOnSubmit={false}
             />
           </View>
 
@@ -168,6 +175,7 @@ export default function AddExpenseScreen() {
                   color={palette.zinc600}
                 />
                 <TextInput
+                  ref={descriptionInputRef}
                   style={styles.fieldInput}
                   placeholder="Nhập ghi chú..."
                   placeholderTextColor={palette.zinc400}
@@ -175,7 +183,9 @@ export default function AddExpenseScreen() {
                   onChangeText={setDescription}
                   onFocus={() => setFocusedField("description")}
                   onBlur={() => setFocusedField(null)}
-                  returnKeyType="done"
+                  returnKeyType="next"
+                  onSubmitEditing={() => dateInputRef.current?.focus()}
+                  blurOnSubmit={false}
                 />
               </View>
             </Card>
@@ -192,6 +202,7 @@ export default function AddExpenseScreen() {
                   color={palette.zinc600}
                 />
                 <TextInput
+                  ref={dateInputRef}
                   style={styles.fieldInput}
                   placeholder="YYYY-MM-DD"
                   placeholderTextColor={palette.zinc400}
@@ -200,6 +211,7 @@ export default function AddExpenseScreen() {
                   onFocus={() => setFocusedField("date")}
                   onBlur={() => setFocusedField(null)}
                   returnKeyType="done"
+                  onSubmitEditing={handleSubmit}
                 />
               </View>
             </Card>

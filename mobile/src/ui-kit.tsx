@@ -11,7 +11,7 @@ import { Card } from "./components/molecules/Card";
 // Atoms
 export { Button, type ButtonProps } from "./components/atoms/Button";
 export { Input, type InputProps } from "./components/atoms/Input";
-export { Text, AppText, type TextProps } from "./components/atoms/Text";
+export { Text, type TextProps } from "./components/atoms/Text";
 export { Switch, type SwitchProps } from "./components/atoms/Switch";
 export { Avatar, type AvatarProps } from "./components/atoms/Avatar";
 export {
@@ -51,6 +51,7 @@ export type {
 } from "./components/organisms/AnimatedFlatList";
 
 // Aliases for backward compatibility
+export { Text as AppText } from "./components/atoms/Text";
 export const AppButton = Button;
 export const Reveal = ({
   children,

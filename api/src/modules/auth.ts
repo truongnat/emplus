@@ -8,6 +8,8 @@ import {
   verifyOtpAndLogin,
   refreshToken,
   logout,
+  requestPasswordReset,
+  resetPassword,
 } from "../services/auth.service.ts";
 import {
   validateRegisterInput,
@@ -15,6 +17,8 @@ import {
   validateRefreshTokenInput,
   validateVerifyOtpInput,
   validateLogoutInput,
+  validateForgotPasswordInput,
+  validateResetPasswordInput,
 } from "../dto/auth.dto.ts";
 import { success } from "../utils/http.ts";
 
@@ -49,6 +53,22 @@ authRoutes.post("/refresh", async (context) => {
   const input = validateRefreshTokenInput(body);
 
   const payload = await refreshToken(input.refreshToken);
+  return success(context, payload);
+});
+
+authRoutes.post("/forgot-password", async (context) => {
+  const body = await readJson<Record<string, unknown>>(context);
+  const input = validateForgotPasswordInput(body);
+
+  const payload = await requestPasswordReset(input.email);
+  return success(context, payload);
+});
+
+authRoutes.post("/reset-password", async (context) => {
+  const body = await readJson<Record<string, unknown>>(context);
+  const input = validateResetPasswordInput(body);
+
+  const payload = await resetPassword(input.email, input.otp, input.newPassword);
   return success(context, payload);
 });
 

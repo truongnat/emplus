@@ -13,7 +13,7 @@ import React, {
 import { useColorScheme } from "react-native";
 
 export type ColorScheme = "light" | "dark" | null;
-export type ThemeName = "telegram" | "aura" | "rose" | "ocean" | "sunset" | "emerald";
+export type ThemeName = "aura" | "telegram";
 
 interface ThemeModeContextType {
   colorScheme: ColorScheme;
@@ -31,7 +31,7 @@ const ThemeModeContext = createContext<ThemeModeContextType | undefined>(
 export function ThemeModeProvider({ children }: { children: ReactNode }) {
   const systemColorScheme = useColorScheme();
   const [manualColorScheme, setManualColorScheme] = useState<ColorScheme>(null);
-  const [themeName, setThemeName] = useState<ThemeName>("telegram");
+  const [themeName, setThemeName] = useState<ThemeName>("aura");
 
   // Use manual override if set, otherwise use system
   const colorScheme: ColorScheme =

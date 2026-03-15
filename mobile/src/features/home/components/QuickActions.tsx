@@ -3,7 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { PressableScale, Reveal, AppText } from "@/src/ui-kit";
-import { palette } from "@/src/theme";
+import { palette, useThemeColors } from "@/src/theme";
 
 interface QuickActionsProps {
   cycleLabel: string;
@@ -43,6 +43,7 @@ export const QuickActions = React.memo(function QuickActions({
   nextDateLabel,
 }: QuickActionsProps) {
   const router = useRouter();
+  const { brand } = useThemeColors();
 
   const handleCarePress = useCallback(() => {
     router.push("/care");
@@ -61,11 +62,7 @@ export const QuickActions = React.memo(function QuickActions({
           onPress={handleCarePress}
         >
           <View style={styles.iconContainer}>
-            <Ionicons
-              name="happy-outline"
-              size={22}
-              color={palette.violet600}
-            />
+            <Ionicons name="happy-outline" size={22} color={brand.default} />
           </View>
           <View style={styles.textContainer}>
             <AppText
@@ -102,7 +99,7 @@ export const QuickActions = React.memo(function QuickActions({
             <Ionicons
               name="calendar-outline"
               size={22}
-              color={palette.violet600}
+              color={brand.default}
             />
           </View>
           <View style={styles.textContainer}>

@@ -24,6 +24,7 @@ export interface TextProps {
   color?: TextColor;
   style?: TextStyle | TextStyle[];
   numberOfLines?: number;
+  onPress?: () => void;
 }
 
 export function Text({
@@ -32,6 +33,7 @@ export function Text({
   color,
   style,
   numberOfLines,
+  onPress,
 }: TextProps) {
   const theme = useTheme();
 
@@ -52,6 +54,7 @@ export function Text({
     <RNText
       style={[styles[variant], dynamicStyles.text, style]}
       numberOfLines={numberOfLines}
+      onPress={onPress}
     >
       {children}
     </RNText>

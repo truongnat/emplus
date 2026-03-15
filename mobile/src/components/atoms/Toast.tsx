@@ -24,11 +24,10 @@ import Animated, {
   useSharedValue,
   withTiming,
   runOnJS,
-  SharedValue,
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTheme, Theme } from "../../theme";
+import { Theme, useTheme } from "@/src/theme/engine";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -77,21 +76,13 @@ class ToastStore {
   }
 
   private notify() {
-    console.log("🍞 Store NOTIFY:", this.listeners.size, "listeners");
     this.listeners.forEach((fn) => {
-      console.log("🍞 Store NOTIFY listener:", fn.name);
       fn([...this.toasts]);
     });
   }
 
   add(config: ToastConfig): string {
     const id = config.id ?? `toast-${++this.counter}`;
-    console.log("🍞 Store ADD:", {
-      id,
-      message: config.message,
-      position: config.position,
-      duration: config.duration,
-    });
 
     const item: ToastItem = {
       id,
@@ -107,24 +98,16 @@ class ToastStore {
       createdAt: Date.now(),
     };
 
-    console.log("🍞 Store ITEM created:", {
-      id: item.id,
-      duration: item.duration,
-      position: item.position,
-    });
-
     if (config.replace && config.id) {
       const existingIdx = this.toasts.findIndex((t) => t.id === id);
       if (existingIdx !== -1) {
         this.toasts[existingIdx] = item;
-        console.log("🍞 Store REPLACE:", id);
         this.notify();
         return id;
       }
     }
 
     this.toasts.push(item);
-    console.log("🍞 Store PUSH:", id, "total:", this.toasts.length);
     this.notify();
     return id;
   }
@@ -217,36 +200,18 @@ function ToastItemView({
   const translateY = useSharedValue(0);
   const opacity = useSharedValue(1);
 
-  // Create refs only once using useMemo
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pausedAt = useRef<number | null>(null);
   const remaining = useRef<number>(item.duration);
   const isPersistent = useMemo(() => item.duration === 0, [item.duration]);
 
-  // Initialize remaining only once
   useEffect(() => {
     remaining.current = item.duration;
-    console.log("🍞 ToastItemView INIT remaining:", remaining.current);
   }, [item.duration]);
 
-  console.log("🍞 ToastItemView INIT:", {
-    id: item.id,
-    duration: item.duration,
-    isPersistent,
-    remaining: remaining.current,
-  });
-
   const startTimer = useCallback(() => {
-    console.log("🍞 ToastItemView startTimer:", {
-      id: item.id,
-      isPersistent,
-      remaining: remaining.current,
-      shouldSkip: isPersistent || remaining.current <= 0,
-    });
-
     if (isPersistent || remaining.current <= 0) return;
     timerRef.current = setTimeout(() => {
-      console.log("🍞 ToastItemView TIMEOUT:", item.id);
       store.remove(item.id);
     }, remaining.current);
   }, [item.id, isPersistent]);
@@ -267,10 +232,8 @@ function ToastItemView({
   }, [startTimer]);
 
   useEffect(() => {
-    console.log("🍞 ToastItemView useEffect START");
     startTimer();
     return () => {
-      console.log("🍞 ToastItemView useEffect CLEANUP");
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [startTimer]);
@@ -317,14 +280,6 @@ function ToastItemView({
     ],
     opacity: opacity.value,
   }));
-
-  const enterAnimation = useMemo(() => {
-    return SlideInDown.duration(300).springify().damping(15).stiffness(300);
-  }, []);
-
-  const exitAnimation = useMemo(() => {
-    return SlideOutDown.duration(250).easing(Easing.bezier(0.25, 0.1, 0.25, 1));
-  }, []);
 
   const entering =
     position === "top"
@@ -388,68 +343,31 @@ function ToastItemView({
   );
 }
 
-function TimerBar({
-  duration,
-  color,
-  paused,
-}: {
-  duration: number;
-  color: string;
-  paused: boolean;
-}) {
-  const width = useSharedValue(100);
-
-  useEffect(() => {
-    if (!paused) {
-      width.value = withTiming(0, {
-        duration,
-        easing: Easing.linear,
-      });
-    }
-  }, [duration, paused]);
-
-  const barStyle = useAnimatedStyle(() => ({
-    width: `${width.value}%`,
-  }));
-
-  return (
-    <View style={styles.timerBarBg}>
-      <Animated.View
-        style={[styles.timerBar, { backgroundColor: color }, barStyle]}
-      />
-    </View>
-  );
-}
-
 function getVariantStyle(variant: ToastVariant, theme: Theme) {
   switch (variant) {
     case "success":
       return {
-        bg: "#30D158", // iOS green - solid, opaque
+        bg: "#30D158",
         textColor: "#FFFFFF",
-        barColor: "#FFFFFF",
         iconChar: "✓",
       };
     case "error":
       return {
-        bg: "#FF3B30", // iOS red - solid, opaque
+        bg: "#FF3B30",
         textColor: "#FFFFFF",
-        barColor: "#FFFFFF",
         iconChar: "✕",
       };
     case "warning":
       return {
-        bg: "#FF9500", // iOS orange - solid, opaque
+        bg: "#FF9500",
         textColor: "#FFFFFF",
-        barColor: "#FFFFFF",
         iconChar: "⚠",
       };
     case "info":
     default:
       return {
-        bg: "#0A84FF", // iOS blue - solid, opaque
+        bg: "#0A84FF",
         textColor: "#FFFFFF",
-        barColor: "#FFFFFF",
         iconChar: "ℹ",
       };
   }
@@ -464,25 +382,14 @@ export function ToastContainer({ maxVisible = 3 }: { maxVisible?: number }) {
 
   useEffect(() => {
     const unsub = store.subscribe(setToasts);
-    console.log("🍞 ToastContainer: subscribed to store");
     return () => {
-      console.log("🍞 ToastContainer: unsubscribed");
       unsub();
     };
   }, []);
 
-  useEffect(() => {
-    console.log("🍞 ToastContainer toasts changed:", toasts.length);
-    toasts.forEach((t) => {
-      console.log("  - Toast:", t.message, t.position);
-    });
-  }, [toasts]);
-
-  // Default to top position if not specified
   const topToasts = toasts
     .filter((t) => t.position !== "bottom")
     .slice(-maxVisible);
-  console.log("🍞 Top toasts to render:", topToasts.length);
 
   return (
     <>
@@ -548,19 +455,4 @@ const styles = StyleSheet.create({
   textContainer: { flex: 1, gap: 2 },
   messageText: { fontSize: 14, fontWeight: "600", lineHeight: 20 },
   descriptionText: { fontSize: 12, lineHeight: 16 },
-  actionButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: "rgba(255,255,255,0.15)",
-  },
-  actionText: { fontSize: 13, fontWeight: "600" },
-  dismissButton: { padding: 4 },
-  dismissIcon: { fontSize: 14 },
-  timerBarBg: {
-    height: 3,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    overflow: "hidden",
-  },
-  timerBar: { height: "100%", borderRadius: 1.5 },
 });

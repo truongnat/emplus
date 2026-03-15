@@ -4,7 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { PulseStar } from "./HomeDecorations";
 import { NumberTicker, ClockTicker } from "./HomeClock";
-import { palette } from "@/src/theme";
+import { palette, useThemeColors } from "@/src/theme";
 import { AppText } from "@/src/ui-kit";
 
 interface HeroCardProps {
@@ -28,16 +28,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     inset: 0,
     backgroundColor: "rgba(255,255,255,0.45)",
-  },
-  subtitle: {
-    fontSize: 13,
-    fontWeight: "bold",
-    color: palette.violet600,
-    letterSpacing: 2,
-    marginBottom: 8,
-    zIndex: 10,
-    opacity: 0.8,
-    textTransform: "uppercase",
   },
   tickerContainer: { position: "relative", marginBottom: 4, zIndex: 10 },
   badge: {
@@ -73,18 +63,33 @@ export const HeroCard = React.memo(function HeroCard({
   loveDays,
   startDateLabel,
 }: HeroCardProps) {
+  const { brand } = useThemeColors();
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
         <LinearGradient
-          colors={[palette.violet600, palette.violet800]}
+          colors={[brand.default, brand.strong]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradient}
         />
         <View style={styles.overlay} />
 
-        <AppText style={styles.subtitle}>NGÀY TRỌNG ĐẠI</AppText>
+        <AppText
+          style={{
+            fontSize: 13,
+            fontWeight: "bold",
+            color: brand.default,
+            letterSpacing: 2,
+            marginBottom: 8,
+            zIndex: 10,
+            opacity: 0.8,
+            textTransform: "uppercase",
+          }}
+        >
+          NGÀY TRỌNG ĐẠI
+        </AppText>
         <View style={styles.tickerContainer}>
           <PulseStar
             right={-30}
@@ -98,7 +103,7 @@ export const HeroCard = React.memo(function HeroCard({
             left={-20}
             bottom={10}
             size={24}
-            color={palette.violet100}
+            color={brand.muted}
             delay={600}
             icon="star"
           />
@@ -118,11 +123,7 @@ export const HeroCard = React.memo(function HeroCard({
         <AppText style={styles.title}>Ngày cho đến Mãi mãi</AppText>
 
         <View style={styles.dateContainer}>
-          <Ionicons
-            name="calendar-outline"
-            size={14}
-            color={palette.violet600}
-          />
+          <Ionicons name="calendar-outline" size={14} color={brand.default} />
           <AppText
             style={{ fontSize: 13, fontWeight: "bold", color: palette.zinc800 }}
           >
@@ -133,3 +134,4 @@ export const HeroCard = React.memo(function HeroCard({
     </View>
   );
 });
+

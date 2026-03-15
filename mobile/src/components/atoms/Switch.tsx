@@ -118,3 +118,4 @@ export const Switch = memo(
     );
   }),
 );
+export default Switch;
