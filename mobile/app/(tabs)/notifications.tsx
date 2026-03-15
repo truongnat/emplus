@@ -23,8 +23,8 @@ export default function NotificationsScreen() {
   const { session } = useSession();
 
   const partnerName = useMemo(() => {
-    return !!session?.user.coupleId ? "Leo" : "Bạn đồng hành";
-  }, [!!session?.user.coupleId]);
+    return !!session?.user?.coupleId ? "Leo" : "Bạn đồng hành";
+  }, [!!session?.user?.coupleId]);
 
   const notifications: NotificationItem[] = [
     {

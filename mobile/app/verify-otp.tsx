@@ -57,7 +57,7 @@ export default function VerifyOtpScreen() {
         });
       } else {
         setSession(session);
-        router.replace(!!session.user.coupleId ? "/(tabs)/home" : "/pairing");
+        router.replace(!!session?.user?.coupleId ? "/(tabs)/home" : "/pairing");
       }
     },
     onError: (err) => {

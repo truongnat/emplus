@@ -132,16 +132,15 @@
       },
       "AuthResponse": {
         "type": "object",
-        "required": [
-          "user",
-          "tokens"
-        ],
         "properties": {
           "user": {
             "$ref": "#/components/schemas/User"
           },
           "tokens": {
             "$ref": "#/components/schemas/TokenPair"
+          },
+          "requiresOTP": {
+            "type": "boolean"
           }
         }
       },

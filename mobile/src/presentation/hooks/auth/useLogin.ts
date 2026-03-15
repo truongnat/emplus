@@ -35,9 +35,11 @@ export function useLogin(options: UseLoginOptions = {}) {
   return useMutation<AuthModule.LoginResponse, Error, AuthModule.LoginRequest>({
     mutationFn: (params) => dependencies.auth.login.execute(params),
     onSuccess: (data) => {
-      setSession(data);
-      if (showToast) {
-        toast("Đăng nhập thành công", "success");
+      if (data.tokens) {
+        setSession(data);
+        if (showToast) {
+          toast("Đăng nhập thành công", "success");
+        }
       }
       onSuccess?.(data);
     },

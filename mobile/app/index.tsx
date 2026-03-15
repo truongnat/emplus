@@ -64,7 +64,7 @@ export default function Index() {
     return <Redirect href="/login" />;
   }
 
-  if (!session?.user.coupleId) {
+  if (!session?.user?.coupleId) {
     return <Redirect href="/pairing" />;
   }
 

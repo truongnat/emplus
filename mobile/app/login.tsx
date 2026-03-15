@@ -59,8 +59,16 @@ export default function LoginScreen() {
       resetLoginError();
 
       login(data, {
-        onSuccess: () => {
-          console.log("Login successful");
+        onSuccess: (response) => {
+          if (response.requiresOTP) {
+            console.log("OTP verification required, redirecting...");
+            router.push({
+              pathname: "/verify-otp",
+              params: { email: data.email },
+            });
+          } else {
+            console.log("Login successful");
+          }
         },
       });
     });

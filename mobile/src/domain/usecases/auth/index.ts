@@ -5,7 +5,7 @@ import { AuthRepository } from "../../repositories/auth.repository";
  * Use Case xử lý đăng nhập.
  */
 export class LoginUseCase {
-  constructor(private authRepository: AuthRepository) {}
+  constructor(private authRepository: AuthRepository) { }
 
   async execute(
     params: AuthModule.LoginRequest,
@@ -18,7 +18,7 @@ export class LoginUseCase {
  * Use Case xử lý đăng ký.
  */
 export class RegisterUseCase {
-  constructor(private authRepository: AuthRepository) {}
+  constructor(private authRepository: AuthRepository) { }
 
   async execute(
     params: AuthModule.RegisterRequest,
@@ -31,9 +31,22 @@ export class RegisterUseCase {
  * Use Case làm mới phiên đăng nhập.
  */
 export class RefreshSessionUseCase {
-  constructor(private authRepository: AuthRepository) {}
+  constructor(private authRepository: AuthRepository) { }
 
   async execute(refreshToken: string): Promise<AuthModule.RefreshResponse> {
     return this.authRepository.refresh({ refreshToken });
+  }
+}
+
+/**
+ * Use Case xác thực OTP.
+ */
+export class VerifyOtpUseCase {
+  constructor(private authRepository: AuthRepository) { }
+
+  async execute(
+    params: AuthModule.VerifyOtpRequest,
+  ): Promise<AuthModule.VerifyOtpResponse> {
+    return this.authRepository.verifyOtp(params);
   }
 }

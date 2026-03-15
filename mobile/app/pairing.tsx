@@ -131,7 +131,7 @@ export default function PairingScreen() {
       if (session)
         setSession({
           ...session,
-          user: { ...session.user, coupleId: res.coupleId },
+          user: session.user ? { ...session.user, coupleId: res.coupleId } : undefined,
         });
       Keyboard.dismiss();
       router.replace("/(tabs)/home");

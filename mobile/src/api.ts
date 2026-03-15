@@ -9,7 +9,7 @@ export const registerWithEmail = (data: any) =>
   dependencies.auth.register.execute(data);
 export const refreshAuthSession = (token: string) =>
   dependencies.auth.refresh.execute(token);
-export const verifyOTP = (data: any) => dependencies.auth.login.execute(data);
+export const verifyOTP = (data: any) => dependencies.auth.verifyOtp.execute(data);
 
 export const generateInvite = () =>
   dependencies.couple.generateInvite.execute();

@@ -23,4 +23,11 @@ export interface AuthRepository {
   refresh(
     params: AuthModule.RefreshRequest,
   ): Promise<AuthModule.RefreshResponse>;
+
+  /**
+   * Verifies the OTP and logs the user in.
+   */
+  verifyOtp(
+    params: AuthModule.VerifyOtpRequest,
+  ): Promise<AuthModule.VerifyOtpResponse>;
 }

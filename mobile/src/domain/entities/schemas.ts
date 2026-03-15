@@ -208,6 +208,64 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v1/auth/verify-otp": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Xác thực OTP và đăng nhập */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /** Format: email */
+            email: string;
+            otp: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Xác thực thành công */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AuthResponse"];
+          };
+        };
+        /** @description Dữ liệu không hợp lệ */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Mã OTP không hợp lệ hoặc đã hết hạn */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v1/auth/refresh": {
     parameters: {
       query?: never;
@@ -909,8 +967,9 @@ export interface components {
       expiresIn: number;
     };
     AuthResponse: {
-      user: components["schemas"]["User"];
-      tokens: components["schemas"]["TokenPair"];
+      user?: components["schemas"]["User"];
+      tokens?: components["schemas"]["TokenPair"];
+      requiresOTP?: boolean;
     };
     Couple: {
       /** Format: uuid */
@@ -1042,10 +1101,10 @@ export type ApiResponse<
 }
   ? T
   : paths[P][M] extends {
-        responses: { 201: { content: { "application/json": infer T } } };
-      }
-    ? T
-    : unknown;
+    responses: { 201: { content: { "application/json": infer T } } };
+  }
+  ? T
+  : unknown;
 
 export type ApiRequest<
   P extends ApiPaths,
@@ -1073,6 +1132,9 @@ export namespace AuthModule {
 
   export type RefreshRequest = ApiRequest<"/v1/auth/refresh", "post">;
   export type RefreshResponse = ApiResponse<"/v1/auth/refresh", "post">;
+
+  export type VerifyOtpRequest = ApiRequest<"/v1/auth/verify-otp", "post">;
+  export type VerifyOtpResponse = ApiResponse<"/v1/auth/verify-otp", "post">;
 }
 
 export namespace CoupleModule {
