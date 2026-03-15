@@ -3,6 +3,10 @@
 Tất cả các thay đổi đáng chú ý đối với dự án này sẽ được ghi lại trong tệp này.
 
 ## [Unreleased]
+- **fix(mobile):** Sửa lỗi crash app khi vuốt để xóa Toast (sử dụng `runOnJS` đúng cách).
+- **fix(mobile):** Sửa lỗi Dark Mode không hoạt động đồng bộ với brand themes (Telegram/Aura).
+- **refactor(mobile):** Hợp nhất hệ thống quản lý theme vào `ThemeModeProvider` và `ThemeProvider`.
+- **feat(mobile):** Bổ sung đầy đủ Semantic Tokens cho Aura Theme.
 - **feat(mobile):** Cài đặt các package Expo cốt lõi cho business (ImagePicker, Notifications, AuthSession, v.v.).
 - **feat(mobile):** Bổ sung tiện ích `expo-helpers` để đơn giản hóa việc sử dụng các API native của Expo.
 - **feat(mobile):** Tích hợp tính năng chọn ảnh (Pick Image) vào màn hình Dòng thời gian (Timeline).

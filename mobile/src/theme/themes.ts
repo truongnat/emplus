@@ -7,6 +7,82 @@
  */
 
 import { createThemePair } from "./engine";
+import { auraPalette } from "./aura-colors";
+
+// ─── Aura (rose/warm brand) - ROMANTIC & WARM ──────────────────────────────────
+
+export const auraTheme = createThemePair({
+  light: {
+    colors: {
+      background: {
+        default: auraPalette.blushLight,
+        subtle: auraPalette.ivoryWhite,
+      },
+      surface: {
+        default: auraPalette.ivoryWhite,
+        sunken: auraPalette.blushMid,
+      },
+      text: {
+        primary: auraPalette.inkWarm,
+        secondary: auraPalette.dustyRose,
+        tertiary: auraPalette.ashRose,
+        link: auraPalette.rose400,
+      },
+      brand: {
+        default: auraPalette.rose400,
+        subtle: auraPalette.rose200,
+        muted: auraPalette.rose50,
+        strong: auraPalette.rose600,
+        text: auraPalette.rose400,
+      },
+      border: {
+        default: "rgba(232, 84, 122, 0.10)",
+        subtle: "rgba(232, 84, 122, 0.05)",
+        strong: auraPalette.rose400,
+      },
+      interactive: {
+        primary: auraPalette.rose400,
+        primaryHovered: auraPalette.rose200,
+        primaryPressed: auraPalette.rose600,
+      },
+    },
+  },
+  dark: {
+    colors: {
+      background: {
+        default: auraPalette.warmBlack,
+        subtle: auraPalette.warmSurface,
+      },
+      surface: {
+        default: auraPalette.warmSurface,
+        sunken: auraPalette.warmPressed,
+      },
+      text: {
+        primary: auraPalette.creamWhite,
+        secondary: auraPalette.softCream,
+        tertiary: auraPalette.mutedRose,
+        link: auraPalette.rose400,
+      },
+      brand: {
+        default: auraPalette.rose400,
+        subtle: auraPalette.rose200,
+        muted: "rgba(232, 84, 122, 0.15)",
+        strong: auraPalette.rose600,
+        text: auraPalette.rose400,
+      },
+      border: {
+        default: "rgba(232, 84, 122, 0.20)",
+        subtle: "rgba(232, 84, 122, 0.10)",
+        strong: auraPalette.rose400,
+      },
+      interactive: {
+        primary: auraPalette.rose400,
+        primaryHovered: auraPalette.rose200,
+        primaryPressed: auraPalette.rose600,
+      },
+    },
+  },
+});
 
 // ─── Ocean (blue/cyan brand) - CALM & TRUST ───────────────────────────────────
 
@@ -241,10 +317,12 @@ export const highContrastTheme = createThemePair({
 
 export const themeRegistry = {
   default: null, // use built-in (rose)
-  rose: roseTheme, // Romantic red/pink
-  ocean: oceanTheme, // Calm blue/cyan
-  sunset: sunsetTheme, // Warm orange/coral
-  emerald: emeraldTheme, // Fresh green
+  telegram: roseTheme, // Telegram uses Rose as default in this implementation
+  aura: auraTheme,
+  rose: roseTheme,
+  ocean: oceanTheme,
+  sunset: sunsetTheme,
+  emerald: emeraldTheme,
   highContrast: highContrastTheme,
 } as const;
 

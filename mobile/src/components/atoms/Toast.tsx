@@ -297,7 +297,7 @@ function ToastItemView({
         const dir = e.translationX > 0 ? 1 : -1;
         translateX.value = withTiming(dir * 500, { duration: 200 });
         opacity.value = withTiming(0, { duration: 180 }, () => {
-          runOnJS(store.remove.bind(store))(item.id);
+          runOnJS(toast.dismiss)(item.id);
         });
       } else {
         translateX.value = withTiming(0, {
