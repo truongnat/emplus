@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Em Plus",
-    "slug": "emplus",
+    "slug": "em-plus",
     "scheme": "emplus",
     "version": "0.1.0",
     "orientation": "portrait",
@@ -32,9 +32,23 @@
         }
       ]
     },
-    "plugins": ["expo-router", "expo-font", "expo-secure-store"],
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-secure-store",
+      "expo-localization",
+      "expo-web-browser",
+      "expo-sharing"
+    ],
     "web": {
       "bundler": "metro"
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "2267f4e9-6807-4c95-b08b-c07e96dab3aa"
+      }
+    },
+    "owner": "truongdq"
   }
 }

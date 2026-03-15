@@ -1,8 +1,9 @@
 import { tws } from "@/src/utils/tws";
 
 import React from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
-import { AppText, PressableScale } from "@/src/ui-kit";
+import { View, ScrollView, Alert } from "react-native";
+import { AppText, PressableScale, pickImage } from "@/src/ui-kit";
+import { Plus } from "lucide-react-native";
 
 export interface FilterChip {
   id: string;
@@ -27,13 +28,37 @@ export function TimelineHeader({
   setActiveFilter,
   filters = DEFAULT_FILTERS,
 }: TimelineHeaderProps) {
+  const handleAddMemory = async () => {
+    try {
+      const asset = await pickImage();
+      if (asset) {
+        // Logic to upload/save memory would go here
+        Alert.alert(
+          "Thành công",
+          `Đã chọn ảnh: ${asset.fileName || "ảnh mới"}`,
+        );
+      }
+    } catch (error: any) {
+      Alert.alert("Lỗi", error.message);
+    }
+  };
+
   return (
     <View style={tws("pt-6 pb-4 px-5 gap-6")}>
       <View style={tws("flex-row items-center justify-between")}>
         <AppText variant="h2" color="slate-900" style={tws("tracking-tighter")}>
           Dòng thời gian
         </AppText>
-        <View style={tws("w-10 h-10")} />
+        <PressableScale
+          onPress={handleAddMemory}
+          style={
+            tws(
+              "w-10 h-10 bg-primary rounded-full items-center justify-center shadow-lg",
+            ) as any
+          }
+        >
+          <Plus size={24} color="#fff" />
+        </PressableScale>
       </View>
 
       <ScrollView
