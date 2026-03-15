@@ -6,106 +6,38 @@ import {
   Animated,
   View,
   ActivityIndicator,
-  Text,
   TouchableOpacity,
   TextInput,
   StyleSheet,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, useRouter } from "expo-router";
 import QRCodeStyled from "react-native-qrcode-styled";
 import * as Clipboard from "expo-clipboard";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Button } from "@/src/components/atoms/Button";
-import { LoadingOverlay } from "@/src/components/organisms/LoadingOverlay";
-import { useSession } from "@/src/session-context";
+import {
+  Button,
+  AppScreen,
+  GlassCard,
+  AppText as Text,
+  Input,
+  LoadingOverlay,
+} from "@/src/ui-kit";
+import { useSession } from "@/src/framework/ctx/session-context";
 import { useToast } from "@/src/toast-context";
 import { dependencies } from "@/src/framework/di/dependencies";
 import { toDisplayError } from "@/src/core/api/to-display-error";
-import { palette } from "@/src/theme/tokens";
+import { useThemeColors } from "@/src/theme";
 
 const QR_HEART_IMAGE = require("../assets/images/qr-heart.png");
 
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "flex-start", padding: 24 },
-  card: {
-    backgroundColor: "white",
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 5,
-  },
-  qrWrapper: {
-    padding: 12,
-    backgroundColor: "white",
-    borderRadius: 18,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-  },
-  qrContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    width: 180,
-    height: 180,
-  },
-  logoOverlay: {
-    position: "absolute",
-    width: 48,
-    height: 48,
-    backgroundColor: "white",
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 2,
-    shadowRadius: 4,
-  },
-  timeRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  copyButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  copyButtonCopied: { backgroundColor: "#22c55e" },
-  copyButtonDefault: { backgroundColor: "rgba(255,255,255,0.4)" },
-  dividerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    paddingVertical: 20,
-    paddingHorizontal: 32,
-  },
-  dividerLine: { flex: 1, height: 1, backgroundColor: "#e5e7eb", opacity: 0.2 },
-  inputSection: { gap: 16, paddingBottom: 40 },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 9999,
-    backgroundColor: "rgba(255,255,255,0.45)",
-    borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.6)",
-    paddingHorizontal: 20,
-    height: 56,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 0,
-    backgroundColor: "transparent",
-    height: "100%",
-    textAlign: "center",
-    fontWeight: "bold",
-    fontSize: 18,
-    color: "#0f172a",
-  },
-  buttonRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-});
-
 export default function PairingScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
   const { session, setSession, hydrated, isAuthenticated } = useSession();
   const { showToast } = useToast();
 
@@ -131,7 +63,9 @@ export default function PairingScreen() {
       if (session)
         setSession({
           ...session,
-          user: session.user ? { ...session.user, coupleId: res.coupleId } : undefined,
+          user: session.user
+            ? { ...session.user, coupleId: res.coupleId }
+            : undefined,
         });
       Keyboard.dismiss();
       router.replace("/(tabs)/home");
@@ -156,6 +90,7 @@ export default function PairingScreen() {
   }, []);
 
   const handleCopy = async () => {
+    if (!inviteCode) return;
     await Clipboard.setStringAsync(inviteCode);
     setIsCopied(true);
     Animated.sequence([
@@ -178,160 +113,295 @@ export default function PairingScreen() {
   if (isPaired) return <Redirect href="/(tabs)/home" />;
 
   return (
-    <View style={styles.container}>
-      <Text
-        style={{
-          fontSize: 24,
-          fontWeight: "bold",
-          textAlign: "center",
-          marginVertical: 20,
-        }}
+    <AppScreen>
+      <KeyboardAwareScrollView
+        style={styles.container}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: insets.bottom + 40 },
+        ]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
-        Pairing
-      </Text>
+        <View style={styles.header}>
+          <Text variant="h1" style={styles.title}>
+            Kế đôi
+          </Text>
+          <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
+            Kết nối trái tim của hai bạn
+          </Text>
+        </View>
 
-      <View style={styles.card}>
-        <View style={{ alignItems: "center", paddingVertical: 16, gap: 16 }}>
-          <View style={styles.qrWrapper}>
-            <View style={styles.qrContainer}>
+        <GlassCard style={styles.qrCard}>
+          <View style={styles.qrContent}>
+            <View style={styles.qrWrapper}>
               {inviteCode ? (
-                <>
+                <View style={styles.qrContainer}>
                   <QRCodeStyled
                     data={inviteCode}
-                    size={180}
-                    color="#0f172a"
-                    pieceBorderRadius={2}
+                    size={200}
+                    color={colors.text.primary}
+                    pieceBorderRadius={4}
                     isPiecesGlued={true}
-                    outerEyesOptions={{ borderRadius: 16, color: "#ec1334" }}
-                    innerEyesOptions={{ borderRadius: 6, color: "#0f172a" }}
+                    outerEyesOptions={{
+                      borderRadius: 16,
+                      color: colors.brand.default,
+                    }}
+                    innerEyesOptions={{
+                      borderRadius: 6,
+                      color: colors.text.primary,
+                    }}
                   />
-                  <View style={styles.logoOverlay}>
+                  <View
+                    style={[
+                      styles.logoOverlay,
+                      { backgroundColor: colors.surface.default },
+                    ]}
+                  >
                     <Image
                       source={QR_HEART_IMAGE}
-                      style={{ width: "100%", height: "100%" }}
+                      style={styles.logoImage}
                       resizeMode="contain"
                     />
                   </View>
-                </>
+                </View>
               ) : (
-                <ActivityIndicator color="#ec1334" />
+                <View style={styles.loaderContainer}>
+                  <ActivityIndicator color={colors.brand.default} size="large" />
+                </View>
               )}
             </View>
-          </View>
 
-          <View style={styles.timeRow}>
-            <Ionicons name="time-outline" size={14} color="#64748b" />
-            <Text
-              style={{ fontSize: 12, fontWeight: "bold", color: "#64748b" }}
+            <View style={styles.timeRow}>
+              <Ionicons
+                name="time-outline"
+                size={16}
+                color={colors.text.tertiary}
+              />
+              <Text style={{ fontSize: 13, color: colors.text.secondary }}>
+                Mã làm mới sau:{" "}
+                <Text style={{ fontWeight: "700", color: colors.brand.default }}>
+                  {Math.floor(timeLeft / 60)}:
+                  {(timeLeft % 60).toString().padStart(2, "0")}
+                </Text>
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              onPress={handleCopy}
+              activeOpacity={0.7}
+              style={[
+                styles.copyButton,
+                { backgroundColor: colors.brand.muted },
+                isCopied && { backgroundColor: "#22c55e" },
+              ]}
             >
-              Mã làm mới sau: {Math.floor(timeLeft / 60)}:
-              {(timeLeft % 60).toString().padStart(2, "0")}
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            onPress={handleCopy}
-            style={[
-              styles.copyButton,
-              isCopied ? styles.copyButtonCopied : styles.copyButtonDefault,
-            ]}
-          >
-            <View style={styles.buttonRow}>
               <Animated.View
-                style={{
-                  transform: [{ scale: feedbackScale }],
-                  opacity: feedbackScale.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0.5, 1],
-                  }),
-                }}
+                style={[
+                  styles.buttonInner,
+                  { transform: [{ scale: feedbackScale }] },
+                ]}
               >
                 <Ionicons
                   name={isCopied ? "checkmark-circle" : "copy-outline"}
                   size={20}
-                  color={isCopied ? "white" : "#ec1334"}
+                  color={isCopied ? "white" : colors.brand.default}
                 />
-              </Animated.View>
-              <Text
-                style={{
-                  color: isCopied ? "white" : "#ec1334",
-                  fontWeight: "700",
-                }}
-              >
-                {isCopied ? "Đã sao chép!" : "Sao chép mã QR"}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.dividerRow}>
-        <View style={styles.dividerLine} />
-        <Text
-          style={{
-            fontSize: 11,
-            fontWeight: "bold",
-            color: "#64748b",
-            fontStyle: "italic",
-            letterSpacing: 2,
-          }}
-        >
-          hoặc
-        </Text>
-        <View style={styles.dividerLine} />
-      </View>
-
-      <View style={styles.inputSection}>
-        <Text
-          style={{
-            fontSize: 11,
-            fontWeight: "bold",
-            color: "#64748b",
-            textAlign: "center",
-            textTransform: "uppercase",
-            letterSpacing: 2,
-          }}
-        >
-          Nhập mã của người ấy
-        </Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Dán mã vào đây..."
-            value={joinCode}
-            autoCapitalize="characters"
-            onChangeText={(t) => {
-              setJoinCode(t.toUpperCase());
-              if (t.length === 6) joinMutation.mutate(t.toUpperCase());
-            }}
-            returnKeyType="done"
-            onSubmitEditing={() => {
-              Keyboard.dismiss();
-              joinMutation.mutate(joinCode);
-            }}
-          />
-          <Ionicons name="heart-outline" size={22} color="#ec1334" />
-        </View>
-        <Button
-          onPress={() => joinMutation.mutate(joinCode)}
-          disabled={joinMutation.isPending}
-        >
-          <View style={styles.buttonRow}>
-            {joinMutation.isPending ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <>
-                <Text style={{ color: "white", fontWeight: "700" }}>
-                  Kết nối trái tim
+                <Text
+                  style={[
+                    styles.copyText,
+                    { color: isCopied ? "white" : colors.brand.default },
+                  ]}
+                >
+                  {isCopied ? "Đã sao chép!" : "Sao chép mã QR"}
                 </Text>
-                <Ionicons name="heart" size={18} color="white" />
-              </>
-            )}
+              </Animated.View>
+            </TouchableOpacity>
           </View>
-        </Button>
-      </View>
+        </GlassCard>
+
+        <View style={styles.dividerRow}>
+          <View
+            style={[styles.dividerLine, { backgroundColor: colors.border.default }]}
+          />
+          <Text style={[styles.dividerText, { color: colors.text.tertiary }]}>
+            HOẶC
+          </Text>
+          <View
+            style={[styles.dividerLine, { backgroundColor: colors.border.default }]}
+          />
+        </View>
+
+        <View style={styles.inputSection}>
+          <Text style={[styles.inputLabel, { color: colors.text.secondary }]}>
+            Nhập mã từ người ấy để kết nối
+          </Text>
+
+          <Input
+            placeholder="Dán mã tại đây..."
+            value={joinCode}
+            onChangeText={(t) => {
+              const code = t.toUpperCase();
+              setJoinCode(code);
+              if (code.length === 6) joinMutation.mutate(code);
+            }}
+            autoCapitalize="characters"
+            returnKeyType="done"
+            maxLength={10}
+            onSubmitEditing={() => joinCode && joinMutation.mutate(joinCode)}
+            leftElement={
+              <Ionicons
+                name="heart-outline"
+                size={22}
+                color={colors.brand.default}
+                style={{ marginLeft: 12 }}
+              />
+            }
+          />
+
+          <Button
+            label="Kết nối ngay"
+            onPress={() => joinMutation.mutate(joinCode)}
+            loading={joinMutation.isPending}
+            disabled={!joinCode || joinMutation.isPending}
+            size="lg"
+            fullWidth
+            rightIcon={<Ionicons name="heart" size={20} color="white" />}
+          />
+        </View>
+      </KeyboardAwareScrollView>
 
       {joinMutation.isPending && <LoadingOverlay />}
-    </View>
+    </AppScreen>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingTop: 20,
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: 32,
+  },
+  title: {
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: "center",
+  },
+  qrCard: {
+    marginBottom: 32,
+    padding: 0,
+  },
+  qrContent: {
+    alignItems: "center",
+    paddingVertical: 24,
+    gap: 20,
+  },
+  qrWrapper: {
+    padding: 16,
+    backgroundColor: "white",
+    borderRadius: 24,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+  },
+  qrContainer: {
+    width: 200,
+    height: 200,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loaderContainer: {
+    width: 200,
+    height: 200,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  logoOverlay: {
+    position: "absolute",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 4,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  logoImage: {
+    width: "100%",
+    height: "100%",
+  },
+  timeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  copyButton: {
+    width: "80%",
+    height: 52,
+    borderRadius: 26,
+    overflow: "hidden",
+  },
+  buttonInner: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+  },
+  copyText: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  dividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 16,
+    marginBottom: 32,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    opacity: 0.5,
+  },
+  dividerText: {
+    fontSize: 12,
+    fontWeight: "800",
+    letterSpacing: 2,
+  },
+  inputSection: {
+    gap: 20,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+});
