@@ -10,17 +10,29 @@
       "resizeMode": "contain",
       "backgroundColor": "#fff7f3"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "associatedDomains": ["applinks:emplus.app", "applinks:emplus.app"],
+      "bundleIdentifier": "com.truongdq.emplus",
+      "appleTeamId": "ZG4LJ9HHX8"
     },
-    "android": {},
-    "plugins": [
-      "expo-router",
-      "expo-font"
-    ],
+    "android": {
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "emplus",
+              "host": "emplus.app"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "plugins": ["expo-router", "expo-font", "expo-secure-store"],
     "web": {
       "bundler": "metro"
     }

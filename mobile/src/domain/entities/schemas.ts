@@ -4,1008 +4,1008 @@
  */
 
 export interface paths {
-    "/health": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Kiểm tra sức khỏe dịch vụ */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description API hoạt động bình thường */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            status?: string;
-                        };
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/health": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v1/system/dependencies": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Báo cáo trạng thái các phụ thuộc */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
+    /** Kiểm tra sức khỏe dịch vụ */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description API hoạt động bình thường */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              status?: string;
             };
-            requestBody?: never;
-            responses: {
-                /** @description Tất cả phụ thuộc quan trọng đều ổn hoặc phụ thuộc tùy chọn được bỏ qua. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            database?: string;
-                            redis?: string;
-                            mail?: string;
-                            minio?: string;
-                        };
-                    };
-                };
-                /** @description Có ít nhất một phụ thuộc đang lỗi hoặc không truy cập được. */
-                503: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+          };
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/v1/auth/register": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Đăng ký bằng email/mật khẩu */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        /** Format: email */
-                        email: string;
-                        password: string;
-                        fullName?: string;
-                        gender?: components["schemas"]["Gender"];
-                    };
-                };
-            };
-            responses: {
-                /** @description Đăng ký và đăng nhập thành công */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AuthResponse"];
-                    };
-                };
-                /** @description Dữ liệu gửi lên không hợp lệ */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Email đã tồn tại */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/system/dependencies": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v1/auth/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /** Báo cáo trạng thái các phụ thuộc */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Tất cả phụ thuộc quan trọng đều ổn hoặc phụ thuộc tùy chọn được bỏ qua. */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              database?: string;
+              redis?: string;
+              mail?: string;
+              minio?: string;
+            };
+          };
         };
-        get?: never;
-        put?: never;
-        /** Đăng nhập bằng email/mật khẩu */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        /** Format: email */
-                        email: string;
-                        password: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description Đăng nhập thành công */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["AuthResponse"];
-                    };
-                };
-                /** @description Dữ liệu gửi lên không hợp lệ */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Thông tin đăng nhập không đúng */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** @description Có ít nhất một phụ thuộc đang lỗi hoặc không truy cập được. */
+        503: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/v1/auth/refresh": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Làm mới phiên đăng nhập bằng refresh token */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        refreshToken: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description Làm mới phiên thành công */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["TokenPair"];
-                    };
-                };
-                /** @description Dữ liệu gửi lên không hợp lệ */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Refresh token không hợp lệ hoặc đã hết hạn */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/auth/register": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v1/couples/generate-invite": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Tạo mã mời ghép đôi */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Tạo mã mời thành công */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            inviteCode: string;
-                            expiresIn: number;
-                        };
-                    };
-                };
-                /** @description Chưa xác thực */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/couples/join": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Tham gia cặp đôi bằng mã mời */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        inviteCode: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description Ghép đôi thành công */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** Format: uuid */
-                            coupleId: string;
-                            status: string;
-                            partnerInfo: {
-                                /** Format: uuid */
-                                id: string;
-                                fullName: string;
-                                gender: string;
-                            };
-                        };
-                    };
-                };
-                /** @description Không tìm thấy mã mời hoặc mã đã hết hạn */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/dashboard/home": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lấy dữ liệu trang chủ */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Trả về dữ liệu trang chủ */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["DashboardHome"];
-                    };
-                };
-                /** @description Không có mối quan hệ đang hoạt động */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/timeline/memories": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lấy danh sách kỷ niệm */
-        get: {
-            parameters: {
-                query?: {
-                    page?: number;
-                    limit?: number;
-                    order?: "asc" | "desc";
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Danh sách kỷ niệm */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            items: components["schemas"]["Memory"][];
-                            pagination: {
-                                page: number;
-                                limit: number;
-                                totalItems: number;
-                                totalPages: number;
-                            };
-                        };
-                    };
-                };
-            };
-        };
-        put?: never;
-        /** Tạo kỷ niệm mới */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        title: string;
-                        description?: string;
-                        /** Format: date */
-                        memoryDate: string;
-                        mediaUrls?: string[];
-                        tags?: string[];
-                    };
-                };
-            };
-            responses: {
-                /** @description Tạo kỷ niệm thành công */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Memory"];
-                    };
-                };
-                /** @description Dữ liệu gửi lên không hợp lệ */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/care/female-cycle": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Lưu dữ liệu chu kỳ (nữ) */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        /** Format: date */
-                        lastPeriodStart: string;
-                        avgCycleLength: number;
-                        avgPeriodLength: number;
-                    };
-                };
-            };
-            responses: {
-                /** @description Lưu thành công */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            success?: boolean;
-                        };
-                    };
-                };
-                /** @description Chỉ tài khoản nữ mới được gọi API này */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/care/male-suggestions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lấy gợi ý chăm sóc (nam) */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Dữ liệu gợi ý chăm sóc */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            context: string;
-                            suggestions: {
-                                priority: number;
-                                text: string;
-                                callToAction: {
-                                    label: string;
-                                    actionType?: string;
-                                    actionUrl?: string;
-                                    icon?: string;
-                                };
-                            }[];
-                        };
-                    };
-                };
-                /** @description Chỉ tài khoản nam mới được gọi API này */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/budget/summary": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lấy tổng quan ngân sách */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Tổng quan ngân sách */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["BudgetSummary"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/budget/expenses": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lấy danh sách khoản chi */
-        get: {
-            parameters: {
-                query?: {
-                    category?: string;
-                    page?: number;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Danh sách khoản chi */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            items: components["schemas"]["BudgetItem"][];
-                            pagination: {
-                                page: number;
-                                limit: number;
-                                totalItems: number;
-                                totalPages: number;
-                            };
-                        };
-                    };
-                };
-            };
-        };
-        put?: never;
-        /** Tạo khoản chi mới */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        title: string;
-                        amount: number;
-                        category: string;
-                        /** Format: date */
-                        date: string;
-                        place?: string;
-                        note?: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description Tạo khoản chi thành công */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["BudgetItem"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/debug/seed-user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Tạo người dùng mẫu ngẫu nhiên */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Tạo người dùng thành công */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/debug/seed-invite": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Tạo mã mời ghép đôi mẫu */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Tạo mã mời thành công */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/debug/seed-happy-case": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Tạo dữ liệu Happy Case
-         * @description Tạo dữ liệu mẫu (kỷ niệm, sự kiện, ngân sách) cho người dùng hiện tại để kiểm tra giao diện. Cần xác thực Bearer Token của người dùng đã có couple.
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Tạo dữ liệu happy case thành công */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Tài khoản chưa có couple để thao tác */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Chưa xác thực */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/docs/openapi.json": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Đặc tả OpenAPI */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Tệp JSON OpenAPI */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-}
-export type webhooks = Record<string, never>;
-export interface components {
-    schemas: {
-        /** @enum {string} */
-        Gender: "NAM" | "NU" | "KHAC" | "KHONG_TIET_LO";
-        User: {
-            /** Format: uuid */
-            id: string;
+    get?: never;
+    put?: never;
+    /** Đăng ký bằng email/mật khẩu */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
             /** Format: email */
             email: string;
-            fullName: string;
-            nickname?: string;
-            /** Format: uri */
-            avatarUrl?: string;
-            gender: components["schemas"]["Gender"];
-            /** Format: date */
-            dob?: string;
-            timezone?: string;
-            isActive: boolean;
-            isAdmin?: boolean;
-            /** Format: uuid */
-            coupleId?: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
+            password: string;
+            fullName?: string;
+            gender?: components["schemas"]["Gender"];
+          };
         };
-        TokenPair: {
-            accessToken: string;
+      };
+      responses: {
+        /** @description Đăng ký và đăng nhập thành công */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AuthResponse"];
+          };
+        };
+        /** @description Dữ liệu gửi lên không hợp lệ */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Email đã tồn tại */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/auth/login": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Đăng nhập bằng email/mật khẩu */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /** Format: email */
+            email: string;
+            password: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Đăng nhập thành công */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["AuthResponse"];
+          };
+        };
+        /** @description Dữ liệu gửi lên không hợp lệ */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Thông tin đăng nhập không đúng */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/auth/refresh": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Làm mới phiên đăng nhập bằng refresh token */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
             refreshToken: string;
-            expiresIn: number;
+          };
         };
-        AuthResponse: {
-            user: components["schemas"]["User"];
-            tokens: components["schemas"]["TokenPair"];
+      };
+      responses: {
+        /** @description Làm mới phiên thành công */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["TokenPair"];
+          };
         };
-        Couple: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            partner1Id: string;
-            /** Format: uuid */
-            partner2Id?: string;
-            /** Format: date */
-            loveStartDate?: string;
-            /** Format: date */
-            weddingDate?: string;
-            /** @enum {string} */
-            status: "CHO_GHEP_DOI" | "DANG_YEU" | "DA_CUOI" | "DA_CHIA_TAY";
-            inviteCode?: string;
-            /** Format: date-time */
-            inviteExpiresAt?: string;
-            settings: Record<string, never>;
-            /** Format: date-time */
-            createdAt: string;
+        /** @description Dữ liệu gửi lên không hợp lệ */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
-        Memory: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            coupleId: string;
-            /** Format: uuid */
-            createdById: string;
+        /** @description Refresh token không hợp lệ hoặc đã hết hạn */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/couples/generate-invite": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Tạo mã mời ghép đôi */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Tạo mã mời thành công */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              inviteCode: string;
+              expiresIn: number;
+            };
+          };
+        };
+        /** @description Chưa xác thực */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/couples/join": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Tham gia cặp đôi bằng mã mời */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            inviteCode: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Ghép đôi thành công */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              /** Format: uuid */
+              coupleId: string;
+              status: string;
+              partnerInfo: {
+                /** Format: uuid */
+                id: string;
+                fullName: string;
+                gender: string;
+              };
+            };
+          };
+        };
+        /** @description Không tìm thấy mã mời hoặc mã đã hết hạn */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/dashboard/home": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Lấy dữ liệu trang chủ */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Trả về dữ liệu trang chủ */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["DashboardHome"];
+          };
+        };
+        /** @description Không có mối quan hệ đang hoạt động */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/timeline/memories": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Lấy danh sách kỷ niệm */
+    get: {
+      parameters: {
+        query?: {
+          page?: number;
+          limit?: number;
+          order?: "asc" | "desc";
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Danh sách kỷ niệm */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              items: components["schemas"]["Memory"][];
+              pagination: {
+                page: number;
+                limit: number;
+                totalItems: number;
+                totalPages: number;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    /** Tạo kỷ niệm mới */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
             title: string;
             description?: string;
             /** Format: date */
             memoryDate: string;
-            mediaUrls: string[];
-            tags: string[];
-            /** Format: date-time */
-            createdAt: string;
+            mediaUrls?: string[];
+            tags?: string[];
+          };
         };
-        DashboardHome: {
-            coupleContext: {
-                loveDays: number;
-                /** Format: date */
-                loveStartDate: string;
-                /** Format: date */
-                weddingDate?: string;
-            };
-            upcomingEvents: {
-                id: string;
-                title: string;
-                /** Format: date */
-                date: string;
-                daysLeft: number;
-                category: string;
-                isSystem: boolean;
-                /** @enum {string} */
-                priority?: "MEDIUM" | "HIGH";
-            }[];
-            careAdvice: {
-                greeting: string;
-                subGreeting: string;
-                iconName: string;
-            };
+      };
+      responses: {
+        /** @description Tạo kỷ niệm thành công */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["Memory"];
+          };
         };
-        BudgetItem: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            coupleId: string;
-            /** Format: uuid */
-            createdById: string;
+        /** @description Dữ liệu gửi lên không hợp lệ */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/care/female-cycle": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Lưu dữ liệu chu kỳ (nữ) */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
+            /** Format: date */
+            lastPeriodStart: string;
+            avgCycleLength: number;
+            avgPeriodLength: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Lưu thành công */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              success?: boolean;
+            };
+          };
+        };
+        /** @description Chỉ tài khoản nữ mới được gọi API này */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/care/male-suggestions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Lấy gợi ý chăm sóc (nam) */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Dữ liệu gợi ý chăm sóc */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              context: string;
+              suggestions: {
+                priority: number;
+                text: string;
+                callToAction: {
+                  label: string;
+                  actionType?: string;
+                  actionUrl?: string;
+                  icon?: string;
+                };
+              }[];
+            };
+          };
+        };
+        /** @description Chỉ tài khoản nam mới được gọi API này */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/budget/summary": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Lấy tổng quan ngân sách */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Tổng quan ngân sách */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["BudgetSummary"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/budget/expenses": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Lấy danh sách khoản chi */
+    get: {
+      parameters: {
+        query?: {
+          category?: string;
+          page?: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Danh sách khoản chi */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              items: components["schemas"]["BudgetItem"][];
+              pagination: {
+                page: number;
+                limit: number;
+                totalItems: number;
+                totalPages: number;
+              };
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    /** Tạo khoản chi mới */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody: {
+        content: {
+          "application/json": {
             title: string;
             amount: number;
             category: string;
             /** Format: date */
             date: string;
             place?: string;
-            /** @enum {string} */
-            status: "PAID" | "PENDING" | "OVER_BUDGET" | "DRAFT";
             note?: string;
-            /** Format: date-time */
-            createdAt: string;
+          };
         };
-        BudgetSummary: {
-            totalBudget: number;
-            totalSpent: number;
-            pendingAmount: number;
-            remainingAmount: number;
-            usagePercentage: number;
-            projectedTotal: number;
+      };
+      responses: {
+        /** @description Tạo khoản chi thành công */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["BudgetItem"];
+          };
         };
+      };
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/debug/seed-user": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Tạo người dùng mẫu ngẫu nhiên */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Tạo người dùng thành công */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/debug/seed-invite": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Tạo mã mời ghép đôi mẫu */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Tạo mã mời thành công */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/debug/seed-happy-case": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Tạo dữ liệu Happy Case
+     * @description Tạo dữ liệu mẫu (kỷ niệm, sự kiện, ngân sách) cho người dùng hiện tại để kiểm tra giao diện. Cần xác thực Bearer Token của người dùng đã có couple.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Tạo dữ liệu happy case thành công */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Tài khoản chưa có couple để thao tác */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Chưa xác thực */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v1/docs/openapi.json": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Đặc tả OpenAPI */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Tệp JSON OpenAPI */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+}
+export type webhooks = Record<string, never>;
+export interface components {
+  schemas: {
+    /** @enum {string} */
+    Gender: "NAM" | "NU" | "KHAC" | "KHONG_TIET_LO";
+    User: {
+      /** Format: uuid */
+      id: string;
+      /** Format: email */
+      email: string;
+      fullName: string;
+      nickname?: string;
+      /** Format: uri */
+      avatarUrl?: string;
+      gender: components["schemas"]["Gender"];
+      /** Format: date */
+      dob?: string;
+      timezone?: string;
+      isActive: boolean;
+      isAdmin?: boolean;
+      /** Format: uuid */
+      coupleId?: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    TokenPair: {
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+    };
+    AuthResponse: {
+      user: components["schemas"]["User"];
+      tokens: components["schemas"]["TokenPair"];
+    };
+    Couple: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      partner1Id: string;
+      /** Format: uuid */
+      partner2Id?: string;
+      /** Format: date */
+      loveStartDate?: string;
+      /** Format: date */
+      weddingDate?: string;
+      /** @enum {string} */
+      status: "CHO_GHEP_DOI" | "DANG_YEU" | "DA_CUOI" | "DA_CHIA_TAY";
+      inviteCode?: string;
+      /** Format: date-time */
+      inviteExpiresAt?: string;
+      settings: Record<string, never>;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    Memory: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      coupleId: string;
+      /** Format: uuid */
+      createdById: string;
+      title: string;
+      description?: string;
+      /** Format: date */
+      memoryDate: string;
+      mediaUrls: string[];
+      tags: string[];
+      /** Format: date-time */
+      createdAt: string;
+    };
+    DashboardHome: {
+      coupleContext: {
+        loveDays: number;
+        /** Format: date */
+        loveStartDate: string;
+        /** Format: date */
+        weddingDate?: string;
+      };
+      upcomingEvents: {
+        id: string;
+        title: string;
+        /** Format: date */
+        date: string;
+        daysLeft: number;
+        category: string;
+        isSystem: boolean;
+        /** @enum {string} */
+        priority?: "MEDIUM" | "HIGH";
+      }[];
+      careAdvice: {
+        greeting: string;
+        subGreeting: string;
+        iconName: string;
+      };
+    };
+    BudgetItem: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      coupleId: string;
+      /** Format: uuid */
+      createdById: string;
+      title: string;
+      amount: number;
+      category: string;
+      /** Format: date */
+      date: string;
+      place?: string;
+      /** @enum {string} */
+      status: "PAID" | "PENDING" | "OVER_BUDGET" | "DRAFT";
+      note?: string;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    BudgetSummary: {
+      totalBudget: number;
+      totalSpent: number;
+      pendingAmount: number;
+      remainingAmount: number;
+      usagePercentage: number;
+      projectedTotal: number;
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export type operations = Record<string, never>;
@@ -1034,18 +1034,32 @@ export type BudgetSummary = Schemas["BudgetSummary"];
  */
 export type ApiPaths = keyof paths;
 
-export type ApiResponse<P extends ApiPaths, M extends keyof paths[P]> = 
-  paths[P][M] extends { responses: { 200: { content: { "application/json": infer T } } } } ? T :
-  paths[P][M] extends { responses: { 201: { content: { "application/json": infer T } } } } ? T :
-  unknown;
+export type ApiResponse<
+  P extends ApiPaths,
+  M extends keyof paths[P],
+> = paths[P][M] extends {
+  responses: { 200: { content: { "application/json": infer T } } };
+}
+  ? T
+  : paths[P][M] extends {
+        responses: { 201: { content: { "application/json": infer T } } };
+      }
+    ? T
+    : unknown;
 
-export type ApiRequest<P extends ApiPaths, M extends keyof paths[P]> = 
-  paths[P][M] extends { requestBody: { content: { "application/json": infer T } } } ? T : 
-  never;
+export type ApiRequest<
+  P extends ApiPaths,
+  M extends keyof paths[P],
+> = paths[P][M] extends {
+  requestBody: { content: { "application/json": infer T } };
+}
+  ? T
+  : never;
 
-export type ApiQueryParams<P extends ApiPaths, M extends keyof paths[P]> = 
-  paths[P][M] extends { parameters: { query?: infer T } } ? T : 
-  never;
+export type ApiQueryParams<
+  P extends ApiPaths,
+  M extends keyof paths[P],
+> = paths[P][M] extends { parameters: { query?: infer T } } ? T : never;
 
 /**
  * Module Specific Types
@@ -1053,17 +1067,20 @@ export type ApiQueryParams<P extends ApiPaths, M extends keyof paths[P]> =
 export namespace AuthModule {
   export type RegisterRequest = ApiRequest<"/v1/auth/register", "post">;
   export type RegisterResponse = ApiResponse<"/v1/auth/register", "post">;
-  
+
   export type LoginRequest = ApiRequest<"/v1/auth/login", "post">;
   export type LoginResponse = ApiResponse<"/v1/auth/login", "post">;
-  
+
   export type RefreshRequest = ApiRequest<"/v1/auth/refresh", "post">;
   export type RefreshResponse = ApiResponse<"/v1/auth/refresh", "post">;
 }
 
 export namespace CoupleModule {
-  export type GenerateInviteResponse = ApiResponse<"/v1/couples/generate-invite", "post">;
-  
+  export type GenerateInviteResponse = ApiResponse<
+    "/v1/couples/generate-invite",
+    "post"
+  >;
+
   export type JoinRequest = ApiRequest<"/v1/couples/join", "post">;
   export type JoinResponse = ApiResponse<"/v1/couples/join", "post">;
 }
@@ -1075,24 +1092,30 @@ export namespace DashboardModule {
 export namespace TimelineModule {
   export type ListQueryParams = ApiQueryParams<"/v1/timeline/memories", "get">;
   export type ListResponse = ApiResponse<"/v1/timeline/memories", "get">;
-  
+
   export type CreateRequest = ApiRequest<"/v1/timeline/memories", "post">;
   export type CreateResponse = ApiResponse<"/v1/timeline/memories", "post">;
 }
 
 export namespace CareModule {
   export type FemaleCycleRequest = ApiRequest<"/v1/care/female-cycle", "post">;
-  export type FemaleCycleResponse = ApiResponse<"/v1/care/female-cycle", "post">;
-  
-  export type MaleSuggestionsResponse = ApiResponse<"/v1/care/male-suggestions", "get">;
+  export type FemaleCycleResponse = ApiResponse<
+    "/v1/care/female-cycle",
+    "post"
+  >;
+
+  export type MaleSuggestionsResponse = ApiResponse<
+    "/v1/care/male-suggestions",
+    "get"
+  >;
 }
 
 export namespace BudgetModule {
   export type SummaryResponse = ApiResponse<"/v1/budget/summary", "get">;
-  
+
   export type ListQueryParams = ApiQueryParams<"/v1/budget/expenses", "get">;
   export type ListResponse = ApiResponse<"/v1/budget/expenses", "get">;
-  
+
   export type CreateRequest = ApiRequest<"/v1/budget/expenses", "post">;
   export type CreateResponse = ApiResponse<"/v1/budget/expenses", "post">;
 }

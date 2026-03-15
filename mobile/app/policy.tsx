@@ -6,189 +6,208 @@ import { useState } from "react";
 import { AppScreen, AppText, GlassCard, Reveal } from "../src/ui-kit";
 import { palette } from "../src/theme";
 
+const styles = StyleSheet.create({
+  sectionWrap: { marginBottom: 16 },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+    backgroundColor: "rgba(255,255,255,0.5)",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.6)",
+  },
+  sectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flex: 1,
+  },
+  sectionTitle: { fontSize: 15, fontWeight: "bold", color: palette.zinc800 },
+  sectionContent: {
+    marginTop: 8,
+    padding: 16,
+    backgroundColor: "rgba(255,255,255,0.3)",
+    borderRadius: 12,
+  },
+  contentText: { fontSize: 15, color: palette.zinc600, lineHeight: 22 },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 8,
+  },
+  headerText: {
+    fontSize: 13,
+    fontWeight: "bold",
+    color: palette.zinc500,
+    textTransform: "uppercase" as "uppercase",
+    letterSpacing: 1,
+  },
+  card: { marginBottom: 16 },
+});
+
 interface SectionProps {
-    icon: keyof typeof Ionicons.glyphMap;
-    title: string;
-    content: string;
-    isOpen: boolean;
-    onToggle: () => void;
-    color: string;
+  icon: string;
+  title: string;
+  content: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  color: string;
 }
 
-function PolicySection({ icon, title, content, isOpen, onToggle, color }: SectionProps) {
-    return (
-        <View style={styles.sectionWrap}>
-            <Pressable onPress={onToggle} style={styles.sectionHeader}>
-                <View style={styles.sectionTitleRow}>
-                    <Ionicons name={icon} size={22} color={color} />
-                    <AppText variant="bodyBold" style={styles.sectionTitle}>{title}</AppText>
-                </View>
-                <Ionicons
-                    name={isOpen ? "chevron-up" : "chevron-down"}
-                    size={20}
-                    color={palette['slate-400']}
-                />
-            </Pressable>
-            {isOpen && (
-                <View style={styles.sectionContent}>
-                    <AppText variant="body" color={palette.muted} style={styles.contentText}>
-                        {content}
-                    </AppText>
-                </View>
-            )}
+function PolicySection({
+  icon,
+  title,
+  content,
+  isOpen,
+  onToggle,
+  color,
+}: SectionProps) {
+  return (
+    <View style={styles.sectionWrap}>
+      <Pressable onPress={onToggle} style={styles.sectionHeader}>
+        <View style={styles.sectionTitleRow}>
+          <Ionicons name={icon as any} size={22} color={color} />
+          <AppText style={styles.sectionTitle}>{title}</AppText>
         </View>
-    );
+        <Ionicons
+          name={isOpen ? "chevron-up" : "chevron-down"}
+          size={20}
+          color={palette.zinc400}
+        />
+      </Pressable>
+      {isOpen && (
+        <View style={styles.sectionContent}>
+          <AppText style={styles.contentText}>{content}</AppText>
+        </View>
+      )}
+    </View>
+  );
 }
 
 export default function PolicyScreen() {
-    const router = useRouter();
-    const [openSection, setOpenSection] = useState<string | null>("collect");
+  const router = useRouter();
+  const [openSection, setOpenSection] = useState<string | null>("collect");
 
-    const toggleSection = (key: string) => {
-        setOpenSection(openSection === key ? null : key);
-    };
+  const toggleSection = (key: string) => {
+    setOpenSection(openSection === key ? null : key);
+  };
 
-    return (
-        <AppScreen>
-            <View style={styles.header}>
-                <Pressable onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color={palette.ink} />
-                </Pressable>
-                <AppText variant="h3" style={styles.headerTitle}>Chính sách và Bảo mật</AppText>
-                <View style={{ width: 40 }} />
-            </View>
+  const sections = [
+    {
+      key: "collect",
+      icon: "datacontainers-outline",
+      title: "Thu thập dữ liệu",
+      color: palette.violet600,
+      content:
+        "Chúng tôi chỉ thu thập những thông tin cần thiết để cung cấp dịch vụ Em Plus, bao gồm: email, mật khẩu (mã hóa), giới tính, và ID người dùng. Không thu thập dữ liệu cá nhân nhạy cảm khác.",
+    },
+    {
+      key: "use",
+      icon: "settings-outline",
+      title: "Sử dụng thông tin",
+      color: palette.violet500,
+      content:
+        "Thông tin được sử dụng để: (1) Xác thực tài khoản, (2) Ghép đôi giữa hai người dùng, (3) Cá nhân hóa trải nghiệm, (4) Sao lưu dữ liệu đám mây (tùy chọn).",
+    },
+    {
+      key: "share",
+      icon: "share-outline",
+      title: "Chia sẻ dữ liệu",
+      color: palette.violet400,
+      content:
+        "Chúng tôi KHÔNG bán hoặc chia sẻ dữ liệu của bạn cho bên thứ ba. Dữ liệu chỉ được chia sẻ giữa hai tài khoản đã ghép đôi và với nhà cung cấp dịch vụ đám mây (Firebase) để sao lưu.",
+    },
+    {
+      key: "security",
+      icon: "shield-checkmark-outline",
+      title: "Bảo mật",
+      color: palette.green500,
+      content:
+        "Mật khẩu được mã hóa bcrypt. Dữ liệu truyền qua HTTPS. Bạn có thể xóa toàn bộ dữ liệu bất cứ lúc nào bằng cách hủy tài khoản trong phần Cài đặt.",
+    },
+    {
+      key: "rights",
+      icon: "person-outline",
+      title: "Quyền của bạn",
+      color: palette.blue500,
+      content:
+        "Bạn có quyền: (1) Truy cập dữ liệu cá nhân, (2) Sửa thông tin, (3) Xóa tài khoản và dữ liệu, (4) Ngừng sử dụng dịch vụ bất cứ lúc nào.",
+    },
+  ];
 
-            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-                <Reveal>
-                    <AppText variant="h1" style={styles.mainTitle}>Quyền riêng tư của bạn</AppText>
-                    <AppText variant="body" color={palette.muted} style={styles.intro}>
-                        Chào mừng bạn đến với <AppText variant="bodyBold" color={palette.primary}>Crystal Structure</AppText>.
-                        Chúng tôi cam kết bảo vệ thông tin cá nhân và quyền riêng tư của bạn trong suốt hành trình lập kế hoạch cho ngày trọng đại nhất cuộc đời.
-                    </AppText>
+  return (
+    <AppScreen>
+      <ScrollView
+        contentContainerStyle={{ padding: 20, paddingBottom: 60 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <Reveal>
+          <View style={styles.headerRow}>
+            <Ionicons
+              name="document-text-outline"
+              size={24}
+              color={palette.violet600}
+            />
+            <AppText style={styles.headerText}>Chính sách bảo mật</AppText>
+          </View>
+        </Reveal>
 
-                    <View style={styles.sectionsContainer}>
-                        <GlassCard>
-                            <PolicySection
-                                icon="analytics-outline"
-                                title="Thu thập dữ liệu"
-                                color={palette.primary}
-                                isOpen={openSection === "collect"}
-                                onToggle={() => toggleSection("collect")}
-                                content="Chúng tôi thu thập các thông tin cần thiết như tên, email, ngày cưới dự kiến và sở thích cá nhân để cá nhân hóa trải nghiệm và cung cấp những gợi ý dịch vụ cưới tốt nhất dành riêng cho bạn."
-                            />
-                            <View style={styles.divider} />
-                            <PolicySection
-                                icon="information-circle-outline"
-                                title="Sử dụng thông tin"
-                                color={palette.accent}
-                                isOpen={openSection === "use"}
-                                onToggle={() => toggleSection("use")}
-                                content="Dữ liệu của bạn được sử dụng để tối ưu hóa quy trình lập kế hoạch, liên kết với các nhà cung cấp dịch vụ được bạn lựa chọn và cải thiện tính năng ứng dụng dựa trên hành vi người dùng."
-                            />
-                            <View style={styles.divider} />
-                            <PolicySection
-                                icon="shield-checkmark-outline"
-                                title="Bảo mật dữ liệu"
-                                color={palette.primary}
-                                isOpen={openSection === "security"}
-                                onToggle={() => toggleSection("security")}
-                                content="Crystal Structure áp dụng các tiêu chuẩn mã hóa tiên tiến nhất để bảo vệ thông tin cá nhân của bạn khỏi các truy cập trái phép. Chúng tôi không chia sẻ dữ liệu của bạn cho bên thứ ba khi chưa có sự đồng ý."
-                            />
-                            <View style={styles.divider} />
-                            <PolicySection
-                                icon="checkmark-circle-outline"
-                                title="Quyền của người dùng"
-                                color={palette.accent}
-                                isOpen={openSection === "rights"}
-                                onToggle={() => toggleSection("rights")}
-                                content="Bạn hoàn toàn có quyền truy cập, sửa đổi hoặc yêu cầu xóa bỏ vĩnh viễn dữ liệu cá nhân của mình bất kỳ lúc nào thông qua cài đặt tài khoản hoặc liên hệ trực tiếp với đội ngũ hỗ trợ của chúng tôi."
-                            />
-                        </GlassCard>
-                    </View>
+        <GlassCard style={styles.card}>
+          <AppText
+            style={{
+              fontSize: 15,
+              color: palette.zinc700,
+              lineHeight: 22,
+              marginBottom: 16,
+            }}
+          >
+            Em Plus cam kết bảo vệ quyền riêng tư của bạn. Ứng dụng được thiết
+            kế với nguyên tắc "quyền riêng tư từ đầu" (privacy by design), chỉ
+            thu thập dữ liệu tối thiểu cần thiết.
+          </AppText>
+        </GlassCard>
 
-                    <View style={styles.footer}>
-                        <AppText variant="h3" style={styles.footerTitle}>Bạn có thắc mắc?</AppText>
-                        <AppText variant="caption" color={palette.muted} textAlign="center">
-                            Liên hệ với đội ngũ pháp lý của chúng tôi tại privacy@crystalstructure.vn
-                        </AppText>
-                    </View>
-                </Reveal>
-            </ScrollView>
-        </AppScreen>
-    );
+        {sections.map((section) => (
+          <PolicySection
+            key={section.key}
+            icon={section.icon}
+            title={section.title}
+            content={section.content}
+            isOpen={openSection === section.key}
+            onToggle={() => toggleSection(section.key)}
+            color={section.color}
+          />
+        ))}
+
+        <GlassCard style={{ marginTop: 24 }}>
+          <View style={styles.headerRow}>
+            <Ionicons name="mail-outline" size={20} color={palette.zinc600} />
+            <AppText
+              style={{
+                fontSize: 15,
+                fontWeight: "bold",
+                color: palette.zinc800,
+              }}
+            >
+              Liên hệ
+            </AppText>
+          </View>
+          <AppText
+            style={{
+              fontSize: 15,
+              color: palette.zinc600,
+              lineHeight: 22,
+              marginTop: 8,
+            }}
+          >
+            Nếu bạn có bất kỳ câu hỏi nào về chính sách bảo mật, vui lòng liên
+            hệ: support@emplus.app
+          </AppText>
+        </GlassCard>
+      </ScrollView>
+    </AppScreen>
+  );
 }
-
-const styles = StyleSheet.create({
-    header: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-    },
-    backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: palette.glass,
-    },
-    headerTitle: {
-        fontSize: 18,
-    },
-    content: {
-        paddingHorizontal: 24,
-        paddingBottom: 40,
-    },
-    mainTitle: {
-        fontSize: 32,
-        marginTop: 20,
-        marginBottom: 12,
-    },
-    intro: {
-        lineHeight: 24,
-        marginBottom: 32,
-    },
-    sectionsContainer: {
-        gap: 16,
-    },
-    sectionWrap: {
-        paddingVertical: 4,
-    },
-    sectionHeader: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingVertical: 12,
-    },
-    sectionTitleRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 12,
-    },
-    sectionTitle: {
-        fontSize: 16,
-    },
-    sectionContent: {
-        paddingLeft: 34,
-        paddingBottom: 12,
-    },
-    contentText: {
-        lineHeight: 20,
-        fontSize: 14,
-    },
-    divider: {
-        height: 1,
-        backgroundColor: palette.divider,
-        marginVertical: 4,
-    },
-    footer: {
-        marginTop: 48,
-        alignItems: "center",
-        gap: 8,
-    },
-    footerTitle: {
-        fontSize: 20,
-    },
-});

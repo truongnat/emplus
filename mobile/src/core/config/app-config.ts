@@ -15,10 +15,10 @@ export const appConfig = {
 
   // Storage Keys (Persistence)
   storage: {
-    authTokens: "emplus.auth.tokens.v1",     // SecureStore
-    userMetadata: "emplus.user.meta.v1",     // AsyncStorage
-    appSettings: "emplus.settings.v1",       // AsyncStorage
-    onboarding: "emplus.onboarding.v1",      // AsyncStorage
+    authTokens: "emplus.auth.tokens.v1", // SecureStore
+    userMetadata: "emplus.user.meta.v1", // AsyncStorage
+    appSettings: "emplus.settings.v1", // AsyncStorage
+    onboarding: "emplus.onboarding.v1", // AsyncStorage
   },
 
   // Authentication & Session
@@ -37,7 +37,7 @@ export const appConfig = {
   // Other constants
   brand: {
     name: "Em Plus",
-  }
+  },
 } as const;
 
 export default appConfig;

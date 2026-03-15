@@ -1,15 +1,19 @@
 import { AuthRepositoryImpl } from "../../data/repositories/auth.repository.impl";
-import { 
-  CoupleRepositoryImpl, 
-  DashboardRepositoryImpl, 
-  TimelineRepositoryImpl, 
-  CareRepositoryImpl, 
-  BudgetRepositoryImpl 
+import {
+  CoupleRepositoryImpl,
+  DashboardRepositoryImpl,
+  TimelineRepositoryImpl,
+  CareRepositoryImpl,
+  BudgetRepositoryImpl,
 } from "../../data/repositories/modules.repository.impl";
-import { LoginUseCase, RegisterUseCase, RefreshSessionUseCase } from "../../domain/usecases/auth";
-import { 
-  GenerateInviteUseCase, 
-  JoinCoupleUseCase, 
+import {
+  LoginUseCase,
+  RegisterUseCase,
+  RefreshSessionUseCase,
+} from "../../domain/usecases/auth";
+import {
+  GenerateInviteUseCase,
+  JoinCoupleUseCase,
   GetDashboardUseCase,
   GetMemoriesUseCase,
   CreateMemoryUseCase,
@@ -17,7 +21,7 @@ import {
   GetMaleSuggestionsUseCase,
   GetBudgetSummaryUseCase,
   GetExpensesUseCase,
-  CreateExpenseUseCase
+  CreateExpenseUseCase,
 } from "../../domain/usecases/modules";
 
 /**
@@ -56,5 +60,5 @@ export const dependencies = {
     getSummary: new GetBudgetSummaryUseCase(budgetRepo),
     getExpenses: new GetExpensesUseCase(budgetRepo),
     createExpense: new CreateExpenseUseCase(budgetRepo),
-  }
+  },
 } as const;

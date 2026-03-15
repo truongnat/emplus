@@ -1,5 +1,12 @@
 import { AppState } from "react-native";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import type { ReactNode } from "react";
 
 import { storage } from "@/src/core/common/storage";
@@ -19,7 +26,9 @@ interface SessionContextValue {
   setSession: (session: AuthModule.LoginResponse | null) => void;
   clearSession: () => void;
   refreshAuth: () => Promise<boolean>;
-  withAccessToken: <T>(operation: (accessToken: string) => Promise<T>) => Promise<T>;
+  withAccessToken: <T>(
+    operation: (accessToken: string) => Promise<T>,
+  ) => Promise<T>;
 }
 
 const SessionContext = createContext<SessionContextValue>({
@@ -29,12 +38,13 @@ const SessionContext = createContext<SessionContextValue>({
   setSession: () => {},
   clearSession: async () => {},
   refreshAuth: async () => false,
-  withAccessToken: async (op: any) => op(''),
+  withAccessToken: async (op: any) => op(""),
 });
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthModule.LoginResponse | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     tokenManager.setAccessToken(session?.tokens.accessToken ?? null);
@@ -46,45 +56,71 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refreshAuth = useCallback(async (): Promise<string | null> => {
-    const currentTokens = await storage.auth.getTokens();
-    const refreshToken = currentTokens?.refreshToken?.trim();
-    if (!refreshToken) {
-      await clearSession();
-      return null;
-    }
+    if (isRefreshing) return null;
+
+    setIsRefreshing(true);
     try {
+      const currentTokens = await storage.auth.getTokens();
+      const refreshToken = currentTokens?.refreshToken?.trim();
+      if (!refreshToken) {
+        await clearSession();
+        return null;
+      }
       const nextTokens = await refreshSessionUseCase.execute(refreshToken);
       setSession((prev) => (prev ? { ...prev, tokens: nextTokens } : null));
       return nextTokens.accessToken;
     } catch {
       await clearSession();
       return null;
+    } finally {
+      setIsRefreshing(false);
     }
-  }, [clearSession]);
+  }, [clearSession, isRefreshing]);
 
   useEffect(() => {
     tokenManager.setRefreshHandler(refreshAuth);
   }, [refreshAuth]);
 
-  const withAccessToken = useCallback(async <T,>(operation: (token: string) => Promise<T>): Promise<T> => {
-    const token = session?.tokens.accessToken || "";
-    return operation(token);
-  }, [session?.tokens.accessToken]);
+  const withAccessToken = useCallback(
+    async <T,>(operation: (token: string) => Promise<T>): Promise<T> => {
+      const token = session?.tokens.accessToken;
+      if (!token) {
+        throw new Error("No access token available - user must login");
+      }
+      return operation(token);
+    },
+    [session?.tokens.accessToken],
+  );
 
   useEffect(() => {
     let active = true;
     const init = async () => {
       try {
-        const [tokens, meta] = await Promise.all([storage.auth.getTokens(), storage.user.getMetadata()]);
+        const [tokens, meta] = await Promise.all([
+          storage.auth.getTokens(),
+          storage.user.getMetadata(),
+        ]);
+        console.log("Session init:", { hasTokens: !!tokens, hasMeta: !!meta });
         if (tokens && active) {
           const user = meta?.user || null;
           setSession({ user, tokens });
-          if (tokens.refreshToken) await refreshAuth();
+          // Refresh AFTER state update completes
+          setTimeout(async () => {
+            if (tokens.refreshToken && active) {
+              await refreshAuth();
+            }
+          }, 100);
         }
-      } catch { await clearSession(); } finally { if (active) setHydrated(true); }
+      } catch (error) {
+        console.error("Session init error:", error);
+      } finally {
+        if (active) setHydrated(true);
+      }
     };
     init();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [clearSession, refreshAuth]);
 
   useEffect(() => {
@@ -97,19 +133,22 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const tokens = session?.tokens;
     if (!tokens?.expiresIn || !tokens?.accessToken) return;
-    const delay = Math.max(0, tokens.expiresIn * 1000 - appConfig.auth.silentRefreshBufferMs);
+    const delay = Math.max(
+      0,
+      tokens.expiresIn * 1000 - appConfig.auth.silentRefreshBufferMs,
+    );
     const timer = setTimeout(() => void refreshAuth(), delay);
     return () => clearTimeout(timer);
   }, [session?.tokens, refreshAuth]);
 
   useEffect(() => {
     const sub = AppState.addEventListener("change", (state) => {
-      if (state === "active" && session?.tokens.refreshToken) {
+      if (state === "active" && session?.tokens.refreshToken && !isRefreshing) {
         void refreshAuth();
       }
     });
     return () => sub.remove();
-  }, [refreshAuth, session?.tokens.refreshToken]);
+  }, [refreshAuth, session?.tokens.refreshToken, isRefreshing]);
 
   const value = useMemo(
     () => ({
@@ -119,12 +158,14 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       setSession,
       clearSession,
       refreshAuth: async () => !!(await refreshAuth()),
-      withAccessToken
+      withAccessToken,
     }),
-    [session, hydrated, clearSession, refreshAuth, withAccessToken]
+    [session, hydrated, clearSession, refreshAuth, withAccessToken],
   );
 
-  return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
+  return (
+    <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
+  );
 }
 
 export const useSession = () => {

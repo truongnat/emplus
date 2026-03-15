@@ -8,7 +8,9 @@ export interface AuthRepository {
   /**
    * Registers a new user account.
    */
-  register(params: AuthModule.RegisterRequest): Promise<AuthModule.RegisterResponse>;
+  register(
+    params: AuthModule.RegisterRequest,
+  ): Promise<AuthModule.RegisterResponse>;
 
   /**
    * Authenticates a user with email and password.
@@ -18,5 +20,7 @@ export interface AuthRepository {
   /**
    * Refreshes the session using a refresh token.
    */
-  refresh(params: AuthModule.RefreshRequest): Promise<AuthModule.RefreshResponse>;
+  refresh(
+    params: AuthModule.RefreshRequest,
+  ): Promise<AuthModule.RefreshResponse>;
 }

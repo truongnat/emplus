@@ -7,7 +7,9 @@ import { AuthRepository } from "../../repositories/auth.repository";
 export class LoginUseCase {
   constructor(private authRepository: AuthRepository) {}
 
-  async execute(params: AuthModule.LoginRequest): Promise<AuthModule.LoginResponse> {
+  async execute(
+    params: AuthModule.LoginRequest,
+  ): Promise<AuthModule.LoginResponse> {
     return this.authRepository.login(params);
   }
 }
@@ -18,7 +20,9 @@ export class LoginUseCase {
 export class RegisterUseCase {
   constructor(private authRepository: AuthRepository) {}
 
-  async execute(params: AuthModule.RegisterRequest): Promise<AuthModule.RegisterResponse> {
+  async execute(
+    params: AuthModule.RegisterRequest,
+  ): Promise<AuthModule.RegisterResponse> {
     return this.authRepository.register(params);
   }
 }

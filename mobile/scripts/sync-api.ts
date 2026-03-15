@@ -9,7 +9,9 @@ async function sync() {
   console.log("🚀 Generating base schemas from OpenAPI...");
 
   // Ensure directory exists
-  mkdirSync(join(import.meta.dir, "../src/domain/entities"), { recursive: true });
+  mkdirSync(join(import.meta.dir, "../src/domain/entities"), {
+    recursive: true,
+  });
 
   // 1. Run openapi-typescript
   try {

@@ -1,27 +1,60 @@
-import { useMutation } from "@tanstack/react-query";
-import { AuthRepositoryImpl } from "@/src/data/repositories/auth.repository.impl";
-import { LoginUseCase, RegisterUseCase } from "@/src/domain/usecases/auth";
-import type { AuthModule } from "@/src/domain/entities/schemas";
-
-// Repository and Use Cases are instantiated here (Simplified DI)
-const authRepository = new AuthRepositoryImpl();
-const loginUseCase = new LoginUseCase(authRepository);
-const registerUseCase = new RegisterUseCase(authRepository);
+import { useMemo } from "react";
+import { useSession } from "@/src/framework/ctx/session-context";
+import { useLogout } from "./useLogout";
+import { useLogin } from "./useLogin";
+import { useRegister } from "./useRegister";
 
 /**
- * Hook for Login operation.
+ * Unified Auth Hook - Provides complete authentication functionality
+ * Combines session state, login, register, and logout in one hook
  */
-export function useLogin() {
-  return useMutation<AuthModule.LoginResponse, Error, AuthModule.LoginRequest>({
-    mutationFn: (params) => loginUseCase.execute(params),
-  });
+export function useAuth() {
+  const sessionCtx = useSession();
+
+  const login = useLogin();
+  const register = useRegister();
+  const logout = useLogout({ showToast: false }); // Let caller decide
+
+  return useMemo(
+    () => ({
+      // Session state
+      user: sessionCtx.session?.user ?? null,
+      session: sessionCtx.session,
+      isAuthenticated: sessionCtx.isAuthenticated,
+      isHydrated: sessionCtx.hydrated,
+      isLoading: !sessionCtx.hydrated,
+
+      // Auth actions
+      login: login.mutate,
+      register: register.mutate,
+      logout: logout.logout,
+
+      // Auth states
+      isLoggingIn: login.isPending,
+      isRegistering: register.isPending,
+      isLoggingOut: logout.isLoggingOut,
+
+      // Errors
+      loginError: login.error,
+      registerError: register.error,
+      logoutError: logout.logoutError,
+
+      // Reset functions
+      resetLoginError: login.reset,
+      resetRegisterError: register.reset,
+      resetLogoutError: logout.reset,
+
+      // Helper methods
+      setSession: sessionCtx.setSession,
+      clearSession: sessionCtx.clearSession,
+      refreshAuth: sessionCtx.refreshAuth,
+      withAccessToken: sessionCtx.withAccessToken,
+    }),
+    [sessionCtx, login, register, logout],
+  );
 }
 
 /**
- * Hook for Register operation.
+ * @deprecated Use useAuth() instead. Will be removed in next major version.
  */
-export function useRegister() {
-  return useMutation<AuthModule.RegisterResponse, Error, AuthModule.RegisterRequest>({
-    mutationFn: (params) => registerUseCase.execute(params),
-  });
-}
+export const useAuthLegacy = useAuth;

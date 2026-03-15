@@ -1,17 +1,19 @@
-import { tws } from "@/src/utils/tws";
-
-import { View, ScrollView } from "react-native";
+import React, { useCallback, useEffect } from "react";
+import { View, ScrollView, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { AppButton, AppScreen, GlassCard, Reveal, AppText } from "@/src/ui-kit";
+import { AppScreen } from "@/src/components/organisms/AppScreen";
+import { Button } from "@/src/components/atoms/Button";
+import { Text } from "@/src/components/atoms/Text";
 import { useSession } from "@/src/session-context";
-
-import { useHomeData } from "@/src/components/home/useHomeData";
-import { HomeHeader } from "@/src/components/home/HomeHeader";
-import { HeroCard } from "@/src/components/home/HeroCard";
-import { QuickActions } from "@/src/components/home/QuickActions";
-import { FocusCard } from "@/src/components/home/FocusCard";
-import { UpcomingEvents } from "@/src/components/home/UpcomingEvents";
-import { useCallback, useEffect } from "react";
+import { useHomeData } from "@/src/features/home";
+import {
+  HomeHeader,
+  HeroCard,
+  QuickActions,
+  FocusCard,
+  UpcomingEvents,
+} from "@/src/features/home";
+import { palette } from "@/src/theme/tokens";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -45,87 +47,101 @@ export default function HomeScreen() {
     router.replace("/login");
   }
 
-  const handleLoginPress = useCallback(() => {
-    router.push("/login");
-  }, [router]);
+  if (!hydrated) {
+    return null;
+  }
 
-  const handlePairingPress = useCallback(() => {
-    router.push("/pairing");
-  }, [router]);
+  if (!isAuthenticated) {
+    return (
+      <AppScreen>
+        <View style={styles.centerContainer}>
+          <Text style={styles.centerText}>Please log in to continue</Text>
+          <Button label="Login" onPress={() => router.push("/login")} />
+        </View>
+      </AppScreen>
+    );
+  }
+
+  if (!isPaired) {
+    return (
+      <AppScreen>
+        <View style={styles.centerContainer}>
+          <Text style={styles.centerText}>
+            You need to pair with your partner first
+          </Text>
+          <Button label="Pair Now" onPress={() => router.push("/pairing")} />
+        </View>
+      </AppScreen>
+    );
+  }
 
   return (
-    <AppScreen scroll={false}>
-      {isAuthenticated && isPaired ? (
-        <HomeHeader
-          userInitial={session?.user?.email?.[0]?.toUpperCase() || "B"}
-          greeting={(greetingInfo as any).greeting}
-          subGreeting={(greetingInfo as any).subGreeting}
-          iconName={(greetingInfo as any).iconName}
-        />
-      ) : null}
-
+    <AppScreen>
       <ScrollView
-        contentContainerStyle={tws("px-5 pt-4 pb-32")}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {!hydrated ? (
-          <Reveal delay={40}>
-            <GlassCard title="Đang khôi phục phiên" subtitle="Ứng dụng đang nạp dữ liệu cục bộ.">
-              <AppText variant="captionBold" color="slate-400">Vui lòng chờ trong giây lát.</AppText>
-            </GlassCard>
-          </Reveal>
-        ) : null}
+        {/* Header */}
+        <HomeHeader
+          userInitial={session?.user?.email?.[0]?.toUpperCase() || "B"}
+          greeting={greetingInfo.greeting}
+          subGreeting={greetingInfo.subGreeting}
+          iconName={greetingInfo.iconName}
+        />
 
-        {!isAuthenticated ? (
-          <Reveal delay={64}>
-            <GlassCard title="Bắt đầu hành trình" subtitle="Đăng nhập để mở không gian chung của hai bạn.">
-              <AppText variant="captionBold" color="slate-400" style={tws("mb-4")}>
-                Em Plus là nơi lưu giữ kỷ niệm và nhịp cảm xúc riêng tư của hai bạn.
-              </AppText>
-              <AppButton label="Đến màn đăng nhập" onPress={handleLoginPress} />
-            </GlassCard>
-          </Reveal>
-        ) : null}
+        {/* Hero Card - Love Days Counter */}
+        <HeroCard loveDays={loveDays} startDateLabel={startDateLabel} />
 
-        {isAuthenticated && !isPaired ? (
-          <Reveal delay={80}>
-            <GlassCard title="Cần ghép đôi" subtitle="Kết nối với người ấy để mở Dashboard chung.">
-              <AppText variant="captionBold" color="slate-400" style={tws("mb-4")}>
-                Dùng Trung tâm kết nối để tạo hoặc nhập mã mời và ghép đôi tài khoản.
-              </AppText>
-              <AppButton label="Mở Trung tâm kết nối" onPress={handlePairingPress} />
-              <AppButton label="Đăng xuất" variant="ghost" onPress={handleLogout} />
-            </GlassCard>
-          </Reveal>
-        ) : null}
+        {/* Quick Actions - Cycle & Next Date */}
+        <QuickActions cycleLabel={cycleLabel} nextDateLabel={nextDateLabel} />
 
-        {isAuthenticated && isPaired ? (
-          <View style={tws("flex-1")}>
-            <Reveal delay={150}>
-              <HeroCard
-                loveDays={loveDays}
-                startDateLabel={startDateLabel}
-              />
-            </Reveal>
+        {/* Focus Card - Mood Check-in */}
+        {showFocusCard && (
+          <FocusCard
+            focusTitle={focusTitle}
+            focusSubtitle={focusSubtitle}
+            showFocusCard={showFocusCard}
+            setShowFocusCard={setShowFocusCard}
+          />
+        )}
 
-            <QuickActions
-              cycleLabel={cycleLabel}
-              nextDateLabel={nextDateLabel}
-            />
+        {/* Upcoming Events */}
+        <UpcomingEvents upcomingEvents={upcomingEvents} />
 
-            <FocusCard
-              focusTitle={focusTitle}
-              focusSubtitle={focusSubtitle}
-              showFocusCard={showFocusCard}
-              setShowFocusCard={setShowFocusCard}
-            />
-
-            <UpcomingEvents
-              upcomingEvents={upcomingEvents}
-            />
-          </View>
-        ) : null}
+        {/* Logout Button */}
+        <View style={styles.footer}>
+          <Button
+            label="Đăng xuất"
+            onPress={handleLogout}
+            variant="outline"
+            fullWidth
+          />
+        </View>
       </ScrollView>
     </AppScreen>
   );
 }
+
+const styles = StyleSheet.create({
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 128,
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  centerText: {
+    fontSize: 16,
+    color: palette.zinc500,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  footer: {
+    marginTop: 32,
+    marginBottom: 20,
+  },
+});

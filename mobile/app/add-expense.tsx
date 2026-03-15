@@ -1,228 +1,367 @@
-import { tws } from "@/src/utils/tws";
 import React, { useState, useRef, useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-    View,
-    TextInput,
-    ScrollView,
-    KeyboardAvoidingView,
-    Platform,
-    Keyboard,
+  View,
+  TextInput,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { palette } from "@/src/theme";
-import { PressableScale, AppText } from "@/src/ui-kit";
+import { AppScreen } from "@/src/components/organisms/AppScreen";
+import { Text } from "@/src/components/atoms/Text";
+import { Button } from "@/src/components/atoms/Button";
+import { Card } from "@/src/components/molecules/Card";
+import { palette } from "@/src/theme/tokens";
 import { createBudgetExpense } from "@/src/api";
 import { useToast } from "@/src/toast-context";
 import { useSession } from "@/src/session-context";
-import { CATEGORY_CONFIG } from "@/src/components/budget/constants";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { CATEGORY_CONFIG } from "@/src/features/budget/components/constants";
+import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
 
-const PremiumField = ({
-    label,
-    value,
-    onChangeText,
-    placeholder,
-    icon,
-    keyboardType = "default",
-    onFocus,
-    isFocused
-}: {
-    label: string,
-    value: string,
-    onChangeText: (text: string) => void,
-    placeholder: string,
-    icon: any,
-    keyboardType?: any,
-    onFocus?: () => void,
-    isFocused?: boolean
-}) => (
-    <View style={tws("gap-2")}>
-        <AppText variant="captionBold" color="slate-500" style={tws("tracking-widest ml-1")}>{label}</AppText>
-        <View style={tws(`flex-row items-center bg-slate-50 border ${isFocused ? 'border-secondary' : 'border-slate-200'} rounded-3xl px-5 py-3.5 shadow-sm overflow-hidden`)}>
-            <View style={tws("mr-3 w-8 h-8 rounded-xl bg-white items-center justify-center shadow-sm shadow-slate-200/50")}>
-                <Ionicons name={icon} size={18} color={isFocused ? (palette as any).secondary : (palette as any)['slate-600']} />
-            </View>
-            <TextInput
-                style={tws("flex-1 font-bold text-[16px] text-slate-800 p-0")}
-                placeholder={placeholder}
-                value={value}
-                onChangeText={onChangeText}
-                placeholderTextColor={(palette as any).placeholder}
-                keyboardType={keyboardType}
-                onFocus={onFocus}
-                returnKeyType="done"
-                blurOnSubmit={true}
-            />
-        </View>
-    </View>
-);
+interface Category {
+  icon: string;
+  bg: string;
+  color: string;
+  label: string;
+}
 
 export default function AddExpenseScreen() {
-    const router = useRouter();
-    const insets = useSafeAreaInsets();
-    const scrollViewRef = useRef<ScrollView>(null);
-    const [title, setTitle] = useState("");
-    const [amount, setAmount] = useState("");
-    const [category, setCategory] = useState("other");
-    const [place, setPlace] = useState("");
-    const [focusedField, setFocusedField] = useState<string | null>(null);
+  const router = useRouter();
+  const { withAccessToken } = useSession();
+  const { showToast } = useToast();
+  const queryClient = useQueryClient();
+  const insets = useSafeAreaInsets();
 
-    const { withAccessToken } = useSession();
-    const { showToast } = useToast();
-    const queryClient = useQueryClient();
+  const [amount, setAmount] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
-    const handleFieldFocus = useCallback((field: string, index: number) => {
-        setFocusedField(field);
-        setTimeout(() => {
-            if (scrollViewRef.current) {
-                scrollViewRef.current.scrollTo({
-                    y: index * 140,
-                    animated: true
-                });
-            }
-        }, 150);
-    }, []);
+  const amountInputRef = useRef<TextInput>(null);
 
-    const handleClose = () => {
-        Keyboard.dismiss();
-        router.back();
-    };
+  const { mutate: createExpense, isPending } = useMutation({
+    mutationFn: (data: any) =>
+      withAccessToken((api: any) => api.budget.createExpense.execute(data)),
+    onSuccess: () => {
+      showToast("Đã thêm chi tiêu mới!", "success");
+      void queryClient.invalidateQueries({ queryKey: ["budgetExpenses"] });
+      void queryClient.invalidateQueries({ queryKey: ["budgetSummary"] });
+      router.back();
+    },
+    onError: (err: any) => {
+      showToast(err.message || "Không thể thêm chi tiêu", "error");
+    },
+  });
 
-    const mutation = useMutation({
-        mutationFn: (data: Parameters<typeof createBudgetExpense>[1]) =>
-            withAccessToken((token) => createBudgetExpense(token, data)),
-        onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: ["budgetSummary"] });
-            void queryClient.invalidateQueries({ queryKey: ["budgetExpenses"] });
-            showToast("Đã thêm thành công!", "success");
-            handleClose();
-        },
-        onError: () => {
-            showToast("Có lỗi xảy ra", "error");
-        },
+  const handleSubmit = useCallback(() => {
+    Keyboard.dismiss();
+    if (!amount || !categoryId) {
+      showToast("Vui lòng nhập số tiền và chọn danh mục", "warning");
+      return;
+    }
+    createExpense({
+      amount: parseFloat(amount.replace(/,/g, "")),
+      categoryId,
+      description: description || undefined,
+      date: new Date(date).toISOString(),
     });
+  }, [amount, categoryId, description, date, createExpense, showToast]);
 
-    const handleSubmit = () => {
-        if (!title || !amount) {
-            showToast("Vui lòng nhập tên và số tiền", "error");
-            return;
-        }
-        mutation.mutate({
-            title,
-            amount: parseFloat(amount),
-            category,
-            place: place || undefined,
-            status: "PENDING",
-            date: new Date().toISOString().split('T')[0]
-        });
-    };
+  const handleCategorySelect = useCallback((id: string) => {
+    setCategoryId(id);
+    amountInputRef.current?.focus();
+  }, []);
 
-    return (
-        <KeyboardAvoidingView
-            style={tws("flex-1 bg-white")}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+      keyboardVerticalOffset={insets.top + 60}
+    >
+      <AppScreen>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-            <View style={[tws("flex-1"), { paddingTop: insets.top + 16 }]}>
-                <View style={tws("flex-row items-center justify-between mb-6 px-6 gap-4")}>
-                    <PressableScale onPress={handleClose} style={tws("w-10 h-10 rounded-full items-center justify-center bg-slate-100")}>
-                        <Ionicons name="arrow-back" size={20} color={(palette as any)['slate-800']} />
-                    </PressableScale>
-                    <View style={tws("flex-1")}>
-                        <AppText variant="h1" color="slate-900" style={tws("tracking-tight")}>Chi tiêu mới</AppText>
-                        <AppText variant="caption" color="slate-500" style={tws("mt-0.5")}>Xây dựng thói quen tài chính tốt</AppText>
-                    </View>
-                    <View style={tws("w-10 h-10")} />
-                </View>
+          {/* Amount Input */}
+          <View style={styles.amountContainer}>
+            <TextInput
+              ref={amountInputRef}
+              style={styles.amountInput}
+              value={amount}
+              onChangeText={setAmount}
+              placeholder="0 ₫"
+              placeholderTextColor={palette.zinc400}
+              keyboardType="decimal-pad"
+              returnKeyType="done"
+              blurOnSubmit={true}
+            />
+          </View>
 
-                <ScrollView
-                    ref={scrollViewRef}
-                    showsVerticalScrollIndicator={false}
-                    keyboardShouldPersistTaps="handled"
-                    contentContainerStyle={{ paddingBottom: insets.bottom + 140, paddingHorizontal: 24 }}
-                    style={tws("flex-1")}
-                >
-                    <View style={tws("gap-6")}>
-                        <PremiumField
-                            label="Lý do chi tiêu"
-                            icon="reader-outline"
-                            placeholder="Ví dụ: Ăn tối cùng gia đình..."
-                            value={title}
-                            onChangeText={setTitle}
-                            onFocus={() => handleFieldFocus('title', 0)}
-                            isFocused={focusedField === 'title'}
-                        />
-
-                        <PremiumField
-                            label="Số tiền (VNĐ)"
-                            icon="wallet-outline"
-                            placeholder="0"
-                            keyboardType="numeric"
-                            value={amount}
-                            onChangeText={setAmount}
-                            onFocus={() => handleFieldFocus('amount', 1)}
-                            isFocused={focusedField === 'amount'}
-                        />
-
-                        <View style={tws("gap-3.5")}>
-                            <AppText variant="captionBold" color="slate-500" style={tws("tracking-widest ml-1")}>Danh mục chi tiêu</AppText>
-                            <View style={tws("flex-row flex-wrap gap-2.5")}>
-                                {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => {
-                                    const isSelected = category === key;
-                                    return (
-                                        <PressableScale
-                                            key={key}
-                                            onPress={() => setCategory(key)}
-                                            style={tws(
-                                                "flex-row items-center gap-2.5 px-4 py-3 rounded-2xl border",
-                                                isSelected ? "border-transparent shadow-md shadow-secondary/20" : "bg-slate-50 border-slate-200"
-                                            )}
-                                        >
-                                            {isSelected && (
-                                                <View style={tws("absolute inset-0 bg-secondary rounded-2xl")} />
-                                            )}
-                                            <View style={tws("w-7 h-7 rounded-xl items-center justify-center", { backgroundColor: isSelected ? 'rgba(255,255,255,0.2)' : cfg.bg })}>
-                                                <Ionicons name={cfg.icon} size={15} color={isSelected ? "white" : cfg.color} />
-                                            </View>
-                                            <AppText variant="bodyBold" color={isSelected ? "white" : "slate-600"}>{cfg.label}</AppText>
-                                        </PressableScale>
-                                    );
-                                })}
-                            </View>
+          {/* Category Selection */}
+          <View style={styles.categoryContainer}>
+            <Text style={styles.categoryLabel}>DANH MỤC</Text>
+            <View style={styles.categoryGrid}>
+              {(Object.entries(CATEGORY_CONFIG) as [string, Category][]).map(
+                ([id, config]) => (
+                  <View key={id} style={styles.categoryItem}>
+                    <BlurView
+                      intensity={80}
+                      tint="light"
+                      style={[
+                        styles.categoryButton,
+                        categoryId === id && styles.categoryButtonActive,
+                      ]}
+                    >
+                      <LinearGradient
+                        colors={
+                          categoryId === id
+                            ? [palette.violet600, palette.violet700]
+                            : ["rgba(255,255,255,0.8)", "rgba(255,255,255,0.6)"]
+                        }
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.categoryGradient}
+                      >
+                        <View style={styles.categoryIconContainer}>
+                          <Ionicons
+                            name={config.icon as any}
+                            size={20}
+                            color={categoryId === id ? "#fff" : palette.zinc700}
+                          />
                         </View>
-
-                        <PremiumField
-                            label="Địa điểm (Tùy chọn)"
-                            icon="map-outline"
-                            placeholder="Nơi bạn đã chi tiêu..."
-                            value={place}
-                            onChangeText={setPlace}
-                            onFocus={() => handleFieldFocus('place', 3)}
-                            isFocused={focusedField === 'place'}
-                        />
-
-                        <PressableScale
-                            onPress={handleSubmit}
-                            disabled={mutation.isPending}
-                            style={tws("mt-4 min-h-[56px] rounded-2xl overflow-hidden shadow-lg shadow-secondary/30")}
+                        <Text
+                          style={[
+                            styles.categoryLabel,
+                            categoryId === id
+                              ? styles.categoryLabelActive
+                              : styles.categoryLabelInactive,
+                          ]}
                         >
-                            <View style={tws("absolute inset-0 bg-secondary")} />
-                            <View style={tws("absolute inset-0 flex-row items-center justify-center px-4")}>
-                                <View style={tws("flex-row items-center justify-center gap-3")}>
-                                    <AppText variant="bodyBold" color="white" style={tws("tracking-tight")}>Tạo chi tiêu ngay</AppText>
-                                    <View style={tws("w-7 h-7 rounded-full bg-white/20 items-center justify-center")}>
-                                        <Ionicons name="arrow-forward" size={14} color="white" />
-                                    </View>
-                                </View>
-                            </View>
-                        </PressableScale>
-                    </View>
-                </ScrollView>
+                          {config.label}
+                        </Text>
+                      </LinearGradient>
+                    </BlurView>
+                  </View>
+                ),
+              )}
             </View>
-        </KeyboardAvoidingView>
-    );
+          </View>
+
+          {/* Description Field */}
+          <View style={styles.fieldContainer}>
+            <Text style={styles.fieldLabel}>GHI CHÚ</Text>
+            <Card style={styles.fieldCard}>
+              <View style={styles.fieldContent}>
+                <Ionicons
+                  name="document-text-outline"
+                  size={20}
+                  color={palette.zinc600}
+                />
+                <TextInput
+                  style={styles.fieldInput}
+                  placeholder="Nhập ghi chú..."
+                  placeholderTextColor={palette.zinc400}
+                  value={description}
+                  onChangeText={setDescription}
+                  onFocus={() => setFocusedField("description")}
+                  onBlur={() => setFocusedField(null)}
+                  returnKeyType="done"
+                />
+              </View>
+            </Card>
+          </View>
+
+          {/* Date Field */}
+          <View style={styles.fieldContainer}>
+            <Text style={styles.fieldLabel}>NGÀY</Text>
+            <Card style={styles.fieldCard}>
+              <View style={styles.fieldContent}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={20}
+                  color={palette.zinc600}
+                />
+                <TextInput
+                  style={styles.fieldInput}
+                  placeholder="YYYY-MM-DD"
+                  placeholderTextColor={palette.zinc400}
+                  value={date}
+                  onChangeText={setDate}
+                  onFocus={() => setFocusedField("date")}
+                  onBlur={() => setFocusedField(null)}
+                  returnKeyType="done"
+                />
+              </View>
+            </Card>
+          </View>
+
+          {/* Submit Button */}
+          <Button
+            label={isPending ? "Đang xử lý..." : "Xác nhận chi tiêu"}
+            onPress={handleSubmit}
+            disabled={isPending}
+            fullWidth
+            style={styles.submitButton}
+          >
+            {isPending && (
+              <ActivityIndicator color="#fff" style={styles.buttonIcon} />
+            )}
+            {!isPending && (
+              <>
+                <Ionicons
+                  name="checkmark-circle-outline"
+                  size={20}
+                  color="#fff"
+                  style={styles.buttonIcon}
+                />
+                <Text style={styles.buttonText}>Xác nhận chi tiêu</Text>
+              </>
+            )}
+          </Button>
+        </ScrollView>
+      </AppScreen>
+
+      {isPending && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator color="#fff" size="large" />
+        </View>
+      )}
+    </KeyboardAvoidingView>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: palette.zinc50,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 40,
+  },
+  amountContainer: {
+    marginBottom: 24,
+  },
+  amountInput: {
+    fontSize: 42,
+    fontWeight: "bold",
+    color: palette.zinc900,
+    textAlign: "center",
+    paddingVertical: 16,
+  },
+  categoryContainer: {
+    marginBottom: 24,
+  },
+  categoryLabel: {
+    fontSize: 13,
+    fontWeight: "bold",
+    color: palette.zinc500,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 12,
+    paddingHorizontal: 4,
+  },
+  categoryLabelActive: {
+    color: "#fff",
+  },
+  categoryLabelInactive: {
+    color: palette.zinc700,
+  },
+  categoryGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+  },
+  categoryItem: {
+    width: "31%",
+  },
+  categoryButton: {
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+  categoryButtonActive: {
+    shadowColor: palette.violet600,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  categoryGradient: {
+    padding: 16,
+    alignItems: "center",
+    gap: 8,
+  },
+  categoryIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.9)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  fieldContainer: {
+    marginBottom: 16,
+  },
+  fieldLabel: {
+    fontSize: 13,
+    fontWeight: "bold",
+    color: palette.zinc500,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 8,
+    paddingHorizontal: 4,
+  },
+  fieldCard: {
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  fieldContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    padding: 14,
+  },
+  fieldInput: {
+    flex: 1,
+    fontSize: 15,
+    color: palette.zinc900,
+    padding: 0,
+  },
+  submitButton: {
+    marginTop: 24,
+    marginBottom: 40,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonIcon: {
+    marginRight: 8,
+  },
+  buttonText: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

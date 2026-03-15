@@ -1,30 +1,66 @@
 import { Redirect, Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, View, Platform, Animated, Pressable, Dimensions } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Platform,
+  Animated,
+  Pressable,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
 import { useSession } from "@/src/session-context";
 import { palette } from "@/src/theme";
 import { PressableScale } from "@/src/ui-kit";
 import { BlurView } from "expo-blur";
 import { useEffect, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as Haptics from "expo-haptics";
 
 const { width } = Dimensions.get("window");
 
-function iconForRoute(route: string, focused: boolean): keyof typeof Ionicons.glyphMap {
+// Constants
+const TAB_ITEM_COUNT = 4;
+const PILL_PADDING = 8;
+const PILL_WIDTH = width * 0.72;
+const ITEM_WIDTH = (PILL_WIDTH - PILL_PADDING * 2) / TAB_ITEM_COUNT;
+const PILL_HEIGHT = 72;
+const ACTIVE_INDICATOR_HEIGHT = 56;
+const CARE_BUTTON_SIZE = 80;
+
+function iconForRoute(
+  route: string,
+  focused: boolean,
+): keyof typeof Ionicons.glyphMap {
   if (route === "home") return focused ? "home" : "home-outline";
   if (route === "timeline") return focused ? "apps" : "apps-outline";
-  if (route === "notifications") return focused ? "notifications" : "notifications-outline";
+  if (route === "notifications")
+    return focused ? "notifications" : "notifications-outline";
   if (route === "care") return "heart";
   if (route === "budget") return focused ? "pie-chart" : "pie-chart-outline";
   if (route === "profile") return focused ? "person" : "person-outline";
   return "person-outline";
 }
 
+function labelForRoute(route: string): string {
+  const labels: Record<string, string> = {
+    home: "Trang chủ",
+    timeline: "Kế hoạch",
+    notifications: "Thông báo",
+    care: "Cảm xúc",
+    budget: "Ngân sách",
+    profile: "Tài khoản",
+  };
+  return labels[route] || route;
+}
+
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const insets = useSafeAreaInsets();
 
   // Routes for the pill (excluding care and notifications)
-  const pillRoutes = state.routes.filter((r: any) => r.name !== "care" && r.name !== "notifications");
+  const pillRoutes = state.routes.filter(
+    (r: any) => r.name !== "care" && r.name !== "notifications",
+  );
   const careRouteIndex = state.routes.findIndex((r: any) => r.name === "care");
   const careRoute = state.routes[careRouteIndex];
   const isCareFocused = state.index === careRouteIndex;
@@ -37,7 +73,9 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
 
   useEffect(() => {
     // Determine the active index relative to the pill routes
-    const pillActiveIndex = pillRoutes.findIndex((r: any) => r.name === state.routes[state.index].name);
+    const pillActiveIndex = pillRoutes.findIndex(
+      (r: any) => r.name === state.routes[state.index].name,
+    );
 
     if (pillActiveIndex !== -1) {
       Animated.spring(slideAnim, {
@@ -49,7 +87,10 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
     }
   }, [state.index]);
 
-  const handlePress = (route: any, index: number) => {
+  const handlePress = async (route: any, index: number) => {
+    // Trigger haptic feedback
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
     const event = navigation.emit({
       type: "tabPress",
       target: route.key,
@@ -61,7 +102,9 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
     }
   };
 
-  const isPillFocused = pillRoutes.some((r: any) => r.name === state.routes[state.index].name);
+  const isPillFocused = pillRoutes.some(
+    (r: any) => r.name === state.routes[state.index].name,
+  );
 
   return (
     <View style={[styles.tabBarWrapper, { paddingBottom: insets.bottom + 16 }]}>
@@ -76,41 +119,59 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
                   styles.activeIndicator,
                   {
                     width: ITEM_WIDTH,
-                    transform: [{ translateX: slideAnim }]
-                  }
+                    transform: [{ translateX: slideAnim }],
+                  },
                 ]}
               />
             )}
 
             {pillRoutes.map((route: any) => {
-              const routeIndex = state.routes.findIndex((r: any) => r.key === route.key);
+              const routeIndex = state.routes.findIndex(
+                (r: any) => r.key === route.key,
+              );
               const isFocused = state.index === routeIndex;
+              const label = labelForRoute(route.name);
               return (
-                <PressableScale
+                <TouchableOpacity
                   key={route.key}
                   onPress={() => handlePress(route, routeIndex)}
                   style={styles.tabItem}
-                  scaleTo={0.8}
+                  activeOpacity={0.8}
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: isFocused }}
+                  accessibilityLabel={label}
+                  accessibilityHint={`Chuyển đến ${label.toLowerCase()}`}
                 >
                   <Ionicons
                     name={iconForRoute(route.name, isFocused)}
                     size={24}
                     color={isFocused ? "#ec1334" : "#94a3b8"}
                   />
-                </PressableScale>
+                </TouchableOpacity>
               );
             })}
           </BlurView>
         </View>
 
         {/* Detached Care Button (Light Theme) */}
-        <PressableScale
+        <TouchableOpacity
           onPress={() => handlePress(careRoute, careRouteIndex)}
           style={styles.detachedButtonWrapper}
-          scaleTo={0.9}
+          activeOpacity={0.9}
+          accessibilityRole="button"
+          accessibilityState={{ selected: isCareFocused }}
+          accessibilityLabel="Cảm xúc"
+          accessibilityHint="Kiểm tra tâm trạng và kết nối với người ấy"
         >
           <View style={styles.careOuter}>
-            <BlurView intensity={90} tint="light" style={[styles.careButton, isCareFocused && styles.careButtonActive]}>
+            <BlurView
+              intensity={90}
+              tint="light"
+              style={[
+                styles.careButton,
+                isCareFocused && styles.careButtonActive,
+              ]}
+            >
               <Ionicons
                 name={isCareFocused ? "heart" : "heart-outline"}
                 size={30}
@@ -118,7 +179,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
               />
             </BlurView>
           </View>
-        </PressableScale>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -138,7 +199,8 @@ export default function TabsLayout() {
   const isPaired = Boolean(!!session?.user.coupleId);
 
   if (!hydrated) return null;
-  if (!isAuthenticated || !!!session?.user.coupleId) return <Redirect href="/login" />;
+  if (!isAuthenticated || !!!session?.user.coupleId)
+    return <Redirect href="/login" />;
 
   return (
     <Tabs
@@ -183,23 +245,23 @@ const styles = StyleSheet.create({
   },
   pillContainer: {
     flexDirection: "row",
-    height: 72,
-    width: width * 0.72,
-    paddingHorizontal: 8,
+    height: PILL_HEIGHT,
+    width: PILL_WIDTH,
+    paddingHorizontal: PILL_PADDING,
     alignItems: "center",
     justifyContent: "space-between",
   },
   activeIndicator: {
     position: "absolute",
-    height: 56,
+    height: ACTIVE_INDICATOR_HEIGHT,
     borderRadius: 28,
     backgroundColor: "rgba(236, 19, 52, 0.12)",
     left: 0,
-    top: 8,
+    top: PILL_PADDING,
   },
   tabItem: {
     flex: 1,
-    height: 72,
+    height: PILL_HEIGHT,
     alignItems: "center",
     justifyContent: "center",
     zIndex: 10,
@@ -217,9 +279,9 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.8)",
   },
   careButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: CARE_BUTTON_SIZE,
+    height: CARE_BUTTON_SIZE,
+    borderRadius: CARE_BUTTON_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,

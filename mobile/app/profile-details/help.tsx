@@ -1,106 +1,144 @@
-import { View, ScrollView, TouchableOpacity, Linking } from "react-native";
+import { View, ScrollView, StyleSheet, Linking } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { AppScreen, Reveal, AppText } from "@/src/ui-kit";
+import { AppScreen, AppText } from "@/src/ui-kit";
 import { palette } from "@/src/theme";
-import { tws } from "@/src/utils/tws";
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  section: { marginTop: 24, marginBottom: 8, paddingHorizontal: 20 },
+  sectionLabel: {
+    fontSize: 13,
+    fontWeight: "bold",
+    color: palette.zinc500,
+    textTransform: "uppercase" as "uppercase",
+    letterSpacing: 1,
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 20,
+    marginHorizontal: 20,
+    marginBottom: 16,
+  },
+  faqItem: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.zinc100,
+  },
+  faqQuestion: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: palette.zinc800,
+    marginBottom: 8,
+  },
+  faqAnswer: { fontSize: 15, color: palette.zinc600, lineHeight: 22 },
+  contactRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    paddingVertical: 16,
+  },
+  contactIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: palette.violet100,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  contactText: { fontSize: 15, fontWeight: "bold", color: palette.zinc700 },
+});
 
 export default function HelpScreen() {
-    const router = useRouter();
+  const handleEmailPress = () => {
+    Linking.openURL("mailto:support@emplus.app");
+  };
 
-    const HelpItem = ({ icon, label, onPress }: any) => (
-        <TouchableOpacity style={tws("flex-row items-center justify-between py-3.5 px-4")} onPress={onPress}>
-            <View style={tws("flex-row items-center flex-1")}>
-                <View style={tws("w-9 h-9 rounded-full items-center justify-center mr-3 bg-white/60")}>
-                    <Ionicons name={icon} size={18} color={(palette as any)['slate-500']} />
-                </View>
-                <AppText variant="bodyBold" color="slate-700">{label}</AppText>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color={(palette as any)['slate-300']} />
-        </TouchableOpacity>
-    );
+  return (
+    <AppScreen>
+      <View style={styles.header}>
+        <Ionicons
+          name="help-circle-outline"
+          size={24}
+          color={palette.violet600}
+        />
+        <AppText
+          style={{ fontSize: 20, fontWeight: "bold", color: palette.zinc900 }}
+        >
+          Trợ giúp
+        </AppText>
+      </View>
 
-    const FAQItem = ({ question, answer }: any) => (
-        <View style={tws("p-4")}>
-            <AppText variant="bodyBold" color="slate-800" style={tws("mb-1.5")}>{question}</AppText>
-            <AppText variant="caption" color="slate-500" style={tws("leading-5")}>{answer}</AppText>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 60 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.card}>
+          <AppText
+            style={{ fontSize: 15, color: palette.zinc700, lineHeight: 22 }}
+          >
+            Tìm câu trả lời cho các câu hỏi thường gặp hoặc liên hệ với chúng
+            tôi để được hỗ trợ.
+          </AppText>
         </View>
-    );
 
-    return (
-        <AppScreen>
-            <View style={tws("flex-row items-center justify-between px-4 py-3")}>
-                <TouchableOpacity
-                    style={tws("w-10 h-10 rounded-full items-center justify-center bg-white shadow-glass")}
-                    onPress={() => router.back()}
-                >
-                    <Ionicons name="arrow-back" size={24} color={(palette as any)['slate-800']} />
-                </TouchableOpacity>
-                <AppText variant="h2" color="slate-800">Hỗ trợ</AppText>
-                <View style={tws("w-10")} />
+        <View style={styles.section}>
+          <AppText style={styles.sectionLabel}>Câu hỏi thường gặp</AppText>
+        </View>
+
+        <View style={styles.card}>
+          <View style={styles.faqItem}>
+            <AppText style={styles.faqQuestion}>
+              Làm thế nào để ghép đôi tài khoản?
+            </AppText>
+            <AppText style={styles.faqAnswer}>
+              Vào phần Pairing, sao chép mã QR và gửi cho người ấy. Khi họ nhập
+              mã, hai tài khoản sẽ được ghép đôi.
+            </AppText>
+          </View>
+          <View style={styles.faqItem}>
+            <AppText style={styles.faqQuestion}>
+              Tôi quên mật khẩu phải làm sao?
+            </AppText>
+            <AppText style={styles.faqAnswer}>
+              Nhấn "Quên mật khẩu" ở màn hình đăng nhập và làm theo hướng dẫn để
+              đặt lại mật khẩu.
+            </AppText>
+          </View>
+          <View style={styles.faqItem}>
+            <AppText style={styles.faqQuestion}>
+              Làm thế nào để xóa tài khoản?
+            </AppText>
+            <AppText style={styles.faqAnswer}>
+              Vào Cài đặt → Tài khoản → Xóa tài khoản. Lưu ý: hành động này
+              không thể hoàn tác.
+            </AppText>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <AppText style={styles.sectionLabel}>Liên hệ</AppText>
+        </View>
+
+        <View style={styles.card}>
+          <View style={styles.contactRow}>
+            <View style={styles.contactIcon}>
+              <Ionicons
+                name="mail-outline"
+                size={20}
+                color={palette.violet600}
+              />
             </View>
-
-            <ScrollView style={tws("flex-1")} contentContainerStyle={tws("p-5")}>
-                <Reveal delay={100}>
-                    <AppText variant="captionBold" color="slate-400" style={tws("mb-3 px-1 uppercase tracking-widest")}>
-                        Liên hệ chúng tôi
-                    </AppText>
-                    <View style={tws("bg-white/45 rounded-[32px] py-1 border border-white/60 shadow-glass")}>
-                        <HelpItem
-                            icon="mail-outline"
-                            label="Gửi email hỗ trợ"
-                            onPress={() => Linking.openURL('mailto:support@emplus.app')}
-                        />
-                        <View style={tws("h-[1px] bg-slate-100/40 mx-4")} />
-                        <HelpItem
-                            icon="chatbubbles-outline"
-                            label="Chat với chúng tôi"
-                            onPress={() => { }}
-                        />
-                        <View style={tws("h-[1px] bg-slate-100/40 mx-4")} />
-                        <HelpItem
-                            icon="logo-facebook"
-                            label="Cộng đồng Em Plus"
-                            onPress={() => Linking.openURL('https://facebook.com/emplus')}
-                        />
-                    </View>
-                </Reveal>
-
-                <Reveal delay={200}>
-                    <View style={tws("mt-8")}>
-                        <AppText variant="captionBold" color="slate-400" style={tws("mb-3 px-1 uppercase tracking-widest")}>
-                            Câu hỏi thường gặp
-                        </AppText>
-                        <View style={tws("bg-white/45 rounded-[32px] py-1 border border-white/60 shadow-glass")}>
-                            <FAQItem
-                                question="Làm thế nào để ghép đôi?"
-                                answer="Vào mục Hồ sơ, chọn 'Mã cặp đôi' và gửi mã này cho đối phương để họ nhập vào ứng dụng."
-                            />
-                            <View style={tws("h-[1px] bg-slate-100/40 mx-4")} />
-                            <FAQItem
-                                question="Dữ liệu của tôi có được bảo mật không?"
-                                answer="Tất cả kỷ niệm và hình ảnh của bạn đều được mã hóa và chỉ có hai bạn mới có quyền truy cập."
-                            />
-                            <View style={tws("h-[1px] bg-slate-100/40 mx-4")} />
-                            <FAQItem
-                                question="Tôi có thể dùng trên nhiều thiết bị không?"
-                                answer="Có, bạn chỉ cần đăng nhập bằng cùng một email trên bất kỳ thiết bị nào."
-                            />
-                        </View>
-                    </View>
-                </Reveal>
-
-                <Reveal delay={300}>
-                    <View style={tws("items-center mt-10 mb-5")}>
-                        <AppText variant="caption" color="slate-300" style={tws("leading-5 text-center")}>
-                            Version 1.0.0 (Build 20260305){"\n"}
-                            © 2026 Em Plus Team
-                        </AppText>
-                    </View>
-                </Reveal>
-            </ScrollView>
-        </AppScreen>
-    );
+            <AppText style={styles.contactText}>support@emplus.app</AppText>
+          </View>
+        </View>
+      </ScrollView>
+    </AppScreen>
+  );
 }
-
-

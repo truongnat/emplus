@@ -6,7 +6,7 @@ import { PropsWithChildren, useEffect, useMemo } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import appConfig from "@/src/core/config/app-config";
 import ApiError from "@/src/core/api/api-error";
-import { useToast } from "./toast-context";
+import { useToast } from "@/src/toast-context";
 
 /**
  * Configure TanStack Query network listener for mobile.
@@ -40,9 +40,15 @@ function useConfiguredQueryClient() {
           if (error instanceof ApiError) {
             // Global error feedback via Toast
             if (error.isNetworkError()) {
-              showToast("Mất kết nối Internet. Vui lòng kiểm tra lại.", "warning");
+              showToast(
+                "Mất kết nối Internet. Vui lòng kiểm tra lại.",
+                "warning",
+              );
             } else if (error.status >= 500) {
-              showToast("Hệ thống đang gặp sự cố. Thử lại sau ít phút.", "error");
+              showToast(
+                "Hệ thống đang gặp sự cố. Thử lại sau ít phút.",
+                "error",
+              );
             } else if (error.isForbidden()) {
               showToast("Bạn không có quyền thực hiện hành động này.", "error");
             }
@@ -54,7 +60,8 @@ function useConfiguredQueryClient() {
           staleTime: appConfig.api.staleTime,
           gcTime: appConfig.api.gcTime,
           retry: (count, error: unknown) => {
-            if (error instanceof ApiError) return error.shouldRetry() && count < 2;
+            if (error instanceof ApiError)
+              return error.shouldRetry() && count < 2;
             return count < 2;
           },
           refetchOnWindowFocus: false,
@@ -63,9 +70,9 @@ function useConfiguredQueryClient() {
         },
       },
     });
-    
+
     return queryClient;
-  }, [showToast]);
+  }, []); // Empty deps - QueryClient created once
 }
 
 export default function ApiContext({ children }: PropsWithChildren) {

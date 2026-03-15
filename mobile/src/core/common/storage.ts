@@ -1,6 +1,6 @@
-import * as SecureStore from 'expo-secure-store';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import appConfig from '../config/app-config';
+import * as SecureStore from "expo-secure-store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import appConfig from "../config/app-config";
 
 /**
  * Utility tập trung để quản lý dữ liệu lưu trữ (Storage).
@@ -10,25 +10,39 @@ export const storage = {
   // --- Secure Storage (Tokens) ---
   auth: {
     getTokens: async () => {
-      const raw = await SecureStore.getItemAsync(appConfig.storage.authTokens);
-      return raw ? JSON.parse(raw) : null;
+      try {
+        const raw = await SecureStore.getItemAsync(
+          appConfig.storage.authTokens,
+        );
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
     },
-    setTokens: (tokens: object) => 
-      SecureStore.setItemAsync(appConfig.storage.authTokens, JSON.stringify(tokens)),
-    clear: () => 
-      SecureStore.deleteItemAsync(appConfig.storage.authTokens),
+    setTokens: (tokens: object) =>
+      SecureStore.setItemAsync(
+        appConfig.storage.authTokens,
+        JSON.stringify(tokens),
+      ),
+    clear: () => SecureStore.deleteItemAsync(appConfig.storage.authTokens),
   },
 
   // --- Async Storage (Metadata / Settings) ---
   user: {
     getMetadata: async () => {
-      const raw = await AsyncStorage.getItem(appConfig.storage.userMetadata);
-      return raw ? JSON.parse(raw) : null;
+      try {
+        const raw = await AsyncStorage.getItem(appConfig.storage.userMetadata);
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
     },
-    setMetadata: (meta: object) => 
-      AsyncStorage.setItem(appConfig.storage.userMetadata, JSON.stringify(meta)),
-    clear: () => 
-      AsyncStorage.removeItem(appConfig.storage.userMetadata),
+    setMetadata: (meta: object) =>
+      AsyncStorage.setItem(
+        appConfig.storage.userMetadata,
+        JSON.stringify(meta),
+      ),
+    clear: () => AsyncStorage.removeItem(appConfig.storage.userMetadata),
   },
 
   /**
@@ -39,5 +53,5 @@ export const storage = {
       SecureStore.deleteItemAsync(appConfig.storage.authTokens),
       AsyncStorage.removeItem(appConfig.storage.userMetadata),
     ]);
-  }
+  },
 };

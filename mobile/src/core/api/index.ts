@@ -33,7 +33,7 @@ export class ApiClient {
     path: string,
     init?: RequestInit,
     options?: ApiRequestOptions,
-    isRetry = false // Dùng để ngăn việc retry vô hạn
+    isRetry = false, // Dùng để ngăn việc retry vô hạn
   ): Promise<T> {
     const url = `${appConfig.env.apiBase}${path}`;
     const method = init?.method ?? "GET";
@@ -43,7 +43,7 @@ export class ApiClient {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       ...(options?.headers ?? {}),
-      ...(init?.headers as Record<string, string> ?? {}),
+      ...((init?.headers as Record<string, string>) ?? {}),
     };
 
     const token = tokenManager.getAccessToken();
@@ -51,27 +51,41 @@ export class ApiClient {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    if (appConfig.env.isDevelopment) startLog(url, method, path, { ...init, headers });
+    if (appConfig.env.isDevelopment)
+      startLog(url, method, path, { ...init, headers });
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     const startTime = Date.now();
     try {
-      const response = await fetch(url, { ...init, headers, signal: controller.signal });
+      const response = await fetch(url, {
+        ...init,
+        headers,
+        signal: controller.signal,
+      });
       clearTimeout(timeoutId);
-      
+
       const duration = Date.now() - startTime;
       let payload: unknown = null;
       const raw = await response.text();
       if (raw) {
-        try { payload = JSON.parse(raw); } catch { payload = raw; }
+        try {
+          payload = JSON.parse(raw);
+        } catch {
+          payload = raw;
+        }
       }
 
-      if (appConfig.env.isDevelopment) endLog(method, path, response, payload, duration);
+      if (appConfig.env.isDevelopment)
+        endLog(method, path, response, payload, duration);
 
       // Xử lý Lỗi 401 (Hết hạn Token)
-      if (response.status === ApiErrorCode.UNAUTHORIZED && !options?.skipAuth && !isRetry) {
+      if (
+        response.status === ApiErrorCode.UNAUTHORIZED &&
+        !options?.skipAuth &&
+        !isRetry
+      ) {
         const nextToken = await this.handleTokenExpiration();
         if (nextToken) {
           // Thực hiện lại yêu cầu gốc với Token mới
@@ -80,10 +94,15 @@ export class ApiClient {
       }
 
       const allowedStatuses = options?.allowStatuses ?? [];
-      const isAcceptedStatus = response.ok || allowedStatuses.includes(response.status);
+      const isAcceptedStatus =
+        response.ok || allowedStatuses.includes(response.status);
 
       if (!isAcceptedStatus) {
-        const parsed = toMessageFromResponse(response.status, payload, "API Request Failed");
+        const parsed = toMessageFromResponse(
+          response.status,
+          payload,
+          "API Request Failed",
+        );
         throw new ApiError({
           message: parsed.message,
           status: response.status,
@@ -98,8 +117,15 @@ export class ApiClient {
       clearTimeout(timeoutId);
       if (error instanceof ApiError) throw error;
 
-      if (error.name === 'AbortError') throw new ApiError({ message: "Request Timeout", status: ApiErrorCode.TIMEOUT });
-      throw new ApiError({ message: "Network Error", status: ApiErrorCode.NETWORK_ERROR });
+      if (error.name === "AbortError")
+        throw new ApiError({
+          message: "Request Timeout",
+          status: ApiErrorCode.TIMEOUT,
+        });
+      throw new ApiError({
+        message: "Network Error",
+        status: ApiErrorCode.NETWORK_ERROR,
+      });
     }
   }
 
@@ -125,7 +151,11 @@ export class ApiClient {
   }
 
   post<T>(path: string, body?: any, options?: ApiRequestOptions) {
-    return this.request<T>(path, { method: "POST", body: body ? JSON.stringify(body) : undefined }, options);
+    return this.request<T>(
+      path,
+      { method: "POST", body: body ? JSON.stringify(body) : undefined },
+      options,
+    );
   }
 }
 

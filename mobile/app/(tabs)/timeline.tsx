@@ -1,24 +1,26 @@
-import { tws } from "@/src/utils/tws";
-
-import React, { useMemo, useCallback, useRef } from "react";
+import React, { useMemo, useCallback } from "react";
 import {
   Text,
   View,
   ActivityIndicator,
   SectionList,
-  SectionListData,
+  StyleSheet,
 } from "react-native";
-import { palette } from "../../src/theme";
-import { AppButton, AppScreen, GlassCard, Reveal } from "../../src/ui-kit";
-import { useTimelineData } from "../../src/components/timeline/useTimelineData";
-import { TimelineHeader } from "../../src/components/timeline/TimelineHeader";
-import { TimelineDateGroupHeader } from "../../src/components/timeline/TimelineDateGroupHeader";
-import { TimelineItem } from "../../src/components/timeline/TimelineItem";
-import { TimelineImageViewer } from "../../src/components/timeline/TimelineImageViewer";
-import { type MemoryItem } from "../../src/api";
+import { AppScreen } from "@/src/components/organisms/AppScreen";
+import { Button } from "@/src/components/atoms/Button";
+import { palette } from "@/src/theme/tokens";
+import { useTimelineData } from "@/src/features/timeline";
+import {
+  TimelineHeader,
+  TimelineDateGroupHeader,
+  TimelineItem,
+  TimelineImageViewer,
+} from "@/src/features/timeline";
+import { type MemoryItem } from "@/src/api";
 
-interface TimelineSection extends SectionListData<MemoryItem> {
+interface TimelineSection {
   title: string;
+  data: MemoryItem[];
 }
 
 export default function TimelineScreen() {
@@ -31,7 +33,6 @@ export default function TimelineScreen() {
     setActiveFilter,
     groupedItems,
     hasNext,
-    page,
     items,
     fetchNextPage,
     viewerImages,
@@ -47,113 +48,171 @@ export default function TimelineScreen() {
     }));
   }, [groupedItems]);
 
-  const renderSectionHeader = useCallback(({ section }: { section: TimelineSection }) => (
-    <TimelineDateGroupHeader dateString={section.title} />
-  ), []);
+  const renderSectionHeader = useCallback(
+    ({ section }: { section: TimelineSection }) => (
+      <TimelineDateGroupHeader dateString={section.title} />
+    ),
+    [],
+  );
 
-  const renderItem = useCallback(({ item, index }: { item: MemoryItem; index: number }) => (
-    <TimelineItem
-      item={item}
-      showAxis={index === 0}
-      onImagePress={openViewer}
-    />
-  ), [openViewer]);
+  const renderItem = useCallback(
+    ({ item, index }: { item: MemoryItem; index: number }) => (
+      <TimelineItem
+        item={item}
+        showAxis={index === 0}
+        onImagePress={openViewer}
+      />
+    ),
+    [openViewer],
+  );
 
-  const ListFooter = useMemo(() => {
-    return () => (
-      <View style={tws("pb-40")}>
-        {loadingMore && (
-          <View style={tws("py-6 items-center")}>
-            <ActivityIndicator color={palette.primary} />
-          </View>
-        )}
-        {hasNext && !loadingMore && (
-          <View style={tws("ml-12 mt-3")}>
-            <AppButton
-              label="Tải thêm"
-              variant="ghost"
-              onPress={fetchNextPage}
-            />
-          </View>
-        )}
-      </View>
-    );
+  const loadMore = useCallback(() => {
+    if (!loadingMore && hasNext) {
+      fetchNextPage();
+    }
   }, [loadingMore, hasNext, fetchNextPage]);
 
-  const ListEmpty = useMemo(() => {
-    return () => {
-      if (loading && items.length === 0) {
-        return (
-          <View style={tws("py-20 items-center")}>
-            <ActivityIndicator color={palette.primary} />
-          </View>
-        );
-      }
-      if (items.length === 0) {
-        return (
-          <View style={tws("ml-12 mt-10")}>
-            <Text style={tws("font-body text-slate-400 text-[13px]")}>
-              Chưa có mục nào trong dòng thời gian.
-            </Text>
-          </View>
-        );
-      }
-      return null;
-    };
-  }, [loading, items.length]);
-
-  const listRef = useRef<SectionList<MemoryItem, TimelineSection>>(null);
-
-  React.useEffect(() => {
-    if (sections.length > 0) {
-      listRef.current?.scrollToLocation({
-        sectionIndex: 0,
-        itemIndex: 0,
-        animated: true,
-        viewOffset: 0,
-      });
-    }
-  }, [activeFilter, sections.length]);
-
-  // Virtualization optimization props
-  const virtualizationConfig = {
-    initialNumToRender: 6,
-    maxToRenderPerBatch: 6,
-    windowSize: 10,
-    updateCellsBatchingPeriod: 50,
-    removeClippedSubviews: true,
-  };
+  if (!isAuthenticated || !isPaired) {
+    return (
+      <AppScreen>
+        <View style={styles.centerContainer}>
+          <Text style={styles.centerText}>
+            {!isAuthenticated
+              ? "Đăng nhập để xem dòng thời gian"
+              : "Ghép đôi để xem kỷ niệm chung"}
+          </Text>
+          <Button
+            label={!isAuthenticated ? "Login" : "Pair Now"}
+            onPress={() => {}}
+            style={styles.centerButton}
+          />
+        </View>
+      </AppScreen>
+    );
+  }
 
   return (
-    <AppScreen scroll={false}>
-      <TimelineHeader
-        activeFilter={activeFilter}
-        setActiveFilter={setActiveFilter}
-      />
-      <View style={tws("flex-1")}>
-        <SectionList<MemoryItem, TimelineSection>
-          ref={listRef}
-          sections={sections}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          renderSectionHeader={renderSectionHeader}
-          ListHeaderComponent={() => <View style={tws("h-4")} />}
-          ListFooterComponent={ListFooter}
-          ListEmptyComponent={ListEmpty}
-          showsVerticalScrollIndicator={false}
-          stickySectionHeadersEnabled={false}
-          contentContainerStyle={{ paddingBottom: 140 }}
-          {...virtualizationConfig}
+    <AppScreen>
+      <View style={styles.container}>
+        {/* Header with Filters */}
+        <TimelineHeader
+          activeFilter={activeFilter}
+          setActiveFilter={setActiveFilter}
         />
-      </View>
 
-      {viewerImages.length > 0 && (
-        <TimelineImageViewer
-          images={viewerImages}
-          initialIndex={viewerIndex}
-          onClose={closeViewer}
-        />
-      )}
+        {/* Filter Buttons */}
+        <View style={styles.filterContainer}>
+          {["Tất cả", "Kỷ niệm", "Chi tiêu", "Nhắc nhở"].map((filter) => (
+            <Button
+              key={filter}
+              label={filter}
+              onPress={() => setActiveFilter(filter)}
+              variant={activeFilter === filter ? "primary" : "outline"}
+              size="sm"
+              style={
+                [
+                  styles.filterButton,
+                  activeFilter === filter
+                    ? styles.filterButtonActive
+                    : styles.filterButtonInactive,
+                ] as any
+              }
+            />
+          ))}
+        </View>
+
+        {/* Loading State */}
+        {loading && items.length === 0 ? (
+          <View style={styles.centerContainer}>
+            <ActivityIndicator color={palette.violet600} size="large" />
+            <Text style={styles.loadingText}>Đang tải kỷ niệm...</Text>
+          </View>
+        ) : items.length === 0 ? (
+          <View style={styles.centerContainer}>
+            <Text style={styles.emptyText}>Chưa có kỷ niệm nào</Text>
+          </View>
+        ) : (
+          /* Timeline List */
+          <SectionList<MemoryItem, TimelineSection>
+            sections={sections}
+            renderSectionHeader={renderSectionHeader}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.listContent}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              loadingMore ? (
+                <View style={styles.loadingFooter}>
+                  <ActivityIndicator color={palette.violet600} />
+                </View>
+              ) : null
+            }
+          />
+        )}
+
+        {/* Image Viewer Modal */}
+        {viewerImages.length > 0 && (
+          <TimelineImageViewer images={viewerImages} onClose={closeViewer} />
+        )}
+      </View>
     </AppScreen>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  filterContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  filterButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  filterButtonActive: {
+    backgroundColor: palette.violet600,
+    borderColor: palette.violet600,
+  },
+  filterButtonInactive: {
+    backgroundColor: "rgba(255,255,255,0.45)",
+    borderColor: "rgba(255,255,255,0.6)",
+  },
+  listContent: {
+    paddingBottom: 120,
+    paddingTop: 8,
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 80,
+  },
+  centerButton: {
+    marginTop: 20,
+  },
+  centerText: {
+    fontSize: 15,
+    color: palette.zinc400,
+  },
+  loadingText: {
+    fontSize: 15,
+    color: palette.zinc400,
+    marginTop: 16,
+  },
+  emptyText: {
+    fontSize: 15,
+    color: palette.zinc400,
+  },
+  loadingFooter: {
+    paddingVertical: 20,
+    alignItems: "center",
+  },
+});

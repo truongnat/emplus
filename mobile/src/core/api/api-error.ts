@@ -37,7 +37,10 @@ export default class ApiError extends Error {
    * Kiểm tra xem lỗi có phải do mất kết nối mạng không.
    */
   isNetworkError(): boolean {
-    return this.status === ApiErrorCode.NETWORK_ERROR || this.status === ApiErrorCode.TIMEOUT;
+    return (
+      this.status === ApiErrorCode.NETWORK_ERROR ||
+      this.status === ApiErrorCode.TIMEOUT
+    );
   }
 
   /**
@@ -52,7 +55,11 @@ export default class ApiError extends Error {
    */
   shouldRetry(): boolean {
     // Không retry nếu là lỗi Client (trừ Timeout)
-    if (this.status >= 400 && this.status < 500 && this.status !== ApiErrorCode.TIMEOUT) {
+    if (
+      this.status >= 400 &&
+      this.status < 500 &&
+      this.status !== ApiErrorCode.TIMEOUT
+    ) {
       return false;
     }
     return true;

@@ -2,6 +2,7 @@ node_modules
 .env
 mobile/node_modules
 mobile/.env
+mobile/.expo
 
 api/node_modules
 api/.env
