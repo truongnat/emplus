@@ -139,7 +139,7 @@ export default function PairingScreen() {
                 <View style={styles.qrContainer}>
                   <QRCodeStyled
                     data={inviteCode}
-                    size={200}
+                    size={180}
                     color={colors.text.primary}
                     pieceBorderRadius={4}
                     isPiecesGlued={true}
@@ -283,61 +283,61 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 20,
+    paddingTop: 16,
   },
   header: {
     alignItems: "center",
-    marginBottom: 32,
+    marginBottom: 20,
   },
   title: {
-    marginBottom: 8,
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     textAlign: "center",
   },
   qrCard: {
-    marginBottom: 32,
+    marginBottom: 20,
     padding: 0,
   },
   qrContent: {
     alignItems: "center",
-    paddingVertical: 24,
-    gap: 20,
+    paddingVertical: 16,
+    gap: 12,
   },
   qrWrapper: {
-    padding: 16,
+    padding: 12,
     backgroundColor: "white",
-    borderRadius: 24,
+    borderRadius: 20,
     ...Platform.select({
       ios: {
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 8 },
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
-        shadowRadius: 12,
+        shadowRadius: 8,
       },
       android: {
-        elevation: 6,
+        elevation: 4,
       },
     }),
   },
   qrContainer: {
-    width: 200,
-    height: 200,
+    width: 180,
+    height: 180,
     alignItems: "center",
     justifyContent: "center",
   },
   loaderContainer: {
-    width: 200,
-    height: 200,
+    width: 180,
+    height: 180,
     alignItems: "center",
     justifyContent: "center",
   },
   logoOverlay: {
     position: "absolute",
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
     padding: 4,
@@ -360,12 +360,12 @@ const styles = StyleSheet.create({
   timeRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
   },
   copyButton: {
     width: "80%",
-    height: 52,
-    borderRadius: 26,
+    height: 48,
+    borderRadius: 24,
     overflow: "hidden",
   },
   buttonInner: {
@@ -373,34 +373,34 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
+    gap: 8,
   },
   copyText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "700",
   },
   dividerRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 16,
-    marginBottom: 32,
+    gap: 12,
+    marginBottom: 20,
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    opacity: 0.5,
+    opacity: 0.3,
   },
   dividerText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "800",
     letterSpacing: 2,
   },
   inputSection: {
-    gap: 20,
+    gap: 16,
   },
   inputLabel: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "600",
     textAlign: "center",
   },
