@@ -125,7 +125,7 @@ export default function PairingScreen() {
       >
         <View style={styles.header}>
           <Text variant="h1" style={styles.title}>
-            Kế đôi
+            Ghép đôi
           </Text>
           <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
             Kết nối trái tim của hai bạn
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 16,
+    paddingTop: 32,
   },
   header: {
     alignItems: "center",
