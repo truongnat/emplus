@@ -8,12 +8,12 @@ export const CYCLE_LABELS: Record<string, string> = {
   NANG_LUONG: "Giai đoạn năng lượng",
 };
 
+const CYCLE_LABEL_ENTRIES = Object.entries(CYCLE_LABELS);
+
 export function normalizeCycleLabel(raw?: string): string {
   if (!raw) return "Giai đoạn năng lượng";
   const upper = raw.trim().toUpperCase();
-  const found = Object.entries(CYCLE_LABELS).find(([key]) =>
-    upper.includes(key),
-  );
+  const found = CYCLE_LABEL_ENTRIES.find(([key]) => upper.includes(key));
   return found ? found[1] : "Giai đoạn năng lượng";
 }
 
