@@ -186,7 +186,6 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
 }
 
 export default function TabsLayout() {
-  console.log("TabsLayout rendering...");
   let sessionValue;
   try {
     sessionValue = useSession();
@@ -194,7 +193,6 @@ export default function TabsLayout() {
     console.error("Error in useSession:", e);
     throw e;
   }
-  console.log("Session value:", !!sessionValue);
   const { hydrated, isAuthenticated, session } = sessionValue;
   const isPaired = Boolean(!!session?.user.coupleId);
 
