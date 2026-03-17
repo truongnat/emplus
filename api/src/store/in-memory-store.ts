@@ -1,13 +1,9 @@
+import { generateInviteCode } from "../shared/code.ts";
 import type { Anniversary, AuthProvider, BudgetItem, Couple, EmotionalCycle, Invite, MemoryItem, User } from "../types.ts";
 import type { DataStore } from "./contracts.ts";
 
 function nowIso(): string {
   return new Date().toISOString();
-}
-
-function randomCode(length = 6): string {
-  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  return Array.from({ length }, () => alphabet[Math.floor(Math.random() * alphabet.length)]).join("");
 }
 
 function randomToken(prefix: string): string {
@@ -166,7 +162,7 @@ export class InMemoryStore implements DataStore {
       this.invites.delete(couple.inviteCode);
     }
 
-    const code = randomCode();
+    const code = generateInviteCode(6);
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
     const invite: Invite = {
       code,
