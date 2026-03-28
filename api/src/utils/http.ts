@@ -49,13 +49,19 @@ export function paginated<T>(
 
   return context.json({
     success: true,
-    data,
-    pagination: {
-      page: pagination.page,
-      limit: pagination.limit,
-      totalItems: pagination.totalItems,
-      totalPages,
-      hasNext: pagination.page < totalPages,
+    data: {
+      items: data,
+      pagination: {
+        page: pagination.page,
+        limit: pagination.limit,
+        totalItems: pagination.totalItems,
+        totalPages,
+        hasNext: pagination.page < totalPages,
+      },
+    },
+    meta: {
+      requestId: context.get("requestId") as string,
+      timestamp: new Date().toISOString(),
     },
   });
 }

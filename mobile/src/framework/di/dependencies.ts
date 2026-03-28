@@ -10,6 +10,8 @@ import {
   LoginUseCase,
   RegisterUseCase,
   RefreshSessionUseCase,
+  VerifyOtpUseCase,
+  GetProfileUseCase,
 } from "../../domain/usecases/auth";
 import {
   GenerateInviteUseCase,
@@ -42,6 +44,8 @@ export const dependencies = {
     login: new LoginUseCase(authRepo),
     register: new RegisterUseCase(authRepo),
     refresh: new RefreshSessionUseCase(authRepo),
+    verifyOtp: new VerifyOtpUseCase(authRepo),
+    getProfile: new GetProfileUseCase(authRepo),
   },
   couple: {
     generateInvite: new GenerateInviteUseCase(coupleRepo),

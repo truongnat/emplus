@@ -7,6 +7,7 @@ export const OTP_TTL_SECONDS = 300; // 5 minutes
 export const OTP_LENGTH = 6;
 export const OTP_RATE_LIMIT_COUNT = 5;
 export const OTP_RATE_LIMIT_WINDOW_SECONDS = 600; // 10 minutes
+export const OTP_MAX_VERIFY_ATTEMPTS = 5; // Max invalid guesses before invalidating OTP
 
 // Rate limiting
 export const LOGIN_RATE_LIMIT_COUNT = 10;

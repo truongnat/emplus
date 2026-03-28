@@ -1,28 +1,7 @@
 import React, { memo } from "react";
 import { View, ScrollView, Pressable, StyleSheet } from "react-native";
 import { FILTERS } from "./constants";
-import { palette } from "@/src/theme";
-import { LinearGradient } from "expo-linear-gradient";
 import { AppText } from "@/src/ui-kit";
-
-const styles = StyleSheet.create({
-  container: { marginTop: 20, marginBottom: 8 },
-  scrollContent: { gap: 8, paddingHorizontal: 20 },
-  pill: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 9999,
-    borderWidth: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  pillActive: { borderColor: "transparent" },
-  pillInactive: {
-    backgroundColor: "rgba(255,255,255,0.4)",
-    borderColor: "rgba(255,255,255,0.6)",
-  },
-  gradient: { position: "absolute", inset: 0, borderRadius: 9999 },
-});
 
 const FilterPill = memo(
   ({
@@ -38,16 +17,8 @@ const FilterPill = memo(
       onPress={onPress}
       style={[styles.pill, active ? styles.pillActive : styles.pillInactive]}
     >
-      {active && (
-        <LinearGradient
-          colors={[palette.violet500, "#9333ea"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.gradient}
-        />
-      )}
       <AppText
-        style={{ fontWeight: "bold", color: active ? "#fff" : palette.zinc600 }}
+        style={[styles.pillText, active ? styles.pillTextActive : styles.pillTextInactive]}
       >
         {label}
       </AppText>
@@ -81,3 +52,45 @@ export default function BudgetFilter({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 20,
+    marginBottom: 8,
+  },
+  scrollContent: {
+    gap: 10,
+    paddingHorizontal: 24,
+  },
+  pill: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  pillActive: {
+    backgroundColor: "#E48B9B", // rose
+    borderColor: "#E48B9B",
+    shadowColor: "#E48B9B",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  pillInactive: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#F5F5F4",
+  },
+  pillText: {
+    fontSize: 13,
+    fontWeight: "800",
+  },
+  pillTextActive: {
+    color: "#FFFFFF",
+  },
+  pillTextInactive: {
+    color: "#A8A29E",
+  },
+});

@@ -132,16 +132,15 @@
       },
       "AuthResponse": {
         "type": "object",
-        "required": [
-          "user",
-          "tokens"
-        ],
         "properties": {
           "user": {
             "$ref": "#/components/schemas/User"
           },
           "tokens": {
             "$ref": "#/components/schemas/TokenPair"
+          },
+          "requiresOTP": {
+            "type": "boolean"
           }
         }
       },
@@ -644,6 +643,115 @@
           },
           "401": {
             "description": "Refresh token không hợp lệ hoặc đã hết hạn"
+          }
+        }
+      }
+    },
+    "/v1/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "Xác thực"
+        ],
+        "summary": "Yêu cầu đặt lại mật khẩu (gửi OTP về email)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Yêu cầu thành công, kiểm tra email để lấy số OTP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Email không hợp lệ"
+          },
+          "404": {
+            "description": "Không tìm thấy người dùng"
+          }
+        }
+      }
+    },
+    "/v1/auth/reset-password": {
+      "post": {
+        "tags": [
+          "Xác thực"
+        ],
+        "summary": "Thiết lập mật khẩu mới sau khi xác thực OTP thành công",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "otp",
+                  "newPassword"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "otp": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 8
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đặt lại mật khẩu thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ hoặc mật khẩu chưa đủ mạnh"
+          },
+          "401": {
+            "description": "Mã OTP không hợp lệ, không đúng email, hoặc mã đã hết hạn"
           }
         }
       }

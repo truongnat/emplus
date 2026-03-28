@@ -13,12 +13,15 @@ import React, {
 import { useColorScheme } from "react-native";
 
 export type ColorScheme = "light" | "dark" | null;
+export type ThemeName = "aura" | "telegram";
 
 interface ThemeModeContextType {
   colorScheme: ColorScheme;
   isDark: boolean;
   setColorScheme: (scheme: ColorScheme) => void;
   toggleColorScheme: () => void;
+  themeName: ThemeName;
+  setThemeName: (name: ThemeName) => void;
 }
 
 const ThemeModeContext = createContext<ThemeModeContextType | undefined>(
@@ -28,6 +31,7 @@ const ThemeModeContext = createContext<ThemeModeContextType | undefined>(
 export function ThemeModeProvider({ children }: { children: ReactNode }) {
   const systemColorScheme = useColorScheme();
   const [manualColorScheme, setManualColorScheme] = useState<ColorScheme>(null);
+  const [themeName, setThemeName] = useState<ThemeName>("aura");
 
   // Use manual override if set, otherwise use system
   const colorScheme: ColorScheme =
@@ -49,6 +53,8 @@ export function ThemeModeProvider({ children }: { children: ReactNode }) {
         isDark,
         setColorScheme,
         toggleColorScheme,
+        themeName,
+        setThemeName,
       }}
     >
       {children}

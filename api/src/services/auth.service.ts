@@ -11,6 +11,7 @@ import {
   LOGIN_RATE_LIMIT_WINDOW_SECONDS,
   OTP_RATE_LIMIT_COUNT,
   OTP_RATE_LIMIT_WINDOW_SECONDS,
+  OTP_MAX_VERIFY_ATTEMPTS,
   OTP_TTL_SECONDS,
   REFRESH_TOKEN_TTL_SECONDS,
 } from "../constants/index.ts";
@@ -183,6 +184,18 @@ export async function loginUser(
  * Verify OTP and create or login user
  */
 export async function verifyOtpAndLogin(email: string, otp: string): Promise<AuthPayload> {
+  // Rate limit check for OTP verify attempts
+  const verifyRateLimitKey = `otp:verify:${email}`;
+  const verifyCount = await store.getRateLimitCount(verifyRateLimitKey);
+
+  if (verifyCount >= OTP_MAX_VERIFY_ATTEMPTS) {
+    await store.deleteOtp(email); // Invalidate OTP completely
+    const error = new Error("Bạn đã nhập sai mã OTP quá nhiều lần. Vui lòng yêu cầu mã mới.") as Error & { status: number; code: string };
+    error.status = 429;
+    error.code = "TOO_MANY_REQUESTS";
+    throw error;
+  }
+
   const storedDataStr = await store.getOtp(email);
   if (!storedDataStr) {
     const error = new Error("Mã OTP đã hết hạn hoặc không tồn tại.") as Error & { status: number; code: string };
@@ -194,13 +207,15 @@ export async function verifyOtpAndLogin(email: string, otp: string): Promise<Aut
   const { otp: storedOtp, password } = JSON.parse(storedDataStr);
 
   if (storedOtp !== otp) {
+    await store.incrementRateLimit(verifyRateLimitKey, OTP_TTL_SECONDS); // Keep verify limit alive for OTP TTL
     const error = new Error("Mã OTP không chính xác.") as Error & { status: number; code: string };
     error.status = 401;
     error.code = "INVALID_OTP";
     throw error;
   }
 
-  // OTP Valid -> Create user or finish login
+  // OTP Valid -> Clear verify limits and OTP
+  await store.deleteRateLimitCount(verifyRateLimitKey);
   await store.deleteOtp(email);
 
   let user = await store.findUserByEmail(email);
@@ -247,4 +262,95 @@ export async function logout(userId: string, accessToken?: string, refreshToken?
   if (refreshToken) {
     await store.deleteRefreshSession(refreshToken);
   }
+}
+
+/**
+ * Request password reset - send OTP to email
+ */
+export async function requestPasswordReset(email: string): Promise<{ success: boolean }> {
+  // Rate limit check for OTP sending
+  const otpRateLimitKey = `otp:reset:${email}`;
+  const otpCount = await store.getRateLimitCount(otpRateLimitKey);
+  if (otpCount >= OTP_RATE_LIMIT_COUNT) {
+    const error = new Error("Bạn đã yêu cầu đặt lại mật khẩu quá nhiều lần. Vui lòng thử lại sau.") as Error & { status: number; code: string };
+    error.status = 429;
+    error.code = "TOO_MANY_REQUESTS";
+    throw error;
+  }
+
+  const user = await store.findUserByEmail(email);
+
+  if (!user) {
+    const error = new Error("Email chưa được đăng ký trong hệ thống.") as Error & { status: number; code: string };
+    error.status = 404;
+    error.code = "USER_NOT_FOUND";
+    throw error;
+  }
+
+  const otp = generateNumericCode(6);
+
+  await store.saveOtp(`reset:${email}`, JSON.stringify({ otp }), OTP_TTL_SECONDS);
+  await store.incrementRateLimit(otpRateLimitKey, OTP_RATE_LIMIT_WINDOW_SECONDS);
+
+  // Send Mail
+  await sendOtpMail(email, otp);
+
+  return { success: true };
+}
+
+/**
+ * Reset password using OTP
+ */
+export async function resetPassword(email: string, otp: string, newPassword: string): Promise<{ success: boolean }> {
+  // Rate limit check for reset OTP verify attempts
+  const verifyRateLimitKey = `otp:verify:reset:${email}`;
+  const verifyCount = await store.getRateLimitCount(verifyRateLimitKey);
+
+  if (verifyCount >= OTP_MAX_VERIFY_ATTEMPTS) {
+    await store.deleteOtp(`reset:${email}`); // Invalidate OTP completely
+    const error = new Error("Bạn đã nhập sai mã OTP quá nhiều lần. Vui lòng yêu cầu mã mới.") as Error & { status: number; code: string };
+    error.status = 429;
+    error.code = "TOO_MANY_REQUESTS";
+    throw error;
+  }
+
+  const storedDataStr = await store.getOtp(`reset:${email}`);
+  if (!storedDataStr) {
+    const error = new Error("Mã OTP đã hết hạn hoặc không tồn tại.") as Error & { status: number; code: string };
+    error.status = 401;
+    error.code = "EXPIRED_OTP";
+    throw error;
+  }
+
+  const { otp: storedOtp } = JSON.parse(storedDataStr);
+
+  if (storedOtp !== otp) {
+    await store.incrementRateLimit(verifyRateLimitKey, OTP_TTL_SECONDS); // Keep verify limit alive for OTP TTL
+    const error = new Error("Mã OTP không chính xác.") as Error & { status: number; code: string };
+    error.status = 401;
+    error.code = "INVALID_OTP";
+    throw error;
+  }
+
+  const user = await store.findUserByEmail(email);
+  if (!user) {
+    const error = new Error("Không thể tìm thấy tài khoản.") as Error & { status: number; code: string };
+    error.status = 404;
+    error.code = "USER_NOT_FOUND";
+    throw error;
+  }
+
+  // OTP Valid -> Update password
+  user.passwordHash = hashPassword(newPassword);
+  user.updatedAt = new Date().toISOString();
+  await store.saveUser(user);
+
+  await store.deleteRateLimitCount(verifyRateLimitKey);
+  await store.deleteOtp(`reset:${email}`);
+
+  // Invalidate all active sessions for security
+  // Note: For simplicity, we assume users will log in again. 
+  // A complete implementation might clear sessions from the store.
+
+  return { success: true };
 }

@@ -123,7 +123,7 @@ describe('Authentication', () => {
       expect(res.status).toBe(401);
     });
 
-    it('should fail with non-existent email', async () => {
+    it('should return requiresOTP for non-existent email', async () => {
       const res = await app.request('/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -133,7 +133,10 @@ describe('Authentication', () => {
         }),
       });
 
-      expect(res.status).toBe(401);
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.success).toBe(true);
+      expect(data.data.requiresOTP).toBe(true);
     });
   });
 
@@ -169,9 +172,10 @@ describe('Authentication', () => {
 
       const data = await res.json();
       expect(data.success).toBe(true);
-      expect(data.data.accessToken).toBeDefined();
-      expect(data.data.refreshToken).toBeDefined();
-      expect(data.data.expiresIn).toBeDefined();
+      expect(data.data.tokens).toBeDefined();
+      expect(data.data.tokens.accessToken).toBeDefined();
+      expect(data.data.tokens.refreshToken).toBeDefined();
+      expect(data.data.tokens.expiresIn).toBeDefined();
     });
 
     it('should fail with invalid refresh token', async () => {

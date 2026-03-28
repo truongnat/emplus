@@ -13,11 +13,12 @@ import { storage } from "@/src/core/common/storage";
 import appConfig from "@/src/core/config/app-config";
 import { AuthModule } from "@/src/domain/entities/schemas";
 import { AuthRepositoryImpl } from "@/src/data/repositories/auth.repository.impl";
-import { RefreshSessionUseCase } from "@/src/domain/usecases/auth";
+import { RefreshSessionUseCase, GetProfileUseCase } from "@/src/domain/usecases/auth";
 import { tokenManager } from "@/src/core/api/token-manager";
 
 const authRepo = new AuthRepositoryImpl();
 const refreshSessionUseCase = new RefreshSessionUseCase(authRepo);
+const getProfileUseCase = new GetProfileUseCase(authRepo);
 
 interface SessionContextValue {
   session: AuthModule.LoginResponse | null;
@@ -35,8 +36,8 @@ const SessionContext = createContext<SessionContextValue>({
   session: null,
   hydrated: false,
   isAuthenticated: false,
-  setSession: () => {},
-  clearSession: async () => {},
+  setSession: () => { },
+  clearSession: async () => { },
   refreshAuth: async () => false,
   withAccessToken: async (op: any) => op(""),
 });
@@ -47,8 +48,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    tokenManager.setAccessToken(session?.tokens.accessToken ?? null);
-  }, [session?.tokens.accessToken]);
+    const token = session?.tokens?.accessToken;
+    tokenManager.setAccessToken(token ?? null);
+  }, [session?.tokens?.accessToken]);
 
   const clearSession = useCallback(async () => {
     setSession(null);
@@ -83,13 +85,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const withAccessToken = useCallback(
     async <T,>(operation: (token: string) => Promise<T>): Promise<T> => {
-      const token = session?.tokens.accessToken;
+      const token = session?.tokens?.accessToken;
       if (!token) {
         throw new Error("No access token available - user must login");
       }
       return operation(token);
     },
-    [session?.tokens.accessToken],
+    [session?.tokens?.accessToken],
   );
 
   useEffect(() => {
@@ -102,12 +104,26 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         ]);
         console.log("Session init:", { hasTokens: !!tokens, hasMeta: !!meta });
         if (tokens && active) {
-          const user = meta?.user || null;
+          let user = meta?.user || null;
           setSession({ user, tokens });
+
           // Refresh AFTER state update completes
           setTimeout(async () => {
-            if (tokens.refreshToken && active) {
-              await refreshAuth();
+            if (active) {
+              try {
+                // Try to refresh token first (ensure we are authenticated)
+                await refreshAuth();
+                const currentTokens = await storage.auth.getTokens();
+                if (currentTokens?.accessToken && active) {
+                  // Then fetch latest profile to sync coupleId
+                  const latestUser = await getProfileUseCase.execute();
+                  setSession((prev) =>
+                    prev ? { ...prev, user: latestUser } : null,
+                  );
+                }
+              } catch (err) {
+                console.error("Sync profile error:", err);
+              }
             }
           }, 100);
         }
@@ -121,12 +137,14 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, [clearSession, refreshAuth]);
+  }, [clearSession]);
+
+  // Handle changes in session state (like auto-saving to storage)
 
   useEffect(() => {
     if (hydrated && session) {
-      void storage.auth.setTokens(session.tokens);
-      void storage.user.setMetadata({ user: session.user });
+      if (session.tokens) void storage.auth.setTokens(session.tokens);
+      if (session.user) void storage.user.setMetadata({ user: session.user });
     }
   }, [session, hydrated]);
 
@@ -143,18 +161,18 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const sub = AppState.addEventListener("change", (state) => {
-      if (state === "active" && session?.tokens.refreshToken && !isRefreshing) {
+      if (state === "active" && session?.tokens?.refreshToken && !isRefreshing) {
         void refreshAuth();
       }
     });
     return () => sub.remove();
-  }, [refreshAuth, session?.tokens.refreshToken, isRefreshing]);
+  }, [refreshAuth, session?.tokens?.refreshToken, isRefreshing]);
 
   const value = useMemo(
     () => ({
       session,
       hydrated,
-      isAuthenticated: !!session?.tokens.accessToken,
+      isAuthenticated: !!session?.tokens?.accessToken,
       setSession,
       clearSession,
       refreshAuth: async () => !!(await refreshAuth()),

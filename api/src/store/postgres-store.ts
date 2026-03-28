@@ -1163,6 +1163,10 @@ export class PostgresStore implements DataStore {
     return val ? parseInt(val, 10) : 0;
   }
 
+  async deleteRateLimitCount(key: string): Promise<void> {
+    await this.redisDel(this.rateLimitKey(key));
+  }
+
   async invalidateHomeCache(coupleId: string): Promise<void> {
     await this.redisDel(this.homeCacheKey(coupleId));
   }

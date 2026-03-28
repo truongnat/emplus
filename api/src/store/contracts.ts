@@ -44,6 +44,7 @@ export interface DataStore {
   deleteOtp(email: string): Promise<void>;
   incrementRateLimit(key: string, ttlSeconds: number): Promise<number>;
   getRateLimitCount(key: string): Promise<number>;
+  deleteRateLimitCount(key: string): Promise<void>;
   invalidateHomeCache(coupleId: string): Promise<void>;
 
   // Anniversary methods

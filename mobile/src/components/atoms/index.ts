@@ -16,6 +16,9 @@ export type { TextProps } from "./Text";
 export { Switch } from "./Switch";
 export type { SwitchProps } from "./Switch";
 
+export { Checkbox } from "./Checkbox";
+export type { CheckboxProps } from "./Checkbox";
+
 // Feedback & Display
 export { Avatar } from "./Avatar";
 export type { AvatarProps } from "./Avatar";

@@ -9,7 +9,7 @@ import {
 export function useBudgetData() {
   const { isAuthenticated, session, withAccessToken } = useSession();
   const { showToast } = useToast();
-  const isPaired = Boolean(!!session?.user.coupleId);
+  const isPaired = Boolean(!!session?.user?.coupleId);
 
   const [activeFilter, setActiveFilter] = useState("Tất cả");
 

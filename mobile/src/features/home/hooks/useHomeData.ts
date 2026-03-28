@@ -10,7 +10,7 @@ export function useHomeData() {
   const { session, isAuthenticated } = useSession();
   const [showFocusCard, setShowFocusCard] = useState(true);
 
-  const isPaired = Boolean(!!session?.user.coupleId);
+  const isPaired = Boolean(!!session?.user?.coupleId);
 
   const {
     data: dashboard = null,

@@ -5,7 +5,7 @@ import { groupMemories, type OrderDirection } from "../components/timelineMap";
 
 export function useTimelineData() {
   const { isAuthenticated, session, withAccessToken } = useSession();
-  const isPaired = Boolean(!!session?.user.coupleId);
+  const isPaired = Boolean(!!session?.user?.coupleId);
 
   const [order, setOrder] = useState<OrderDirection>("desc");
   const [activeFilter, setActiveFilter] = useState("tat-ca");

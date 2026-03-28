@@ -33,4 +33,20 @@ export class AuthRepositoryImpl implements AuthRepository {
     >("/auth/refresh", params);
     return response.data;
   }
+
+  async verifyOtp(
+    params: AuthModule.VerifyOtpRequest,
+  ): Promise<AuthModule.VerifyOtpResponse> {
+    const response = await apiClient.post<
+      ApiResponse<AuthModule.VerifyOtpResponse>
+    >("/auth/verify-otp", params);
+    return response.data;
+  }
+
+  async getProfile(): Promise<AuthModule.User> {
+    const response = await apiClient.get<ApiResponse<AuthModule.User>>(
+      "/users/me",
+    );
+    return response.data;
+  }
 }

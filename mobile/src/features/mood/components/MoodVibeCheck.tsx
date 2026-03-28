@@ -1,10 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Animated, PanResponder, Text, View, Dimensions } from "react-native";
+import { Animated, PanResponder, View, Dimensions, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import Svg, { Defs, RadialGradient, Stop, Circle, G } from "react-native-svg";
-import { palette } from "@/src/theme/tokens";
-import { tws } from "@/src/utils/tws";
 import { AppText } from "@/src/components/atoms/Text";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -61,7 +59,7 @@ const VisualArea = React.memo(
     return (
       <Animated.View
         style={[
-          tws("w-[280px] h-[260px] justify-center items-center my-2.5"),
+          styles.visualContainer,
           { transform: [{ translateY: floatAnim }] },
         ]}
       >
@@ -69,7 +67,7 @@ const VisualArea = React.memo(
           width={SVG_SIZE}
           height={SVG_SIZE}
           viewBox={`0 0 ${SVG_SIZE} ${SVG_SIZE}`}
-          style={tws("absolute")}
+          style={styles.svgAbsolute}
         >
           <Defs>
             <RadialGradient
@@ -81,9 +79,9 @@ const VisualArea = React.memo(
               fx="50%"
               fy="50%"
             >
-              <Stop offset="0%" stopColor="#ec1334" stopOpacity="0.85" />
-              <Stop offset="70%" stopColor="#f43f5e" stopOpacity="0.4" />
-              <Stop offset="100%" stopColor="#f43f5e" stopOpacity="0" />
+              <Stop offset="0%" stopColor="#FB7185" stopOpacity="0.8" />
+              <Stop offset="70%" stopColor="#FDA4AF" stopOpacity="0.3" />
+              <Stop offset="100%" stopColor="#FDA4AF" stopOpacity="0" />
             </RadialGradient>
             <RadialGradient
               id="vibeGrad2"
@@ -94,9 +92,9 @@ const VisualArea = React.memo(
               fx="50%"
               fy="50%"
             >
-              <Stop offset="0%" stopColor="#f43f5e" stopOpacity="0.75" />
-              <Stop offset="70%" stopColor="#ec1334" stopOpacity="0.3" />
-              <Stop offset="100%" stopColor="#ec1334" stopOpacity="0" />
+              <Stop offset="0%" stopColor="#E48B9B" stopOpacity="0.7" />
+              <Stop offset="70%" stopColor="#FBCFE8" stopOpacity="0.2" />
+              <Stop offset="100%" stopColor="#FBCFE8" stopOpacity="0" />
             </RadialGradient>
           </Defs>
 
@@ -127,7 +125,7 @@ export function MoodVibeCheck({
 }: MoodVibeCheckProps) {
   const [value, setValue] = useState(initialValue);
   const [isSliding, setIsSliding] = useState(false);
-  const sliderWidth = useRef(SCREEN_WIDTH - 88);
+  const sliderWidth = useRef(SCREEN_WIDTH - 96);
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const phase = useRef(new Animated.Value(0)).current;
@@ -135,23 +133,22 @@ export function MoodVibeCheck({
 
   // Load saved mood on mount
   useEffect(() => {
+    const loadSavedMood = async () => {
+      try {
+        const savedMood = await AsyncStorage.getItem(MOOD_STORAGE_KEY);
+        if (savedMood) {
+          const parsed = JSON.parse(savedMood);
+          const today = new Date().toDateString();
+          if (parsed.date === today) {
+            setValue(parsed.value);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading mood:", error);
+      }
+    };
     loadSavedMood();
   }, []);
-
-  const loadSavedMood = async () => {
-    try {
-      const savedMood = await AsyncStorage.getItem(MOOD_STORAGE_KEY);
-      if (savedMood) {
-        const parsed = JSON.parse(savedMood);
-        const today = new Date().toDateString();
-        if (parsed.date === today) {
-          setValue(parsed.value);
-        }
-      }
-    } catch (error) {
-      console.error("Error loading mood:", error);
-    }
-  };
 
   const saveMood = async (moodValue: number) => {
     try {
@@ -166,7 +163,6 @@ export function MoodVibeCheck({
     }
   };
 
-  // Debounced save - only save when user stops sliding
   const debouncedSaveMood = (moodValue: number) => {
     if (saveTimeout.current) {
       clearTimeout(saveTimeout.current);
@@ -174,19 +170,20 @@ export function MoodVibeCheck({
     saveTimeout.current = setTimeout(() => {
       saveMood(moodValue);
       onMoodChange?.(moodValue);
-    }, 300) as any; // Wait 300ms after sliding stops
+    }, 300) as any;
   };
 
   useEffect(() => {
-    Animated.loop(
+    const animation = Animated.loop(
       Animated.timing(phase, {
         toValue: 1,
         duration: 20000,
         useNativeDriver: false,
       }),
-    ).start();
+    );
+    animation.start();
 
-    Animated.loop(
+    const floating = Animated.loop(
       Animated.sequence([
         Animated.timing(floatAnim, {
           toValue: -15,
@@ -199,14 +196,20 @@ export function MoodVibeCheck({
           useNativeDriver: true,
         }),
       ]),
-    ).start();
+    );
+    floating.start();
+
+    return () => {
+      animation.stop();
+      floating.stop();
+    };
   }, [floatAnim, phase]);
 
   const getMoodConfig = (val: number) => {
-    if (val < 25) return { text: "Yên tâm", color: "#22c55e" };
-    if (val < 50) return { text: "Ổn định", color: "#eab308" };
-    if (val < 75) return { text: "Lo lắng", color: "#ec1334" };
-    return { text: "Căng thẳng", color: "#ec1334" };
+    if (val < 25) return { text: "Yên tâm", color: "#10B981" };
+    if (val < 50) return { text: "Ổn định", color: "#EAB308" };
+    if (val < 75) return { text: "Lo lắng", color: "#E48B9B" };
+    return { text: "Căng thẳng", color: "#FB7185" };
   };
 
   const moodConfig = useMemo(() => getMoodConfig(value), [value]);
@@ -236,8 +239,6 @@ export function MoodVibeCheck({
           Math.max(0, (relativeX / currentWidth) * 100),
         );
         const roundedValue = Math.round(finalValue);
-
-        // Debounced save
         debouncedSaveMood(roundedValue);
         setIsSliding(false);
       },
@@ -249,115 +250,215 @@ export function MoodVibeCheck({
 
   return (
     <View
-      style={{ width: "100%", alignItems: "center" }}
+      style={styles.mainContainer}
       accessibilityRole="adjustable"
       accessibilityLabel="Mood slider"
       accessibilityValue={{ min: 0, max: 100, now: value }}
     >
       <VisualArea phase={phase} floatAnim={floatAnim} />
 
-      <View
-        style={tws(
-          "w-[SCREEN_WIDTH-44px] bg-white/45 rounded-[40px] px-6 py-6 border border-white/60 shadow-glass",
-        )}
-      >
-        <View style={tws("items-center mb-4")}>
-          <AppText
-            variant="h2"
-            color="slate-900"
-            style={tws("text-center uppercase")}
-          >
-            BẠN ĐANG {moodConfig.text}
+      <View style={styles.card}>
+        <View style={styles.header}>
+          <AppText style={styles.moodStatusLabel}>
+            BẠN ĐANG{" "}
+            <AppText style={[styles.moodStatusValue, { color: moodConfig.color }]}>
+              {moodConfig.text}
+            </AppText>
           </AppText>
-          <AppText variant="caption" color="slate-500" style={tws("mt-1")}>
+          <AppText style={styles.subtitle}>
             Kéo để điều chỉnh nhịp đập tâm trạng
           </AppText>
         </View>
 
         <View
-          style={tws("h-20 justify-center mt-1")}
+          style={styles.sliderArea}
           onLayout={(e) => {
             sliderWidth.current = e.nativeEvent.layout.width;
           }}
         >
-          <View
-            style={tws(
-              "flex-row justify-between absolute top-0 left-0 right-0",
-            )}
-          >
-            <AppText
-              style={tws(
-                "text-[10px] font-bold text-success uppercase tracking-widest",
-              )}
-            >
-              BÌNH THẢN
-            </AppText>
-            <AppText
-              style={tws(
-                "text-[10px] font-bold text-primary uppercase tracking-widest",
-              )}
-            >
-              CĂNG THẲNG
-            </AppText>
+          <View style={styles.sliderLabels}>
+            <AppText style={styles.sliderEdgeText}>BÌNH THẢN</AppText>
+            <AppText style={styles.sliderEdgeText}>CĂNG THẲNG</AppText>
           </View>
 
-          <View style={tws("h-[10px] rounded-full bg-black/5 overflow-hidden")}>
+          <View style={styles.track}>
             <LinearGradient
-              colors={["#4ade80", "#facc15", "#ec1334"]}
+              colors={["#10B981", "#FACC15", "#FB7185"]}
               start={{ x: 0, y: 0.5 }}
               end={{ x: 1, y: 0.5 }}
-              style={tws("flex-1")}
+              style={styles.trackGradient}
             />
           </View>
 
           <View
             {...panResponder.panHandlers}
             style={[
-              tws("absolute w-14 h-14 justify-center items-center z-30"),
+              styles.thumbContainer,
               { left: (value / 100) * sliderWidth.current - 28 },
             ]}
           >
-            <View
-              style={tws(
-                "w-12 h-12 rounded-full bg-white border-4 border-primary items-center justify-center shadow-lg",
-              )}
-            >
-              <View style={tws("w-1 h-1 rounded-full bg-primary")} />
+            <View style={styles.thumbOuter}>
+              <View style={[styles.thumbInner, { backgroundColor: moodConfig.color }]} />
             </View>
           </View>
         </View>
 
-        <View style={tws("flex-row justify-between mt-1 mb-4")}>
-          <View style={tws("flex-row items-center gap-1.5")}>
-            <MaterialCommunityIcons name="waves" size={16} color="#94a3b8" />
-            <AppText
-              style={tws(
-                "text-[10px] font-bold text-slate-400 uppercase tracking-wide",
-              )}
-            >
-              Dịu êm
-            </AppText>
+        <View style={styles.footerInfo}>
+          <View style={styles.infoTag}>
+            <MaterialCommunityIcons name="waves" size={16} color="#A8A29E" />
+            <AppText style={styles.tagText}>DỊU ÊM</AppText>
           </View>
-          <View style={tws("flex-row items-center gap-1.5")}>
-            <AppText
-              style={tws(
-                "text-[10px] font-bold text-slate-400 uppercase tracking-wide",
-              )}
-            >
-              Mạnh mẽ
-            </AppText>
-            <Ionicons name="flash" size={14} color="#94a3b8" />
+          <View style={styles.infoTag}>
+            <AppText style={styles.tagText}>MẠNH MẼ</AppText>
+            <Ionicons name="flash" size={14} color="#A8A29E" />
           </View>
         </View>
 
-        <View style={tws("h-px bg-slate-100 mb-4 opacity-50")} />
-        <AppText
-          style={tws("text-[11px] font-medium text-slate-400 text-center")}
-        >
+        <View style={styles.divider} />
+        <AppText style={styles.hintText}>
           Buông tay để gửi nhịp bộ cảm xúc đến{" "}
-          <AppText style={tws("text-primary font-bold")}>{partnerName}</AppText>
+          <AppText style={styles.partnerName}>{partnerName}</AppText>
         </AppText>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  mainContainer: {
+    width: "100%",
+    alignItems: "center",
+  },
+  visualContainer: {
+    width: 280,
+    height: 260,
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  svgAbsolute: {
+    position: "absolute",
+  },
+  card: {
+    width: SCREEN_WIDTH - 48,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 32,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: "#F5F5F4",
+    shadowColor: "#1C1917",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.05,
+    shadowRadius: 20,
+    elevation: 4,
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  moodStatusLabel: {
+    fontSize: 18,
+    fontWeight: "900",
+    color: "#1C1917",
+    textAlign: "center",
+  },
+  moodStatusValue: {
+    fontWeight: "900",
+  },
+  subtitle: {
+    fontSize: 13,
+    color: "#78716C",
+    marginTop: 6,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  sliderArea: {
+    height: 80,
+    justifyContent: "center",
+    marginTop: 4,
+  },
+  sliderLabels: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+  },
+  sliderEdgeText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: "#A8A29E",
+    letterSpacing: 1,
+  },
+  track: {
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#F5F5F4",
+    overflow: "hidden",
+  },
+  trackGradient: {
+    flex: 1,
+  },
+  thumbContainer: {
+    position: "absolute",
+    width: 56,
+    height: 56,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 30,
+  },
+  thumbOuter: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 4,
+    borderColor: "#F5F5F4",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  thumbInner: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  footerInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 4,
+    marginBottom: 20,
+  },
+  infoTag: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  tagText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: "#A8A29E",
+    letterSpacing: 0.5,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#F5F5F4",
+    marginBottom: 16,
+  },
+  hintText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#78716C",
+    textAlign: "center",
+    lineHeight: 18,
+  },
+  partnerName: {
+    color: "#E48B9B",
+    fontWeight: "800",
+  },
+});

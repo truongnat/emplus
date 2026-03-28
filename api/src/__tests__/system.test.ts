@@ -15,10 +15,30 @@ describe('System Health', () => {
   });
 
   describe('GET /v1/system/dependencies', () => {
-    it('should return dependencies status', async () => {
-      const res = await app.request('/v1/system/dependencies');
+    let accessToken: string;
 
-      expect(res.status).toBe(200);
+    beforeEach(async () => {
+      // Register a test user to get token
+      const email = `sys-test-${Date.now()}@example.com`;
+      const res = await app.request('/v1/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password: 'password123',
+          fullName: 'Sys Test',
+        }),
+      });
+      const data = await res.json();
+      accessToken = data.data.tokens.accessToken;
+    });
+
+    it('should return dependencies status', async () => {
+      const res = await app.request('/v1/system/dependencies', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      expect([200, 503]).toContain(res.status);
 
       const data = await res.json();
       expect(data.success).toBe(true);

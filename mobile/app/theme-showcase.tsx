@@ -18,12 +18,8 @@ import { Button } from "@/src/components/atoms/Button";
 import { Text } from "@/src/components/atoms/Text";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Avatar } from "@/src/components/atoms/Avatar";
-import {
-  useTheme,
-  setThemeStyle,
-  type ThemeStyle,
-} from "@/src/theme/theme-switcher";
-import { useThemeMode } from "@/src/theme/theme-mode-context";
+import { useThemeMode, type ThemeName } from "@/src/theme/theme-mode-context";
+import { useTheme } from "@/src/theme";
 import { palette } from "@/src/theme/tokens";
 import { auraPalette } from "@/src/theme/aura-colors";
 import { useToast } from "@/src/toast-context";
@@ -33,14 +29,12 @@ export default function ThemeShowcaseScreen() {
   const router = useRouter();
   const theme = useTheme();
   const { showToast } = useToast();
-  const { isDark, setColorScheme } = useThemeMode();
-  const [currentStyle, setCurrentStyle] = useState<ThemeStyle>(theme.name);
+  const { isDark, setColorScheme, themeName, setThemeName } = useThemeMode();
 
-  const handleThemeChange = (style: ThemeStyle) => {
-    setThemeStyle(style);
-    setCurrentStyle(style);
+  const handleThemeChange = (name: ThemeName) => {
+    setThemeName(name);
     showToast(
-      style === "telegram"
+      name === "telegram"
         ? "Switched to Telegram theme"
         : "Switched to Aura theme",
       "success",
@@ -70,9 +64,7 @@ export default function ThemeShowcaseScreen() {
                 styles.themeButton,
                 {
                   borderColor:
-                    currentStyle === "telegram"
-                      ? palette.violet600
-                      : "transparent",
+                    themeName === "telegram" ? palette.violet600 : "transparent",
                 },
               ]}
               onPress={() => handleThemeChange("telegram")}
@@ -82,7 +74,7 @@ export default function ThemeShowcaseScreen() {
                   styles.themeButtonText,
                   {
                     color:
-                      currentStyle === "telegram"
+                      themeName === "telegram"
                         ? palette.violet600
                         : palette.zinc600,
                   },
@@ -97,9 +89,7 @@ export default function ThemeShowcaseScreen() {
                 styles.themeButton,
                 {
                   borderColor:
-                    currentStyle === "aura"
-                      ? auraPalette.rose400
-                      : "transparent",
+                    themeName === "aura" ? auraPalette.rose400 : "transparent",
                 },
               ]}
               onPress={() => handleThemeChange("aura")}
@@ -109,7 +99,7 @@ export default function ThemeShowcaseScreen() {
                   styles.themeButtonText,
                   {
                     color:
-                      currentStyle === "aura"
+                      themeName === "aura"
                         ? auraPalette.rose400
                         : palette.zinc600,
                   },
@@ -122,10 +112,11 @@ export default function ThemeShowcaseScreen() {
 
           <View style={styles.currentTheme}>
             <Text style={styles.currentThemeLabel}>Theme:</Text>
-            <Badge variant={currentStyle === "telegram" ? "info" : "primary"}>
-              {currentStyle === "telegram" ? "Telegram Blue" : "Aura Rose"}
+            <Badge variant={themeName === "telegram" ? "info" : "primary"}>
+              {themeName === "telegram" ? "Telegram Blue" : "Aura Rose"}
             </Badge>
           </View>
+
         </Card>
 
         {/* Dark/Light Mode Toggle */}
@@ -186,7 +177,7 @@ export default function ThemeShowcaseScreen() {
                 styles.colorSwatch,
                 {
                   backgroundColor:
-                    theme.name === "telegram" ? "#8B5CF6" : "#E8547A",
+                    themeName === "telegram" ? "#8B5CF6" : "#E8547A",
                 },
               ]}
             />
@@ -195,7 +186,7 @@ export default function ThemeShowcaseScreen() {
                 styles.colorSwatch,
                 {
                   backgroundColor:
-                    theme.name === "telegram" ? "#A78BFA" : "#FF8FAB",
+                    themeName === "telegram" ? "#A78BFA" : "#FF8FAB",
                 },
               ]}
             />
@@ -204,13 +195,13 @@ export default function ThemeShowcaseScreen() {
                 styles.colorSwatch,
                 {
                   backgroundColor:
-                    theme.name === "telegram" ? "#7C3AED" : "#C73D60",
+                    themeName === "telegram" ? "#7C3AED" : "#C73D60",
                 },
               ]}
             />
           </View>
           <Text style={styles.colorLabel}>
-            {theme.name === "telegram" ? "Telegram Violet" : "Aura Rose"}
+            {themeName === "telegram" ? "Telegram Violet" : "Aura Rose"}
           </Text>
         </Card>
 
@@ -224,7 +215,7 @@ export default function ThemeShowcaseScreen() {
             <Avatar name="Alice" size="md" />
           </View>
           <Text style={styles.colorLabel}>
-            {theme.name === "telegram"
+            {themeName === "telegram"
               ? "Cool gradients"
               : "Warm romantic gradients"}
           </Text>

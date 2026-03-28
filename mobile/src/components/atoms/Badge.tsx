@@ -5,7 +5,7 @@
 
 import React, { memo, ReactNode } from "react";
 import { View, Text, StyleSheet, ViewStyle } from "react-native";
-import { palette } from "@/src/theme/tokens";
+import { useThemeColors } from "@/src/theme";
 
 export type BadgeVariant =
   | "default"
@@ -31,15 +31,6 @@ export interface BadgeProps {
   testID?: string;
 }
 
-const variantStyles: Record<BadgeVariant, { bg: string; text: string }> = {
-  default: { bg: palette.zinc100, text: palette.zinc700 },
-  primary: { bg: palette.violet100, text: palette.violet700 },
-  success: { bg: palette.green50, text: palette.green600 },
-  warning: { bg: palette.amber50, text: palette.amber600 },
-  error: { bg: palette.red50, text: palette.red600 },
-  info: { bg: palette.blue50, text: palette.blue600 },
-};
-
 const sizeStyles: Record<
   BadgeSize,
   {
@@ -62,6 +53,35 @@ export const Badge = memo(function Badge({
   style,
   testID,
 }: BadgeProps) {
+  const themeColors = useThemeColors();
+
+  const variantStyles: Record<BadgeVariant, { bg: string; text: string }> = {
+    default: {
+      bg: themeColors.surface.sunken,
+      text: themeColors.text.secondary,
+    },
+    primary: {
+      bg: themeColors.brand.muted,
+      text: themeColors.brand.text,
+    },
+    success: {
+      bg: themeColors.status.success.bg,
+      text: themeColors.status.success.text,
+    },
+    warning: {
+      bg: themeColors.status.warning.bg,
+      text: themeColors.status.warning.text,
+    },
+    error: {
+      bg: themeColors.status.error.bg,
+      text: themeColors.status.error.text,
+    },
+    info: {
+      bg: themeColors.status.info.bg,
+      text: themeColors.status.info.text,
+    },
+  };
+
   const colors = variantStyles[variant];
   const sizes = sizeStyles[size];
 

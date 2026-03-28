@@ -26,7 +26,8 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
   ref,
 ) {
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View style={[styles.container, containerStyle]} collapsable={false}>
+
       {label && <Text style={styles.label}>{label}</Text>}
       <View style={[styles.inputContainer, error && styles.inputError]}>
         {leftElement && <View style={styles.leftElement}>{leftElement}</View>}

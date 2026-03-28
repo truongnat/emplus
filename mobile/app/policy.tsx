@@ -46,7 +46,30 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   card: { marginBottom: 16 },
+  navHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    height: 56,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.05)",
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.03)",
+  },
+  navTitle: {
+    fontSize: 17,
+    fontWeight: "600",
+    color: palette.zinc900,
+  },
 });
+
 
 interface SectionProps {
   icon: string;
@@ -140,6 +163,14 @@ export default function PolicyScreen() {
 
   return (
     <AppScreen>
+      <View style={styles.navHeader}>
+        <Pressable onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="chevron-back" size={24} color={palette.zinc900} />
+        </Pressable>
+        <AppText style={styles.navTitle}>Chính sách bảo mật</AppText>
+        <View style={{ width: 40 }} />
+      </View>
+
       <ScrollView
         contentContainerStyle={{ padding: 20, paddingBottom: 60 }}
         showsVerticalScrollIndicator={false}
@@ -151,9 +182,10 @@ export default function PolicyScreen() {
               size={24}
               color={palette.violet600}
             />
-            <AppText style={styles.headerText}>Chính sách bảo mật</AppText>
+            <AppText style={styles.headerText}>Em Plus Policy</AppText>
           </View>
         </Reveal>
+
 
         <GlassCard style={styles.card}>
           <AppText

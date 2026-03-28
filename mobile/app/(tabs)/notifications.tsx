@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, ScrollView, StyleSheet, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
-import { Text } from "@/src/components/atoms/Text";
-import { Card } from "@/src/components/molecules/Card";
-import { palette } from "@/src/theme/tokens";
+import { AppText, PressableScale } from "@/src/ui-kit";
 import { useSession } from "@/src/session-context";
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 interface NotificationItem {
   id: string;
@@ -23,15 +23,15 @@ export default function NotificationsScreen() {
   const { session } = useSession();
 
   const partnerName = useMemo(() => {
-    return !!session?.user.coupleId ? "Leo" : "Bạn đồng hành";
-  }, [!!session?.user.coupleId]);
+    return !!session?.user?.coupleId ? "Leo" : "Bạn đồng hành";
+  }, [!!session?.user?.coupleId]);
 
   const notifications: NotificationItem[] = [
     {
       id: "1",
       icon: "heart",
-      iconColor: palette.violet600,
-      iconBg: `${palette.violet600}15`,
+      iconColor: "#E48B9B",
+      iconBg: "#FAF0F2",
       title: "Minh Anh đã gửi cho bạn một nhịp đập yêu thương",
       time: "Vừa xong",
       action: "Phản hồi",
@@ -41,8 +41,8 @@ export default function NotificationsScreen() {
     {
       id: "2",
       icon: "wallet",
-      iconColor: palette.violet500,
-      iconBg: `${palette.violet500}15`,
+      iconColor: "#7C3AED",
+      iconBg: "#F5F3FF",
       title: "Thanh toán cho 'Tiền đặt cọc địa điểm' đã được phê duyệt",
       time: "2 giờ trước",
       delay: 200,
@@ -51,8 +51,8 @@ export default function NotificationsScreen() {
     {
       id: "3",
       icon: "checkbox-outline",
-      iconColor: palette.blue500,
-      iconBg: `${palette.blue500}15`,
+      iconColor: "#3B82F6",
+      iconBg: "#EFF6FF",
       title: "Bạn có nhiệm vụ mới: 'Chọn thực đơn thử món'",
       time: "Hôm qua",
       delay: 300,
@@ -61,8 +61,8 @@ export default function NotificationsScreen() {
     {
       id: "4",
       icon: "gift-outline",
-      iconColor: palette.amber500,
-      iconBg: `${palette.amber500}15`,
+      iconColor: "#F59E0B",
+      iconBg: "#FFFBEB",
       title: "Còn 142 ngày nữa đến ngày trọng đại!",
       time: "2 ngày trước",
       delay: 400,
@@ -71,8 +71,8 @@ export default function NotificationsScreen() {
     {
       id: "5",
       icon: "sparkles-outline",
-      iconColor: palette.violet600,
-      iconBg: `${palette.violet600}15`,
+      iconColor: "#E48B9B",
+      iconBg: "#FAF0F2",
       title:
         "Gợi ý phong cách hoa cưới dựa trên cấu trúc pha lê của bạn đã sẵn sàng",
       time: "3 ngày trước",
@@ -84,30 +84,30 @@ export default function NotificationsScreen() {
   return (
     <AppScreen>
       <View style={styles.container}>
-        {/* Header */}
+        {/* Premium Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.title}>Thông báo</Text>
-            <Text style={styles.subtitle}>NHỊP ĐẬP HÔM NAY</Text>
+            <AppText style={styles.title}>Thông báo</AppText>
+            <AppText style={styles.subtitle}>NHỊP ĐẬP HÔM NAY</AppText>
           </View>
 
-          {/* Status Badge */}
+          {/* Refined Status Badge */}
           <View style={styles.statusBadge}>
-            <View style={styles.avatarContainer}>
+            <View style={styles.avatarWrapper}>
               <View style={styles.avatar}>
                 <Ionicons
                   name="person-circle-outline"
-                  size={28}
-                  color={palette.zinc400}
+                  size={24}
+                  color="#A8A29E"
                 />
               </View>
               <View style={styles.statusDot} />
             </View>
             <View style={styles.badgeTextContainer}>
-              <Text style={styles.badgeLabel}>
+              <AppText style={styles.badgeLabel}>
                 {partnerName.toUpperCase()} ĐANG
-              </Text>
-              <Text style={styles.badgeValue}>bình tĩnh</Text>
+              </AppText>
+              <AppText style={styles.badgeValue}>bình tĩnh</AppText>
             </View>
           </View>
         </View>
@@ -121,7 +121,7 @@ export default function NotificationsScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionDot} />
-              <Text style={styles.sectionTitle}>Mới nhất</Text>
+              <AppText style={styles.sectionTitle}>Mới nhất</AppText>
             </View>
 
             {notifications.slice(0, 2).map((notification) => (
@@ -136,9 +136,9 @@ export default function NotificationsScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <View style={[styles.sectionDot, styles.sectionDotMuted]} />
-              <Text style={[styles.sectionTitle, styles.sectionTitleMuted]}>
+              <AppText style={[styles.sectionTitle, styles.sectionTitleMuted]}>
                 Trước đó
-              </Text>
+              </AppText>
             </View>
 
             {notifications.slice(2).map((notification) => (
@@ -160,7 +160,7 @@ function NotificationCard({
   notification: NotificationItem;
 }) {
   return (
-    <Card style={styles.notificationCard}>
+    <PressableScale style={styles.cardContainer}>
       <View
         style={[styles.notificationContent, { opacity: notification.opacity }]}
       >
@@ -178,22 +178,22 @@ function NotificationCard({
         </View>
 
         <View style={styles.notificationTextContainer}>
-          <Text style={styles.notificationTitle} numberOfLines={2}>
+          <AppText style={styles.notificationTitle} numberOfLines={2}>
             {notification.title}
-          </Text>
-          <Text style={styles.notificationTime}>{notification.time}</Text>
+          </AppText>
+          <AppText style={styles.notificationTime}>{notification.time}</AppText>
 
           {notification.action && (
             <View style={styles.notificationAction}>
-              <Ionicons name="chatbubble-outline" size={14} color="#fff" />
-              <Text style={styles.notificationActionText}>
+              <Ionicons name="chatbubble-outline" size={12} color="#FFFFFF" />
+              <AppText style={styles.notificationActionText}>
                 {notification.action}
-              </Text>
+              </AppText>
             </View>
           )}
         </View>
       </View>
-    </Card>
+    </PressableScale>
   );
 }
 
@@ -205,50 +205,52 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingTop: 12,
+    paddingHorizontal: 24,
+    paddingTop: 16,
     paddingBottom: 24,
-    zIndex: 10,
   },
   headerLeft: {
     flex: 1,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: palette.zinc900,
-    letterSpacing: -0.5,
+    fontSize: 28,
+    fontWeight: "900",
+    color: "#1C1917",
+    letterSpacing: -1,
   },
   subtitle: {
-    fontSize: 13,
-    fontWeight: "bold",
-    color: palette.zinc400,
+    fontSize: 12,
+    fontWeight: "800",
+    color: "#A8A29E",
     textTransform: "uppercase",
     letterSpacing: 2,
-    marginTop: 4,
+    marginTop: 2,
   },
   statusBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.45)",
-    borderRadius: 9999,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
     paddingLeft: 4,
     paddingRight: 16,
     paddingVertical: 4,
-    gap: 12,
+    gap: 10,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.6)",
+    borderColor: "#F5F5F4",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  avatarContainer: {
+  avatarWrapper: {
     position: "relative",
   },
   avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 2,
-    borderColor: "#fff",
-    backgroundColor: "#f1f5f9",
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#FAF7F6",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -260,24 +262,24 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     borderWidth: 2,
-    borderColor: "#fff",
-    backgroundColor: "#22c55e",
+    borderColor: "#FFFFFF",
+    backgroundColor: "#10B981",
   },
   badgeTextContainer: {
     justifyContent: "center",
   },
   badgeLabel: {
     fontSize: 8,
-    fontWeight: "bold",
-    color: palette.zinc400,
-    textTransform: "uppercase",
-    letterSpacing: 2,
+    fontWeight: "800",
+    color: "#A8A29E",
+    letterSpacing: 1,
   },
   badgeValue: {
-    fontSize: 12,
-    fontWeight: "bold",
-    color: palette.zinc800,
-    marginTop: -4,
+    fontSize: 11,
+    fontWeight: "900",
+    color: "#44403C",
+    textTransform: "lowercase",
+    marginTop: -2,
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -291,77 +293,84 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     marginBottom: 16,
-    paddingHorizontal: 4,
+    paddingHorizontal: 8,
   },
   sectionDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: palette.violet600,
+    backgroundColor: "#E48B9B",
   },
   sectionDotMuted: {
-    backgroundColor: palette.zinc400,
+    backgroundColor: "#D6D3D1",
   },
   sectionTitle: {
     fontSize: 13,
-    fontWeight: "bold",
-    color: palette.violet600,
+    fontWeight: "900",
+    color: "#E48B9B",
     textTransform: "uppercase",
-    letterSpacing: 1,
-    opacity: 0.8,
+    letterSpacing: 1.5,
   },
   sectionTitleMuted: {
-    color: palette.zinc400,
+    color: "#A8A29E",
   },
-  notificationCard: {
-    borderRadius: 28,
-    overflow: "hidden",
+  cardContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#F5F5F4",
+    shadowColor: "#1C1917",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    elevation: 2,
+    overflow: "hidden",
   },
   notificationContent: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 20,
+    padding: 16,
     gap: 16,
   },
   notificationIcon: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
   },
   notificationTextContainer: {
     flex: 1,
-    gap: 2,
   },
   notificationTitle: {
     fontSize: 15,
-    fontWeight: "bold",
-    color: palette.zinc800,
+    fontWeight: "700",
+    color: "#1C1917",
     lineHeight: 20,
   },
   notificationTime: {
-    fontSize: 13,
-    fontWeight: "bold",
-    color: palette.zinc400,
+    fontSize: 11,
+    fontWeight: "800",
+    color: "#A8A29E",
     textTransform: "uppercase",
     letterSpacing: 1,
+    marginTop: 4,
   },
   notificationAction: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
     alignSelf: "flex-start",
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: palette.violet600,
+    backgroundColor: "#E48B9B",
     borderRadius: 12,
-    marginTop: 8,
+    marginTop: 10,
   },
   notificationActionText: {
-    fontSize: 13,
-    fontWeight: "bold",
-    color: "#fff",
+    fontSize: 12,
+    fontWeight: "900",
+    color: "#FFFFFF",
   },
 });
