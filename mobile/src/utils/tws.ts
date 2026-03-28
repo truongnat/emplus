@@ -17,10 +17,10 @@ export function tws(
   ...inputs: ClassValue[]
 ): ViewStyle | TextStyle | ImageStyle {
   const className = twMerge(clsx(inputs));
+  if (!className) return {} as ViewStyle | TextStyle | ImageStyle;
 
-  // Return empty object - actual styles will be applied via className at runtime
-  // This is a type-safe placeholder for build-time tailwind processing
-  return {} as ViewStyle | TextStyle | ImageStyle;
+  // Convert tailwind classes to style objects using our local parser
+  return twStyles(className) as ViewStyle | TextStyle | ImageStyle;
 }
 
 /**
@@ -77,11 +77,20 @@ export function twStyles(...inputs: ClassValue[]): any {
     if (cls === "mr-4") styles.marginRight = 16;
 
     // Width/Height
+    if (cls === "w-1.5") styles.width = 6;
+    if (cls === "w-3.5") styles.width = 14;
+    if (cls === "w-5") styles.width = 20;
+    if (cls === "w-6") styles.width = 24;
+    if (cls === "w-8") styles.width = 32;
     if (cls === "w-9") styles.width = 36;
     if (cls === "w-10") styles.width = 40;
     if (cls === "w-12") styles.width = 48;
+    if (cls === "w-16") styles.width = 64;
     if (cls === "w-52") styles.width = 208;
     if (cls === "w-full") styles.width = "100%";
+    if (cls === "h-1.5") styles.height = 6;
+    if (cls === "h-5") styles.height = 20;
+    if (cls === "h-8") styles.height = 32;
     if (cls === "h-9") styles.height = 36;
     if (cls === "h-10") styles.height = 40;
     if (cls === "h-12") styles.height = 48;
@@ -101,6 +110,7 @@ export function twStyles(...inputs: ClassValue[]): any {
     // Position
     if (cls === "absolute") styles.position = "absolute";
     if (cls === "relative") styles.position = "relative";
+    if (cls === "top-0") styles.top = 0;
     if (cls === "inset-0") {
       styles.top = 0;
       styles.left = 0;
@@ -111,11 +121,14 @@ export function twStyles(...inputs: ClassValue[]): any {
     if (cls === "z-50") styles.zIndex = 50;
     if (cls === "z-[2000]") styles.zIndex = 2000;
 
-    // Alignment
+    // Alignment & Text
     if (cls === "items-center") styles.alignItems = "center";
     if (cls === "items-start") styles.alignItems = "flex-start";
     if (cls === "justify-center") styles.justifyContent = "center";
     if (cls === "justify-between") styles.justifyContent = "space-between";
+    if (cls === "text-center") styles.textAlign = "center";
+    if (cls === "leading-10") styles.lineHeight = 40;
+    if (cls === "opacity-60") styles.opacity = 0.6;
 
     // Display
     if (cls === "flex") styles.display = "flex";
@@ -123,6 +136,8 @@ export function twStyles(...inputs: ClassValue[]): any {
 
     // Overflow
     if (cls === "overflow-hidden") styles.overflow = "hidden";
+    if (cls === "overflow-visible") styles.overflow = "visible";
+    if (cls === "overflow-scroll") styles.overflow = "scroll";
 
     // Shadow
     if (cls === "shadow-sm") {

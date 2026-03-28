@@ -20,73 +20,75 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingTop: 12,
-    paddingBottom: 12,
+    paddingBottom: 24,
     zIndex: 10,
     width: "100%",
   },
   leftContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 16,
     overflow: "hidden",
     flex: 1,
   },
   avatarContainer: {
     position: "relative",
-    width: 60,
-    height: 36,
+    width: 64,
+    height: 40,
     justifyContent: "center",
+  },
+  avatar2: {
+    position: "absolute",
+    left: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "#FCF9F8", // lightBg
+    backgroundColor: "#F5F5F4", // taupe100
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
   },
   avatar1: {
     position: "absolute",
     left: 0,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     borderWidth: 2,
-    borderColor: "#fff",
-    backgroundColor: "rgba(255,255,255,0.6)",
+    borderColor: "#FCF9F8", // lightBg
+    backgroundColor: "#FCE7F3", // soft pink
     alignItems: "center",
     justifyContent: "center",
     zIndex: 20,
   },
   statusDot: {
     position: "absolute",
-    bottom: 0,
-    right: 0,
+    bottom: -2,
+    right: -2,
     zIndex: 30,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     borderWidth: 2,
-    borderColor: "#fff",
+    borderColor: "#FCF9F8",
     backgroundColor: "#22c55e",
   },
-  avatar2: {
-    position: "absolute",
-    left: 24,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 2,
-    borderColor: "#fff",
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 10,
-    opacity: 0.9,
-  },
-  textContainer: { justifyContent: "center", flex: 1 },
-  subRow: { flexDirection: "row", alignItems: "center", marginTop: 0 },
+  textContainer: { justifyContent: "center", flex: 1, gap: 2 },
+  subRow: { flexDirection: "row", alignItems: "center" },
   button: {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255,255,255,0.45)",
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.6)",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
     marginLeft: 8,
   },
 });
@@ -108,20 +110,20 @@ export const HomeHeader = React.memo(function HomeHeader({
       <View style={styles.container}>
         <View style={styles.leftContainer}>
           <View style={styles.avatarContainer}>
+            <View style={styles.avatar2}>
+              <Ionicons name="person" size={18} color="#D6D3D1" />
+            </View>
             <View style={styles.avatar1}>
               <AppText
                 style={{
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: "bold",
-                  color: palette.zinc400,
+                  color: "#F43F5E",
                 }}
               >
                 {userInitial}
               </AppText>
               <View style={styles.statusDot} />
-            </View>
-            <View style={styles.avatar2}>
-              <Ionicons name="person" size={16} color={palette.zinc300} />
             </View>
           </View>
 
@@ -129,28 +131,30 @@ export const HomeHeader = React.memo(function HomeHeader({
             <AppText
               numberOfLines={1}
               style={{
-                fontSize: 15,
-                fontWeight: "bold",
-                color: palette.zinc900,
+                fontSize: 18,
+                fontWeight: "800",
+                color: "#1C1917", // taupe900
               }}
             >
               {greeting}
             </AppText>
             <View style={styles.subRow}>
-              <Ionicons
-                name={iconName as any}
-                size={12}
-                color={palette.amber500}
-              />
+              {iconName && (
+                <Ionicons
+                  name={iconName as any}
+                  size={12}
+                  color="#FBBF24"
+                  style={{ marginRight: 4 }}
+                />
+              )}
               <AppText
                 numberOfLines={1}
                 style={{
-                  fontSize: 9,
-                  fontWeight: "bold",
-                  color: palette.zinc400,
-                  marginLeft: 4,
+                  fontSize: 10,
+                  fontWeight: "800",
+                  color: "#A8A29E", // taupe400
                   textTransform: "uppercase",
-                  letterSpacing: 2,
+                  letterSpacing: 1.5,
                 }}
               >
                 {subGreeting}

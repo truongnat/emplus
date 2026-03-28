@@ -1,6 +1,5 @@
-import { tws } from "@/src/utils/tws";
 import React, { useEffect, useState, useMemo } from "react";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -13,12 +12,15 @@ import Animated, {
 } from "react-native-reanimated";
 import { AppText } from "@/src/ui-kit";
 
+// Default colors matching Aura aesthetic
+const TEXT_COLOR = "#1C1917"; // taupe900
+
 function Digit({
   digit,
   index,
-  digitHeight = 110,
-  fontSize = 96,
-  width = 64,
+  digitHeight = 100,
+  fontSize = 110,
+  width = 68,
 }: {
   digit: string;
   index: number;
@@ -49,26 +51,15 @@ function Digit({
   });
 
   return (
-    <View
-      style={tws("overflow-hidden items-center", {
-        height: digitHeight,
-        width,
-      })}
-    >
+    <View style={[styles.digitContainer, { height: digitHeight, width }]}>
       <Animated.View style={animatedStyle}>
         {displayDigits.map((d) => (
-          <View
-            key={d}
-            style={tws("items-center justify-center", { height: digitHeight })}
-          >
+          <View key={d} style={[styles.digitWrapper, { height: digitHeight }]}>
             <AppText
-              variant="h1"
-              color="primary"
-              style={tws("text-center", {
-                fontSize,
-                lineHeight: digitHeight,
-                width,
-              })}
+              style={[
+                styles.digitText,
+                { fontSize, lineHeight: digitHeight, width },
+              ]}
             >
               {d}
             </AppText>
@@ -85,11 +76,11 @@ export const NumberTicker = React.memo(function NumberTicker({
   value: number;
 }) {
   const digits = useMemo(
-    () => value.toString().padStart(2, "0").split(""),
+    () => value.toString().padStart(3, "0").split(""),
     [value],
   );
   return (
-    <View style={tws("flex-row items-center")}>
+    <View style={styles.tickerRow}>
       {digits.map((d, i) => (
         <Digit key={i} digit={d} index={i} />
       ))}
@@ -121,19 +112,13 @@ function ClockColon() {
 
   return (
     <Animated.View style={animatedStyle}>
-      <AppText
-        variant="h3"
-        color="primary"
-        style={tws("w-3.5 text-center leading-10 opacity-60")}
-      >
-        :
-      </AppText>
+      <AppText style={styles.colonText}>:</AppText>
     </Animated.View>
   );
 }
 
 function ClockDigit({ digit }: { digit: string }) {
-  const D = 40;
+  const D = 28;
   const num = parseInt(digit, 10);
   const translateY = useSharedValue(-D * num);
 
@@ -150,18 +135,11 @@ function ClockDigit({ digit }: { digit: string }) {
   }));
 
   return (
-    <View style={tws("overflow-hidden w-6 items-center", { height: D })}>
+    <View style={[styles.clockDigitContainer, { height: D }]}>
       <Animated.View style={animatedStyle}>
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
-          <View
-            key={d}
-            style={tws("items-center justify-center", { height: D })}
-          >
-            <AppText
-              variant="h2"
-              color="primary"
-              style={tws("w-6 text-center", { lineHeight: D })}
-            >
+          <View key={d} style={[styles.clockDigitWrapper, { height: D }]}>
+            <AppText style={[styles.clockDigitText, { lineHeight: D }]}>
               {d}
             </AppText>
           </View>
@@ -187,9 +165,9 @@ export const ClockTicker = React.memo(function ClockTicker() {
   }, [now]);
 
   return (
-    <View style={tws("flex-row items-center")}>
+    <View style={styles.clockTickerRow}>
       {[timeDigits.hh, timeDigits.mm, timeDigits.ss].map((group, gi) => (
-        <View key={gi} style={tws("flex-row items-center")}>
+        <View key={gi} style={styles.clockTickerRow}>
           {group.map((d, di) => (
             <ClockDigit key={`${gi}-${di}`} digit={d} />
           ))}
@@ -203,3 +181,55 @@ export const ClockTicker = React.memo(function ClockTicker() {
 export function HomeClock() {
   return <ClockTicker />;
 }
+
+const styles = StyleSheet.create({
+  digitContainer: {
+    overflow: "hidden",
+    alignItems: "center",
+  },
+  digitWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  digitText: {
+    textAlign: "center",
+    fontWeight: "900",
+    color: TEXT_COLOR,
+    letterSpacing: -2,
+  },
+  tickerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  clockTickerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  colonText: {
+    width: 14,
+    textAlign: "center",
+    fontWeight: "800",
+    fontSize: 22,
+    lineHeight: 28,
+    color: TEXT_COLOR,
+    opacity: 0.6,
+  },
+  clockDigitContainer: {
+    overflow: "hidden",
+    width: 18,
+    alignItems: "center",
+  },
+  clockDigitWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  clockDigitText: {
+    width: 18,
+    textAlign: "center",
+    fontSize: 22,
+    fontWeight: "800",
+    color: TEXT_COLOR,
+    letterSpacing: 1,
+  },
+});

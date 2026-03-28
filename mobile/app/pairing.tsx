@@ -53,7 +53,30 @@ export default function PairingScreen() {
   const generateInviteMutation = useMutation({
     mutationFn: () => dependencies.couple.generateInvite.execute(),
     onSuccess: (res) => setInviteCode(res.inviteCode),
-    onError: (err) => showToast(toDisplayError(err), "error"),
+    onError: (err: any) => {
+      console.log("Generate invite error:", {
+        code: err?.code,
+        message: err?.message,
+        status: err?.status,
+      });
+      const displayError = toDisplayError(err);
+      if (
+        err?.code === "COUPLE_ALREADY_PAIRED" ||
+        displayError.includes("COUPLE_ALREADY_PAIRED") ||
+        err?.message?.includes("COUPLE_ALREADY_PAIRED")
+      ) {
+        // If already paired, trigger a session sync and move to home
+        console.log("Already paired detected, syncing profile...");
+        dependencies.auth.getProfile.execute().then((latestUser) => {
+          if (session) {
+            setSession({ ...session, user: latestUser });
+          }
+          router.replace("/(tabs)/home");
+        });
+        return;
+      }
+      showToast(displayError, "error");
+    },
   });
 
   const joinMutation = useMutation({

@@ -1,9 +1,7 @@
-import { tws } from "@/src/utils/tws";
-
 import React from "react";
-import { View, ScrollView, Alert } from "react-native";
+import { View, ScrollView, Alert, StyleSheet } from "react-native";
 import { AppText, PressableScale, pickImage } from "@/src/ui-kit";
-import { Plus } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 export interface FilterChip {
   id: string;
@@ -32,7 +30,6 @@ export function TimelineHeader({
     try {
       const asset = await pickImage();
       if (asset) {
-        // Logic to upload/save memory would go here
         Alert.alert(
           "Thành công",
           `Đã chọn ảnh: ${asset.fileName || "ảnh mới"}`,
@@ -44,48 +41,36 @@ export function TimelineHeader({
   };
 
   return (
-    <View style={tws("pt-6 pb-4 px-5 gap-6")}>
-      <View style={tws("flex-row items-center justify-between")}>
-        <AppText variant="h2" color="slate-900" style={tws("tracking-tighter")}>
-          Dòng thời gian
-        </AppText>
-        <PressableScale
-          onPress={handleAddMemory}
-          style={
-            tws(
-              "w-10 h-10 bg-primary rounded-full items-center justify-center shadow-lg",
-            ) as any
-          }
-        >
-          <Plus size={24} color="#fff" />
+    <View style={styles.container}>
+      <View style={styles.topRow}>
+        <AppText style={styles.title}>Dòng thời gian</AppText>
+        <PressableScale onPress={handleAddMemory} style={styles.plusButton}>
+          <Ionicons name="add" size={24} color="#1C1917" />
         </PressableScale>
       </View>
 
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={tws("gap-3 pr-5")}
+        contentContainerStyle={styles.filterList}
       >
         {filters.map((chip) => {
           const isActive = activeFilter === chip.id;
           return (
             <PressableScale
               key={chip.id}
-              style={
-                tws(
-                  "px-5 py-2.5 rounded-full",
-                  isActive
-                    ? "bg-primary shadow-glass"
-                    : "bg-white/60 border border-white/80 shadow-sm",
-                ) as any
-              }
+              style={[
+                styles.filterChip,
+                isActive ? styles.activeChip : styles.inactiveChip,
+              ]}
               onPress={() => setActiveFilter(chip.id)}
-              scaleTo={0.9}
+              scaleTo={0.95}
             >
               <AppText
-                variant={isActive ? "bodyBold" : "body"}
-                color={isActive ? "white" : "slate-500"}
-                style={tws("text-sm")}
+                style={[
+                  styles.filterLabel,
+                  isActive ? styles.activeLabel : styles.inactiveLabel,
+                ]}
               >
                 {chip.label}
               </AppText>
@@ -96,3 +81,72 @@ export function TimelineHeader({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingTop: 24,
+    paddingBottom: 4,
+    paddingHorizontal: 20,
+    gap: 20,
+  },
+  topRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: "#1C1917", // taupe900
+    letterSpacing: -1,
+  },
+  plusButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: "#F5F5F4",
+  },
+  filterList: {
+    gap: 12,
+    paddingRight: 20,
+    paddingVertical: 4,
+  },
+  filterChip: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 24,
+    borderWidth: 1,
+  },
+  activeChip: {
+    backgroundColor: "#1C1917",
+    borderColor: "#1C1917",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  inactiveChip: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#F5F5F4",
+  },
+  filterLabel: {
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  activeLabel: {
+    color: "#FFFFFF",
+  },
+  inactiveLabel: {
+    color: "#A8A29E", // taupe400
+  },
+});

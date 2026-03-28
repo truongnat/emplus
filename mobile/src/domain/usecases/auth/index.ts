@@ -50,3 +50,14 @@ export class VerifyOtpUseCase {
     return this.authRepository.verifyOtp(params);
   }
 }
+
+/**
+ * Use Case lấy thông tin profile người dùng.
+ */
+export class GetProfileUseCase {
+  constructor(private authRepository: AuthRepository) { }
+
+  async execute(): Promise<AuthModule.User> {
+    return this.authRepository.getProfile();
+  }
+}

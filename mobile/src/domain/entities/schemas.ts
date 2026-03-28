@@ -1135,6 +1135,8 @@ export namespace AuthModule {
 
   export type VerifyOtpRequest = ApiRequest<"/v1/auth/verify-otp", "post">;
   export type VerifyOtpResponse = ApiResponse<"/v1/auth/verify-otp", "post">;
+
+  export type User = Schemas["User"];
 }
 
 export namespace CoupleModule {

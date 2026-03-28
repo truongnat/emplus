@@ -1,13 +1,43 @@
-import { palette } from "@/src/theme";
-import { AppText, PressableScale } from "@/src/ui-kit";
+import React from "react";
+import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Fragment, useCallback, useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
-import BudgetActionMenu from "./BudgetActionMenu";
+import { AppText, PressableScale } from "@/src/ui-kit";
 
 interface BudgetHeaderProps {
   showMenu: boolean;
   onToggleMenu: () => void;
+}
+
+export default function BudgetHeader({
+  showMenu,
+  onToggleMenu,
+}: BudgetHeaderProps) {
+  return (
+    <View style={styles.container}>
+      <AppText style={styles.title}>Ngân sách</AppText>
+      <PressableScale
+        onPress={onToggleMenu}
+        style={[
+          styles.button,
+          showMenu ? styles.buttonActive : styles.buttonInactive,
+        ]}
+      >
+        <Ionicons
+          name={showMenu ? "close" : "options-outline"}
+          size={20}
+          color={showMenu ? "#FFFFFF" : "#1C1917"}
+        />
+        <AppText
+          style={[
+            styles.buttonText,
+            { color: showMenu ? "#FFFFFF" : "#1C1917" },
+          ]}
+        >
+          {showMenu ? "Đóng" : "Quản lý"}
+        </AppText>
+      </PressableScale>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -15,71 +45,41 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingTop: 24,
-    paddingBottom: 12,
-    position: "relative",
+    paddingBottom: 16,
     zIndex: 1001,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: "#1C1917", // taupe900
+    letterSpacing: -0.5,
   },
   button: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 9999,
+    borderRadius: 20,
+    borderWidth: 1,
   },
   buttonActive: {
-    backgroundColor: palette.zinc900,
-    borderColor: palette.zinc900,
+    backgroundColor: "#1C1917",
+    borderColor: "#1C1917",
   },
   buttonInactive: {
-    backgroundColor: "rgba(255,255,255,0.7)",
-    borderColor: "rgba(255,255,255,0.8)",
+    backgroundColor: "#FFFFFF",
+    borderColor: "#F5F5F4",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
   },
-  buttonText: { fontSize: 13, fontWeight: "bold" },
+  buttonText: {
+    fontSize: 14,
+    fontWeight: "800",
+  },
 });
-
-export default function BudgetHeader({
-  showMenu,
-  onToggleMenu,
-}: BudgetHeaderProps) {
-  return (
-    <Fragment key="budget-header">
-      <View style={styles.container}>
-        <AppText
-          style={{
-            fontSize: 24,
-            fontWeight: "bold",
-            color: palette.zinc900,
-            letterSpacing: -0.5,
-          }}
-        >
-          Ngân sách
-        </AppText>
-        <PressableScale
-          onPress={onToggleMenu}
-          style={[
-            styles.button,
-            showMenu ? styles.buttonActive : styles.buttonInactive,
-          ]}
-        >
-          <Ionicons
-            name={showMenu ? "close" : "options-outline"}
-            size={18}
-            color={showMenu ? "#fff" : palette.zinc800}
-          />
-          <AppText
-            style={[
-              styles.buttonText,
-              { color: showMenu ? "#fff" : palette.zinc800 },
-            ]}
-          >
-            {showMenu ? "Đóng" : "Quản lý"}
-          </AppText>
-        </PressableScale>
-      </View>
-      {/* Menu will be rendered at the screen level to avoid overlap issues */}
-    </Fragment>
-  );
-}

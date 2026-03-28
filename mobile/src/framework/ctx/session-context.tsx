@@ -13,11 +13,12 @@ import { storage } from "@/src/core/common/storage";
 import appConfig from "@/src/core/config/app-config";
 import { AuthModule } from "@/src/domain/entities/schemas";
 import { AuthRepositoryImpl } from "@/src/data/repositories/auth.repository.impl";
-import { RefreshSessionUseCase } from "@/src/domain/usecases/auth";
+import { RefreshSessionUseCase, GetProfileUseCase } from "@/src/domain/usecases/auth";
 import { tokenManager } from "@/src/core/api/token-manager";
 
 const authRepo = new AuthRepositoryImpl();
 const refreshSessionUseCase = new RefreshSessionUseCase(authRepo);
+const getProfileUseCase = new GetProfileUseCase(authRepo);
 
 interface SessionContextValue {
   session: AuthModule.LoginResponse | null;
@@ -103,12 +104,26 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         ]);
         console.log("Session init:", { hasTokens: !!tokens, hasMeta: !!meta });
         if (tokens && active) {
-          const user = meta?.user || null;
+          let user = meta?.user || null;
           setSession({ user, tokens });
+
           // Refresh AFTER state update completes
           setTimeout(async () => {
-            if (tokens.refreshToken && active) {
-              await refreshAuth();
+            if (active) {
+              try {
+                // Try to refresh token first (ensure we are authenticated)
+                await refreshAuth();
+                const currentTokens = await storage.auth.getTokens();
+                if (currentTokens?.accessToken && active) {
+                  // Then fetch latest profile to sync coupleId
+                  const latestUser = await getProfileUseCase.execute();
+                  setSession((prev) =>
+                    prev ? { ...prev, user: latestUser } : null,
+                  );
+                }
+              } catch (err) {
+                console.error("Sync profile error:", err);
+              }
             }
           }, 100);
         }
@@ -122,7 +137,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, [clearSession, refreshAuth]);
+  }, [clearSession]);
+
+  // Handle changes in session state (like auto-saving to storage)
 
   useEffect(() => {
     if (hydrated && session) {

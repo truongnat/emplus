@@ -1,6 +1,5 @@
-import { tws } from "@/src/utils/tws";
 import React, { useCallback } from "react";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { AppButton, Reveal, AppText, PressableScale } from "@/src/ui-kit";
@@ -36,59 +35,47 @@ export const FocusCard = React.memo(function FocusCard({
 
   return (
     <Reveal delay={550}>
-      <View style={tws("mb-6 rounded-[32px] bg-white shadow-glass")}>
-        <View
-          style={tws(
-            "relative rounded-[32px] p-6 bg-white/45 border border-white/60 overflow-hidden",
-          )}
-        >
-          <View
-            style={tws(
-              "absolute -right-10 -top-10 w-[120px] h-[120px] rounded-full bg-rose-600/5",
-            )}
-          />
+      <View style={styles.container}>
+        <View style={styles.cardContent}>
+          <View style={styles.backgroundCircle} />
 
-          <View style={tws("flex-row items-center justify-between mb-4 z-10")}>
+          <View style={styles.headerRow}>
             <AppText variant="h3" color="slate-900">
               Trọng tâm hôm nay
             </AppText>
-            <View style={tws("bg-rose-500/10 px-3 py-1 rounded-[12px]")}>
+            <View style={styles.priorityBadge}>
               <AppText variant="captionBold" color="rose-600">
                 Ưu tiên cao
               </AppText>
             </View>
           </View>
 
-          <View style={tws("flex-row gap-4 mb-6 z-10")}>
-            <View
-              style={tws(
-                "w-14 h-14 rounded-2xl bg-white/60 items-center justify-center border border-white/60 shadow-sm",
-              )}
-            >
+          <View style={styles.mainContentRow}>
+            <View style={styles.iconContainer}>
               <Ionicons
                 name="mic-outline"
                 size={24}
                 color={(palette as any)["orange-500"]}
               />
             </View>
-            <View style={tws("flex-1")}>
+            <View style={styles.textContainer}>
               <AppText
                 variant="h3"
                 color="slate-800"
-                style={tws("leading-[24px]")}
+                style={styles.titleText}
               >
                 {focusTitle}
               </AppText>
-              <AppText variant="body" color="slate-500" style={tws("mt-1.5")}>
+              <AppText variant="body" color="slate-500" style={styles.subtitleText}>
                 {focusSubtitle}
               </AppText>
-              <View style={tws("flex-row items-center mt-2.5")}>
+              <View style={styles.timeContainer}>
                 <Ionicons
                   name="time-outline"
                   size={16}
                   color={(palette as any)["slate-600"]}
                 />
-                <AppText variant="body" color="slate-600" style={tws("ml-1")}>
+                <AppText variant="body" color="slate-600" style={styles.timeText}>
                   {" "}
                   Hôm nay
                 </AppText>
@@ -96,18 +83,18 @@ export const FocusCard = React.memo(function FocusCard({
             </View>
           </View>
 
-          <View style={tws("flex-row items-center gap-4 z-10 w-full mt-4")}>
+          <View style={styles.actionRow}>
             <AppButton
               label="Để sau"
               variant="ghost"
               fullWidth={false}
-              style={tws("min-w-[80px] px-0")}
+              style={styles.dismissButton}
               onPress={handleDismiss}
             />
             <AppButton
               label="Ghi lại tâm trạng"
               variant="primary"
-              style={tws("flex-1")}
+              style={styles.recordButton}
               onPress={handleRecord}
             />
           </View>
@@ -115,4 +102,106 @@ export const FocusCard = React.memo(function FocusCard({
       </View>
     </Reveal>
   );
+});
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 24,
+    borderRadius: 32,
+    backgroundColor: "#ffffff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.05,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  cardContent: {
+    position: "relative",
+    borderRadius: 32,
+    padding: 24,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#F5F5F4",
+    overflow: "hidden",
+  },
+  backgroundCircle: {
+    position: "absolute",
+    right: -40,
+    top: -40,
+    width: 120,
+    height: 120,
+    borderRadius: 9999,
+    backgroundColor: "rgba(225,29,72,0.03)",
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+    zIndex: 10,
+  },
+  priorityBadge: {
+    backgroundColor: "rgba(244,63,94,0.1)",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  mainContentRow: {
+    flexDirection: "row",
+    gap: 16,
+    marginBottom: 24,
+    zIndex: 10,
+  },
+  iconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#F5F5F4",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  titleText: {
+    lineHeight: 24,
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#1C1917", // taupe900
+  },
+  subtitleText: {
+    marginTop: 6,
+    color: "#A8A29E",
+  },
+  timeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  timeText: {
+    marginLeft: 4,
+    color: "#A8A29E",
+  },
+  actionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    zIndex: 10,
+    width: "100%",
+    marginTop: 16,
+  },
+  dismissButton: {
+    minWidth: 80,
+    paddingHorizontal: 0,
+  },
+  recordButton: {
+    flex: 1,
+  },
 });

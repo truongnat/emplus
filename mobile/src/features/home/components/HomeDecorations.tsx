@@ -1,7 +1,5 @@
-import { tws } from "@/src/utils/tws";
-
 import React, { useEffect } from "react";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -144,11 +142,21 @@ export function RingingBell() {
         size={24}
         color={(palette as any)["slate-600"]}
       />
-      <View
-        style={tws(
-          "absolute -top-0.5 -right-0.5 w-3 h-3 bg-rose-500 rounded-full border-2 border-white/90",
-        )}
-      />
+      <View style={styles.notificationDot} />
     </Animated.View>
   );
 }
+
+const styles = StyleSheet.create({
+  notificationDot: {
+    position: "absolute",
+    top: -2,
+    right: -2,
+    width: 12,
+    height: 12,
+    backgroundColor: "#f43f5e",
+    borderRadius: 9999,
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.9)",
+  },
+});

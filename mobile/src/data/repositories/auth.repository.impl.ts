@@ -42,4 +42,11 @@ export class AuthRepositoryImpl implements AuthRepository {
     >("/auth/verify-otp", params);
     return response.data;
   }
+
+  async getProfile(): Promise<AuthModule.User> {
+    const response = await apiClient.get<ApiResponse<AuthModule.User>>(
+      "/users/me",
+    );
+    return response.data;
+  }
 }

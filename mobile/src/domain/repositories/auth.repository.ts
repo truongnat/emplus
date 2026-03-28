@@ -30,4 +30,9 @@ export interface AuthRepository {
   verifyOtp(
     params: AuthModule.VerifyOtpRequest,
   ): Promise<AuthModule.VerifyOtpResponse>;
+
+  /**
+   * Retrieves the current user profile.
+   */
+  getProfile(): Promise<AuthModule.User>;
 }

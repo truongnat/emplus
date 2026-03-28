@@ -1,36 +1,114 @@
 import React, { memo } from "react";
 import { View, StyleSheet } from "react-native";
-import { BlurView } from "expo-blur";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { palette } from "@/src/theme/tokens";
 import { type BudgetItem } from "@/src/api";
 import { CATEGORY_CONFIG, STATUS_MAP } from "./constants";
-import { AppText } from "@/src/components/atoms/Text";
+import { AppText } from "@/src/ui-kit";
 
 interface ExpenseItemProps {
   item: BudgetItem;
 }
 
+export const ExpenseItem = memo(({ item }: ExpenseItemProps) => {
+  const isWarning = item.status === "OVER_BUDGET";
+  const config = CATEGORY_CONFIG[item.category] ?? CATEGORY_CONFIG.other;
+  const status = STATUS_MAP[item.status] ?? {
+    label: item.status,
+    color: "#78716C", // taupe500
+  };
+
+  return (
+    <View style={styles.outerContainer}>
+      <View style={styles.container}>
+        <View style={styles.headerRow}>
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: config?.bg || "#F5F5F4" },
+            ]}
+          >
+            <Ionicons
+              name={(config?.icon as any) || "help"}
+              size={24}
+              color={config?.color || "#78716C"}
+            />
+          </View>
+          <View style={styles.titleContainer}>
+            <AppText numberOfLines={1} style={styles.title}>
+              {item.title}
+            </AppText>
+            <AppText style={styles.metaText}>
+              {item.date} {item.place ? `• ${item.place}` : ""}
+            </AppText>
+          </View>
+          <View style={styles.amountContainer}>
+            <AppText
+              style={[styles.amount, isWarning ? styles.warningAmount : {}]}
+            >
+              {item.amount?.toLocaleString() ?? "0"}đ
+            </AppText>
+            <View
+              style={[
+                styles.statusBadge,
+                {
+                  backgroundColor:
+                    item.status === "PAID"
+                      ? "#ECFDF5"
+                      : isWarning
+                        ? "#FFF1F2"
+                        : "#FEF3C7",
+                  borderColor:
+                    item.status === "PAID"
+                      ? "#D1FAE5"
+                      : isWarning
+                        ? "#FFE4E6"
+                        : "#FDE68A",
+                },
+              ]}
+            >
+              <AppText
+                style={[
+                  styles.statusText,
+                  {
+                    color:
+                      item.status === "PAID"
+                        ? "#10B981"
+                        : isWarning
+                          ? "#E11D48"
+                          : "#D97706",
+                  },
+                ]}
+              >
+                {isWarning ? "Vượt hạn mức" : status.label}
+              </AppText>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+});
+
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
+    paddingHorizontal: 24,
     marginBottom: 16,
-    borderRadius: 28,
-    overflow: "hidden",
+  },
+  container: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    elevation: 4,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.6)",
+    borderColor: "#F5F5F4",
   },
-  content: {
+  headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    padding: 20,
-  },
-  leftContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-    flex: 1,
   },
   iconContainer: {
     width: 48,
@@ -39,144 +117,43 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  textContainer: { flex: 1, paddingRight: 8 },
-  rightContainer: { alignItems: "flex-end", gap: 6, marginLeft: 8 },
+  titleContainer: {
+    flex: 1,
+    marginLeft: 16,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#1C1917",
+  },
+  metaText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#A8A29E",
+    marginTop: 2,
+  },
+  amountContainer: {
+    alignItems: "flex-end",
+  },
+  amount: {
+    fontSize: 16,
+    fontWeight: "900",
+    color: "#1C1917",
+  },
+  warningAmount: {
+    color: "#E11D48",
+  },
   statusBadge: {
-    paddingHorizontal: 12,
+    marginTop: 6,
+    paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
   },
-  divider: {
-    width: 1,
-    height: 1,
-    borderRadius: 9999,
-    backgroundColor: palette.zinc200,
+  statusText: {
+    fontSize: 10,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
-});
-
-export const ExpenseItem = memo(({ item }: ExpenseItemProps) => {
-  const isWarning = item.status === "OVER_BUDGET";
-  const config = CATEGORY_CONFIG[item.category] ?? CATEGORY_CONFIG.other;
-  const status = STATUS_MAP[item.status] ?? {
-    label: item.status,
-    color: palette.zinc500,
-  };
-
-  const gradientColors: [string, string] = isWarning
-    ? ["rgba(236,19,52,0.06)", "rgba(236,19,52,0.02)"]
-    : [palette.violet50, palette.zinc50];
-
-  return (
-    <BlurView intensity={25} tint="light" style={styles.container}>
-      <LinearGradient
-        colors={gradientColors}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.content}>
-          <View style={styles.leftContainer}>
-            <View
-              style={[
-                styles.iconContainer,
-                { backgroundColor: config?.bg || palette.zinc200 },
-              ]}
-            >
-              <Ionicons
-                name={(config?.icon as any) || "help"}
-                size={22}
-                color={config?.color || palette.zinc500}
-              />
-            </View>
-            <View style={styles.textContainer}>
-              <AppText
-                numberOfLines={1}
-                style={{
-                  fontSize: 15,
-                  fontWeight: "bold",
-                  color: palette.zinc800,
-                  marginBottom: 4,
-                }}
-              >
-                {item.title}
-              </AppText>
-              <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
-              >
-                <AppText
-                  numberOfLines={1}
-                  style={{
-                    fontSize: 13,
-                    color: isWarning ? palette.violet600 : palette.zinc400,
-                    opacity: 0.7,
-                  }}
-                >
-                  {item.date}
-                </AppText>
-                {item.place && (
-                  <>
-                    <View style={styles.divider} />
-                    <AppText
-                      numberOfLines={1}
-                      style={{
-                        fontSize: 13,
-                        color: palette.zinc400,
-                        maxWidth: 80,
-                      }}
-                    >
-                      {item.place}
-                    </AppText>
-                  </>
-                )}
-              </View>
-            </View>
-          </View>
-          <View style={styles.rightContainer}>
-            <AppText
-              style={{
-                fontSize: 17,
-                fontWeight: "bold",
-                color: isWarning ? palette.violet600 : palette.zinc900,
-              }}
-            >
-              {item.amount?.toLocaleString() ?? "0"}đ
-            </AppText>
-            <View
-              style={[
-                styles.statusBadge,
-                {
-                  backgroundColor: isWarning
-                    ? `${palette.red50}`
-                    : item.status === "PAID"
-                      ? `${palette.green50}`
-                      : `${palette.amber50}`,
-                  borderColor: isWarning
-                    ? `${palette.red500}33`
-                    : item.status === "PAID"
-                      ? `${palette.green500}33`
-                      : `${palette.amber500}33`,
-                },
-              ]}
-            >
-              <AppText
-                style={{
-                  fontSize: 10,
-                  fontWeight: "bold",
-                  color: isWarning
-                    ? palette.violet600
-                    : item.status === "PAID"
-                      ? palette.green600
-                      : palette.amber600,
-                  textTransform: "uppercase",
-                  letterSpacing: 0.5,
-                }}
-              >
-                {isWarning ? "Vượt hạn mức" : status.label}
-              </AppText>
-            </View>
-          </View>
-        </View>
-      </LinearGradient>
-    </BlurView>
-  );
 });
