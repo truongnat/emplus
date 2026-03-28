@@ -6,12 +6,16 @@ import {
   CareRepositoryImpl,
   BudgetRepositoryImpl,
 } from "../../data/repositories/modules.repository.impl";
+import { NotificationsRepositoryImpl } from "../../data/repositories/notifications.repository.impl";
 import {
   LoginUseCase,
   RegisterUseCase,
   RefreshSessionUseCase,
   VerifyOtpUseCase,
   GetProfileUseCase,
+  RequestPasswordResetUseCase,
+  ResetPasswordUseCase,
+  RegisterPushTokenUseCase,
 } from "../../domain/usecases/auth";
 import {
   GenerateInviteUseCase,
@@ -24,6 +28,9 @@ import {
   GetBudgetSummaryUseCase,
   GetExpensesUseCase,
   CreateExpenseUseCase,
+  ListNotificationsUseCase,
+  MarkNotificationReadUseCase,
+  MarkAllNotificationsReadUseCase,
 } from "../../domain/usecases/modules";
 
 /**
@@ -37,6 +44,7 @@ const dashboardRepo = new DashboardRepositoryImpl();
 const timelineRepo = new TimelineRepositoryImpl();
 const careRepo = new CareRepositoryImpl();
 const budgetRepo = new BudgetRepositoryImpl();
+const notificationsRepo = new NotificationsRepositoryImpl();
 
 // Use Cases
 export const dependencies = {
@@ -46,6 +54,9 @@ export const dependencies = {
     refresh: new RefreshSessionUseCase(authRepo),
     verifyOtp: new VerifyOtpUseCase(authRepo),
     getProfile: new GetProfileUseCase(authRepo),
+    requestPasswordReset: new RequestPasswordResetUseCase(authRepo),
+    resetPassword: new ResetPasswordUseCase(authRepo),
+    registerPushToken: new RegisterPushTokenUseCase(authRepo),
   },
   couple: {
     generateInvite: new GenerateInviteUseCase(coupleRepo),
@@ -64,5 +75,10 @@ export const dependencies = {
     getSummary: new GetBudgetSummaryUseCase(budgetRepo),
     getExpenses: new GetExpensesUseCase(budgetRepo),
     createExpense: new CreateExpenseUseCase(budgetRepo),
+  },
+  notifications: {
+    list: new ListNotificationsUseCase(notificationsRepo),
+    markRead: new MarkNotificationReadUseCase(notificationsRepo),
+    markAllRead: new MarkAllNotificationsReadUseCase(notificationsRepo),
   },
 } as const;

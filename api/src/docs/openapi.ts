@@ -29,6 +29,7 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
       { name: "Kỷ niệm" },
       { name: "Chăm sóc" },
       { name: "Debug" },
+      { name: "Thông báo" },
     ],
     components: {
       securitySchemes: {
@@ -77,6 +78,25 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
           properties: {
             user: { $ref: "#/components/schemas/User" },
             tokens: { $ref: "#/components/schemas/TokenPair" },
+          },
+        },
+        LoginResult: {
+          oneOf: [
+            { $ref: "#/components/schemas/AuthResponse" },
+            {
+              type: "object",
+              required: ["requiresOTP"],
+              properties: {
+                requiresOTP: { type: "boolean", enum: [true] },
+              },
+            },
+          ],
+        },
+        PasswordResetAck: {
+          type: "object",
+          required: ["success"],
+          properties: {
+            success: { type: "boolean" },
           },
         },
         Couple: {
@@ -177,6 +197,25 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             remainingAmount: { type: "number" },
             usagePercentage: { type: "number" },
             projectedTotal: { type: "number" },
+          },
+        },
+        InAppNotification: {
+          type: "object",
+          required: ["id", "userId", "type", "title", "createdAt"],
+          properties: {
+            id: { type: "string", format: "uuid" },
+            userId: { type: "string", format: "uuid" },
+            coupleId: { type: "string", format: "uuid" },
+            type: { type: "string" },
+            title: { type: "string" },
+            body: { type: "string" },
+            iconName: { type: "string" },
+            iconColor: { type: "string" },
+            iconBg: { type: "string" },
+            actionLabel: { type: "string" },
+            metadata: { type: "object", additionalProperties: true },
+            readAt: { type: "string", format: "date-time" },
+            createdAt: { type: "string", format: "date-time" },
           },
         },
       },
@@ -297,10 +336,10 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
           },
           responses: {
             200: {
-              description: "Đăng nhập thành công",
+              description: "Đăng nhập thành công hoặc cần OTP (đăng ký lười)",
               content: {
                 "application/json": {
-                  schema: { $ref: "#/components/schemas/AuthResponse" },
+                  schema: { $ref: "#/components/schemas/LoginResult" },
                 },
               },
             },
@@ -310,6 +349,108 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             400: {
               description: "Dữ liệu gửi lên không hợp lệ",
             },
+          },
+        },
+      },
+      "/v1/auth/verify-otp": {
+        post: {
+          tags: ["Xác thực"],
+          summary: "Xác minh OTP (đăng ký lười / hoàn tất đăng nhập)",
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["email", "otp"],
+                  properties: {
+                    email: { type: "string", format: "email" },
+                    otp: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            200: {
+              description: "Xác minh thành công",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/AuthResponse" },
+                },
+              },
+            },
+            400: { description: "Dữ liệu không hợp lệ" },
+            401: { description: "OTP sai hoặc hết hạn" },
+            429: { description: "Quá nhiều lần thử" },
+          },
+        },
+      },
+      "/v1/auth/forgot-password": {
+        post: {
+          tags: ["Xác thực"],
+          summary: "Yêu cầu đặt lại mật khẩu (gửi OTP qua email)",
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["email"],
+                  properties: {
+                    email: { type: "string", format: "email" },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            200: {
+              description: "Đã gửi OTP (nếu email tồn tại)",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/PasswordResetAck" },
+                },
+              },
+            },
+            400: { description: "Email không hợp lệ" },
+            404: { description: "Không tìm thấy người dùng" },
+          },
+        },
+      },
+      "/v1/auth/reset-password": {
+        post: {
+          tags: ["Xác thực"],
+          summary: "Đặt lại mật khẩu bằng OTP",
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["email", "otp", "newPassword"],
+                  properties: {
+                    email: { type: "string", format: "email" },
+                    otp: { type: "string" },
+                    newPassword: { type: "string", minLength: 8 },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            200: {
+              description: "Đặt lại mật khẩu thành công",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/PasswordResetAck" },
+                },
+              },
+            },
+            400: { description: "Dữ liệu không hợp lệ" },
+            401: { description: "OTP sai hoặc hết hạn" },
+            404: { description: "Không tìm thấy tài khoản" },
+            429: { description: "Quá nhiều lần thử OTP" },
           },
         },
       },
@@ -346,6 +487,158 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             400: {
               description: "Dữ liệu gửi lên không hợp lệ",
             },
+          },
+        },
+      },
+      "/v1/users/me": {
+        get: {
+          tags: ["Xác thực"],
+          summary: "Thông tin người dùng hiện tại",
+          security: [{ bearerAuth: [] }],
+          responses: {
+            200: {
+              description: "Hồ sơ người dùng",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/User" },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
+          },
+        },
+      },
+      "/v1/users/push-token": {
+        post: {
+          tags: ["Xác thực"],
+          summary: "Lưu Expo push token (hoặc xóa bằng null)",
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["expoPushToken"],
+                  properties: {
+                    expoPushToken: {
+                      oneOf: [{ type: "string", maxLength: 512 }, { type: "null" }],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            200: {
+              description: "Đã lưu",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["saved"],
+                    properties: {
+                      saved: { type: "boolean" },
+                    },
+                  },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
+          },
+        },
+      },
+      "/v1/notifications": {
+        get: {
+          tags: ["Thông báo"],
+          summary: "Danh sách thông báo in-app",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: "page", in: "query", schema: { type: "integer", minimum: 1, default: 1 } },
+            { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 50, default: 20 } },
+            {
+              name: "unread_only",
+              in: "query",
+              description: "true/1 để chỉ lấy chưa đọc",
+              schema: { type: "string" },
+            },
+          ],
+          responses: {
+            200: {
+              description: "Danh sách phân trang",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["items", "pagination"],
+                    properties: {
+                      items: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/InAppNotification" },
+                      },
+                      pagination: {
+                        type: "object",
+                        required: ["page", "limit", "totalItems", "totalPages"],
+                        properties: {
+                          page: { type: "number" },
+                          limit: { type: "number" },
+                          totalItems: { type: "number" },
+                          totalPages: { type: "number" },
+                          hasNext: { type: "boolean" },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
+          },
+        },
+      },
+      "/v1/notifications/{id}/read": {
+        patch: {
+          tags: ["Thông báo"],
+          summary: "Đánh dấu một thông báo đã đọc",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: "id", in: "path", required: true, schema: { type: "string", format: "uuid" } },
+          ],
+          responses: {
+            200: {
+              description: "Bản ghi sau khi cập nhật",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/InAppNotification" },
+                },
+              },
+            },
+            404: { description: "Không tìm thấy" },
+            401: { description: "Chưa xác thực" },
+          },
+        },
+      },
+      "/v1/notifications/read-all": {
+        post: {
+          tags: ["Thông báo"],
+          summary: "Đánh dấu tất cả đã đọc",
+          security: [{ bearerAuth: [] }],
+          responses: {
+            200: {
+              description: "Số bản ghi đã cập nhật",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["markedCount"],
+                    properties: {
+                      markedCount: { type: "integer" },
+                    },
+                  },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
           },
         },
       },

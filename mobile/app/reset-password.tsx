@@ -2,13 +2,13 @@ import React, { useState, useRef } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import {
     View,
     StyleSheet,
     TouchableOpacity,
     TextInput,
     Keyboard,
-    ActivityIndicator,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -21,40 +21,59 @@ import { Text } from "@/src/components/atoms";
 import { ResetPasswordSchema, ResetPasswordFields } from "@/src/forms";
 import { useThemeColors } from "@/src/theme";
 import { useToast } from "@/src/toast-context";
+import { dependencies } from "@/src/framework/di/dependencies";
+import { toDisplayError } from "@/src/core/api/to-display-error";
 
 export default function ResetPasswordScreen() {
     const router = useRouter();
-    const { email, token } = useLocalSearchParams<{ email: string; token: string }>();
+    const { email: emailParam } = useLocalSearchParams<{ email: string }>();
     const insets = useSafeAreaInsets();
     const colors = useThemeColors();
     const { showToast } = useToast();
 
+    const email = typeof emailParam === "string" ? emailParam : "";
+
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const otpRef = useRef<TextInput>(null);
+    const passwordRef = useRef<TextInput>(null);
     const confirmPasswordRef = useRef<TextInput>(null);
 
     const form = useForm<ResetPasswordFields>({
         resolver: zodResolver(ResetPasswordSchema),
         defaultValues: {
+            otp: "",
             password: "",
             confirmPassword: "",
         },
         mode: "onChange",
     });
 
-    const handleResetPassword = form.handleSubmit((data) => {
-        Keyboard.dismiss();
-        setIsSubmitting(true);
-
-        // TODO: Call API to reset password using token + data.password
-        // Mocking success for UI flow
-        setTimeout(() => {
-            setIsSubmitting(false);
+    const resetMutation = useMutation({
+        mutationFn: (payload: { email: string; otp: string; newPassword: string }) =>
+            dependencies.auth.resetPassword.execute(payload),
+        onSuccess: () => {
             showToast("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.", "success");
             router.replace("/login");
-        }, 1500);
+        },
+        onError: (err) => {
+            showToast(toDisplayError(err), "error");
+        },
+    });
+
+    const handleResetPassword = form.handleSubmit((data) => {
+        Keyboard.dismiss();
+        const normalizedEmail = email.trim().toLowerCase();
+        if (!normalizedEmail) {
+            showToast("Thiếu email. Vui lòng bắt đầu lại từ Quên mật khẩu.", "error");
+            return;
+        }
+        resetMutation.mutate({
+            email: normalizedEmail,
+            otp: data.otp,
+            newPassword: data.password,
+        });
     });
 
     return (
@@ -93,9 +112,30 @@ export default function ResetPasswordScreen() {
                 <View style={styles.formContainer}>
                     <Controller
                         control={form.control}
+                        name="otp"
+                        render={({ field: { onChange, value }, fieldState: { error } }) => (
+                            <Input
+                                ref={otpRef}
+                                label="Mã OTP (6 số)"
+                                placeholder="000000"
+                                value={value}
+                                onChangeText={(t) => onChange(t.replace(/[^0-9]/g, "").slice(0, 6))}
+                                keyboardType="number-pad"
+                                maxLength={6}
+                                error={error?.message}
+                                returnKeyType="next"
+                                onSubmitEditing={() => passwordRef.current?.focus()}
+                                blurOnSubmit={false}
+                            />
+                        )}
+                    />
+
+                    <Controller
+                        control={form.control}
                         name="password"
                         render={({ field: { onChange, value }, fieldState: { error } }) => (
                             <Input
+                                ref={passwordRef}
                                 label="Mật khẩu mới"
                                 placeholder="••••••••"
                                 value={value}
@@ -154,9 +194,13 @@ export default function ResetPasswordScreen() {
                     />
 
                     <Button
-                        label={isSubmitting ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
+                        label={
+                            resetMutation.isPending
+                                ? "Đang cập nhật..."
+                                : "Cập nhật mật khẩu"
+                        }
                         onPress={handleResetPassword}
-                        disabled={isSubmitting}
+                        disabled={resetMutation.isPending}
                         fullWidth
                         size="lg"
                         style={styles.submitButton}

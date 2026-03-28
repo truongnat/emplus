@@ -114,6 +114,23 @@ export interface BudgetItem {
   createdAt: string;
 }
 
+/** Thông báo trong ứng dụng (in-app), theo user */
+export interface InAppNotification {
+  id: string;
+  userId: string;
+  coupleId?: string;
+  type: string;
+  title: string;
+  body?: string;
+  iconName?: string;
+  iconColor?: string;
+  iconBg?: string;
+  actionLabel?: string;
+  metadata?: Record<string, unknown>;
+  readAt?: string;
+  createdAt: string;
+}
+
 export interface BudgetSummary {
   totalBudget: number;
   totalSpent: number;

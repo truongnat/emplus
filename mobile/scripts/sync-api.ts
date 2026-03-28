@@ -69,12 +69,26 @@ export type ApiQueryParams<P extends ApiPaths, M extends keyof paths[P]> =
 export namespace AuthModule {
   export type RegisterRequest = ApiRequest<"/v1/auth/register", "post">;
   export type RegisterResponse = ApiResponse<"/v1/auth/register", "post">;
-  
+
   export type LoginRequest = ApiRequest<"/v1/auth/login", "post">;
   export type LoginResponse = ApiResponse<"/v1/auth/login", "post">;
-  
+
   export type RefreshRequest = ApiRequest<"/v1/auth/refresh", "post">;
   export type RefreshResponse = ApiResponse<"/v1/auth/refresh", "post">;
+
+  export type VerifyOtpRequest = ApiRequest<"/v1/auth/verify-otp", "post">;
+  export type VerifyOtpResponse = ApiResponse<"/v1/auth/verify-otp", "post">;
+
+  /** Phiên đã đăng nhập (user + tokens), không bao gồm nhánh requiresOTP của login */
+  export type SessionPayload = VerifyOtpResponse;
+
+  export type ForgotPasswordRequest = ApiRequest<"/v1/auth/forgot-password", "post">;
+  export type ForgotPasswordResponse = ApiResponse<"/v1/auth/forgot-password", "post">;
+
+  export type ResetPasswordRequest = ApiRequest<"/v1/auth/reset-password", "post">;
+  export type ResetPasswordResponse = ApiResponse<"/v1/auth/reset-password", "post">;
+
+  export type User = Schemas["User"];
 }
 
 export namespace CoupleModule {
@@ -111,6 +125,19 @@ export namespace BudgetModule {
   
   export type CreateRequest = ApiRequest<"/v1/budget/expenses", "post">;
   export type CreateResponse = ApiResponse<"/v1/budget/expenses", "post">;
+}
+
+export namespace NotificationModule {
+  export type InAppNotification = Schemas["InAppNotification"];
+  export type ListQueryParams = ApiQueryParams<"/v1/notifications", "get">;
+  export type ListResponse = ApiResponse<"/v1/notifications", "get">;
+  export type MarkReadResponse = ApiResponse<"/v1/notifications/{id}/read", "patch">;
+  export type MarkAllReadResponse = ApiResponse<"/v1/notifications/read-all", "post">;
+}
+
+export namespace UserModule {
+  export type PushTokenRequest = ApiRequest<"/v1/users/push-token", "post">;
+  export type PushTokenResponse = ApiResponse<"/v1/users/push-token", "post">;
 }
 `;
 

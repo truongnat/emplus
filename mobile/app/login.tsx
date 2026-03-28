@@ -60,7 +60,7 @@ export default function LoginScreen() {
 
       login(data, {
         onSuccess: (response) => {
-          if (response.requiresOTP) {
+          if ("requiresOTP" in response && response.requiresOTP) {
             console.log("OTP verification required, redirecting...");
             router.push({
               pathname: "/verify-otp",

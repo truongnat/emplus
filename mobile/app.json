@@ -38,7 +38,15 @@
       "expo-secure-store",
       "expo-localization",
       "expo-web-browser",
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-notifications",
+        {
+          "color": "#7c3aed",
+          "sounds": [],
+          "mode": "production"
+        }
+      ]
     ],
     "web": {
       "bundler": "metro"

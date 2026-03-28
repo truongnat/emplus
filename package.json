@@ -17,6 +17,7 @@
     "build:builder": "bun run --cwd design-builder build",
     "start:api": "bun run --cwd api start",
     "test:api": "bun run --cwd api test",
+    "typecheck:api": "bun run --cwd api typecheck",
     "db:init": "bun run --cwd api db:init",
     "db:seed": "bun run --cwd api db:seed",
     "db:up": "docker compose -f docker-compose.yml up -d postgres postgres-slave redis minio minio-init mailpit",

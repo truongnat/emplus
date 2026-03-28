@@ -1,4 +1,14 @@
-import type { AuthProvider, Anniversary, BudgetItem, Couple, EmotionalCycle, Invite, MemoryItem, User } from "../types.ts";
+import type {
+  AuthProvider,
+  Anniversary,
+  BudgetItem,
+  Couple,
+  EmotionalCycle,
+  InAppNotification,
+  Invite,
+  MemoryItem,
+  User,
+} from "../types.ts";
 
 export interface DataStore {
   reset?(): Promise<void>;
@@ -58,4 +68,16 @@ export interface DataStore {
   listAllUsers?(): Promise<User[]>;
   listAllCouples?(): Promise<Couple[]>;
   countMemories?(): Promise<number>;
+
+  listNotificationsForUser(
+    userId: string,
+    options?: { page?: number; limit?: number; unreadOnly?: boolean },
+  ): Promise<{ items: InAppNotification[]; total: number }>;
+  getNotificationForUser(userId: string, notificationId: string): Promise<InAppNotification | undefined>;
+  createInAppNotification(
+    input: Omit<InAppNotification, "id" | "createdAt"> & { id?: string },
+  ): Promise<InAppNotification>;
+  markNotificationRead(userId: string, notificationId: string): Promise<InAppNotification | undefined>;
+  markAllNotificationsRead(userId: string): Promise<number>;
+  updateExpoPushToken(userId: string, token: string | null): Promise<void>;
 }

@@ -43,6 +43,7 @@ export const ForgotPasswordSchema = z.object({
 
 export const ResetPasswordSchema = z
   .object({
+    otp: z.string().length(6, "Mã OTP phải có 6 chữ số"),
     password: z.string().min(8, "Mật khẩu phải có ít nhất 8 ký tự"),
     confirmPassword: z.string().min(8, "Xác nhận mật khẩu là bắt buộc"),
   })

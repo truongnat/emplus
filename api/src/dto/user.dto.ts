@@ -33,3 +33,15 @@ export function validateUpdateProfileInput(input: unknown): UpdateProfileDto {
     message: "Dữ liệu cập nhật hồ sơ không hợp lệ.",
   });
 }
+
+const pushTokenSchema = z.object({
+  expoPushToken: z.union([z.string().min(1).max(512), z.null()]),
+});
+
+export type PushTokenDto = z.infer<typeof pushTokenSchema>;
+
+export function validatePushTokenInput(input: unknown): PushTokenDto {
+  return parseWithSchema(pushTokenSchema, input, {
+    message: "Dữ liệu push token không hợp lệ.",
+  });
+}

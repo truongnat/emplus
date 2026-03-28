@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useSession } from "@/src/session-context";
+import { LiveChannelProvider } from "@/src/features/live";
 import { palette } from "@/src/theme";
 import { PressableScale } from "@/src/ui-kit";
 import { BlurView } from "expo-blur";
@@ -201,19 +202,21 @@ export default function TabsLayout() {
     return <Redirect href="/login" />;
 
   return (
-    <Tabs
-      tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Tabs.Screen name="home" options={{ title: "Trang chủ" }} />
-      <Tabs.Screen name="timeline" options={{ title: "Kế hoạch" }} />
-      <Tabs.Screen name="notifications" options={{ title: "Thông báo" }} />
-      <Tabs.Screen name="care" options={{ title: "Cảm xúc" }} />
-      <Tabs.Screen name="budget" options={{ title: "Ngân sách" }} />
-      <Tabs.Screen name="profile" options={{ title: "Tài khoản" }} />
-    </Tabs>
+    <LiveChannelProvider>
+      <Tabs
+        tabBar={(props) => <CustomTabBar {...props} />}
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Tabs.Screen name="home" options={{ title: "Trang chủ" }} />
+        <Tabs.Screen name="timeline" options={{ title: "Kế hoạch" }} />
+        <Tabs.Screen name="notifications" options={{ title: "Thông báo" }} />
+        <Tabs.Screen name="care" options={{ title: "Cảm xúc" }} />
+        <Tabs.Screen name="budget" options={{ title: "Ngân sách" }} />
+        <Tabs.Screen name="profile" options={{ title: "Tài khoản" }} />
+      </Tabs>
+    </LiveChannelProvider>
   );
 }
 

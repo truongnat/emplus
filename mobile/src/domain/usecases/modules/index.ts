@@ -13,6 +13,8 @@ import type {
   CareRepository,
   BudgetRepository,
 } from "../../repositories/modules.repository";
+import type { NotificationsRepository } from "../../repositories/notifications.repository";
+import type { NotificationModule } from "../../entities/schemas";
 
 // --- Timeline ---
 export class GetMemoriesUseCase extends UseCase<
@@ -136,5 +138,41 @@ export class CreateExpenseUseCase extends UseCase<
   }
   execute(params: BudgetModule.CreateRequest) {
     return this.repo.createExpense(params);
+  }
+}
+
+export class ListNotificationsUseCase extends UseCase<
+  NotificationModule.ListQueryParams | undefined,
+  NotificationModule.ListResponse
+> {
+  constructor(private repo: NotificationsRepository) {
+    super();
+  }
+  execute(params?: NotificationModule.ListQueryParams) {
+    return this.repo.list(params ?? {});
+  }
+}
+
+export class MarkNotificationReadUseCase extends UseCase<
+  string,
+  NotificationModule.MarkReadResponse
+> {
+  constructor(private repo: NotificationsRepository) {
+    super();
+  }
+  execute(id: string) {
+    return this.repo.markRead(id);
+  }
+}
+
+export class MarkAllNotificationsReadUseCase extends UseCase<
+  void,
+  NotificationModule.MarkAllReadResponse
+> {
+  constructor(private repo: NotificationsRepository) {
+    super();
+  }
+  execute() {
+    return this.repo.markAllRead();
   }
 }

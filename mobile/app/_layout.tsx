@@ -17,6 +17,7 @@ import { ApiProvider } from "@/src/framework/ctx/api-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { palette } from "@/src/theme/tokens";
 import { AppText } from "@/src/components/atoms/Text";
+import { NotificationBootstrap } from "@/src/components/NotificationBootstrap";
 import {
   BeVietnamPro_400Regular,
   BeVietnamPro_500Medium,
@@ -71,6 +72,7 @@ export default function RootLayout() {
             <SessionProvider>
               <ApiProvider>
                 <>
+                  <NotificationBootstrap />
                   <StatusBar style="auto" />
                   <Stack
                     screenOptions={{

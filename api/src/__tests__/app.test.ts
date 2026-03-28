@@ -234,7 +234,7 @@ describe("Em Plus API MVP", () => {
 
     expect(timelineResponse.status).toBe(200);
     const timelinePayload = await timelineResponse.json();
-    expect(timelinePayload.data.length).toBe(1);
+    expect(timelinePayload.data.items.length).toBe(1);
 
     const dashboardResponse = await app.request("http://localhost/v1/dashboard/home", {
       headers: { Authorization: `Bearer ${maleToken}` },

@@ -13,6 +13,7 @@ import {
   dashboardRoutes,
   debugRoutes,
   liveRoutes,
+  notificationRoutes,
   systemRoutes,
   timelineRoutes,
   userRoutes,
@@ -74,6 +75,7 @@ app.route("/v1/care", careRoutes);
 app.route("/v1/system", systemRoutes);
 app.route("/v1/budget", budgetRoutes);
 app.route("/v1/live", liveRoutes);
+app.route("/v1/notifications", notificationRoutes);
 app.route("/v1/admin", adminRoutes);
 
 // Debug routes - only in non-production

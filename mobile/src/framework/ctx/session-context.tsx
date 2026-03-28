@@ -21,10 +21,10 @@ const refreshSessionUseCase = new RefreshSessionUseCase(authRepo);
 const getProfileUseCase = new GetProfileUseCase(authRepo);
 
 interface SessionContextValue {
-  session: AuthModule.LoginResponse | null;
+  session: AuthModule.SessionPayload | null;
   hydrated: boolean;
   isAuthenticated: boolean;
-  setSession: (session: AuthModule.LoginResponse | null) => void;
+  setSession: (session: AuthModule.SessionPayload | null) => void;
   clearSession: () => void;
   refreshAuth: () => Promise<boolean>;
   withAccessToken: <T>(
@@ -43,7 +43,7 @@ const SessionContext = createContext<SessionContextValue>({
 });
 
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<AuthModule.LoginResponse | null>(null);
+  const [session, setSession] = useState<AuthModule.SessionPayload | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 

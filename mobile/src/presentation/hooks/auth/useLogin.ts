@@ -35,7 +35,11 @@ export function useLogin(options: UseLoginOptions = {}) {
   return useMutation<AuthModule.LoginResponse, Error, AuthModule.LoginRequest>({
     mutationFn: (params) => dependencies.auth.login.execute(params),
     onSuccess: (data) => {
-      if (data.tokens) {
+      if ("requiresOTP" in data && data.requiresOTP) {
+        onSuccess?.(data);
+        return;
+      }
+      if ("tokens" in data && data.tokens && "user" in data) {
         setSession(data);
         if (showToast) {
           toast("Đăng nhập thành công", "success");

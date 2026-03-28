@@ -157,6 +157,14 @@ export class ApiClient {
       options,
     );
   }
+
+  patch<T>(path: string, body?: unknown, options?: ApiRequestOptions) {
+    return this.request<T>(
+      path,
+      { method: "PATCH", body: body !== undefined ? JSON.stringify(body) : undefined },
+      options,
+    );
+  }
 }
 
 export const apiClient = ApiClient.getInstance();

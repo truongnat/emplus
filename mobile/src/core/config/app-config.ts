@@ -34,6 +34,11 @@ export const appConfig = {
     timeoutMs: 15_000,
   },
 
+  /** Realtime: `EXPO_PUBLIC_LIVE_WS_ENABLED=false` tắt WS (kill switch). */
+  features: {
+    liveWebSocket: env.liveWebSocketEnabled,
+  },
+
   // Other constants
   brand: {
     name: "Em Plus",

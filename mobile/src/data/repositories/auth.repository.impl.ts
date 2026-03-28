@@ -1,6 +1,6 @@
 import { apiClient, ApiResponse } from "../../core/api";
 import { AuthRepository } from "../../domain/repositories/auth.repository";
-import { AuthModule } from "../../domain/entities/schemas";
+import { AuthModule, UserModule } from "../../domain/entities/schemas";
 
 /**
  * Implementation của AuthRepository trong tầng Data.
@@ -47,6 +47,33 @@ export class AuthRepositoryImpl implements AuthRepository {
     const response = await apiClient.get<ApiResponse<AuthModule.User>>(
       "/users/me",
     );
+    return response.data;
+  }
+
+  async forgotPassword(
+    params: AuthModule.ForgotPasswordRequest,
+  ): Promise<AuthModule.ForgotPasswordResponse> {
+    const response = await apiClient.post<
+      ApiResponse<AuthModule.ForgotPasswordResponse>
+    >("/auth/forgot-password", params, { skipAuth: true });
+    return response.data;
+  }
+
+  async resetPassword(
+    params: AuthModule.ResetPasswordRequest,
+  ): Promise<AuthModule.ResetPasswordResponse> {
+    const response = await apiClient.post<
+      ApiResponse<AuthModule.ResetPasswordResponse>
+    >("/auth/reset-password", params, { skipAuth: true });
+    return response.data;
+  }
+
+  async registerPushToken(
+    params: UserModule.PushTokenRequest,
+  ): Promise<UserModule.PushTokenResponse> {
+    const response = await apiClient.post<
+      ApiResponse<UserModule.PushTokenResponse>
+    >("/users/push-token", params);
     return response.data;
   }
 }

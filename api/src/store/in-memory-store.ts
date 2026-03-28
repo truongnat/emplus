@@ -1,5 +1,15 @@
 import { generateInviteCode } from "../shared/code.ts";
-import type { Anniversary, AuthProvider, BudgetItem, Couple, EmotionalCycle, Invite, MemoryItem, User } from "../types.ts";
+import type {
+  Anniversary,
+  AuthProvider,
+  BudgetItem,
+  Couple,
+  EmotionalCycle,
+  InAppNotification,
+  Invite,
+  MemoryItem,
+  User,
+} from "../types.ts";
 import type { DataStore } from "./contracts.ts";
 
 function nowIso(): string {
@@ -27,6 +37,8 @@ export class InMemoryStore implements DataStore {
   homeCache = new Map<string, { payload: unknown; expiresAt: number }>();
   otps = new Map<string, { otp: string; expiresAt: number }>();
   rateLimits = new Map<string, { count: number; expiresAt: number }>();
+  inAppNotifications = new Map<string, InAppNotification>();
+  expoPushTokens = new Map<string, string>();
 
   async reset(): Promise<void> {
     this.users.clear();
@@ -43,6 +55,8 @@ export class InMemoryStore implements DataStore {
     this.homeCache.clear();
     this.otps.clear();
     this.rateLimits.clear();
+    this.inAppNotifications.clear();
+    this.expoPushTokens.clear();
   }
 
   async getUserByToken(token: string): Promise<User | undefined> {
@@ -399,6 +413,75 @@ export class InMemoryStore implements DataStore {
 
   async countMemories(): Promise<number> {
     return this.memories.size;
+  }
+
+  async listNotificationsForUser(
+    userId: string,
+    options?: { page?: number; limit?: number; unreadOnly?: boolean },
+  ): Promise<{ items: InAppNotification[]; total: number }> {
+    const page = Math.max(1, options?.page ?? 1);
+    const limit = Math.min(50, Math.max(1, options?.limit ?? 20));
+    const unreadOnly = options?.unreadOnly ?? false;
+    let items = [...this.inAppNotifications.values()].filter((n) => n.userId === userId);
+    if (unreadOnly) {
+      items = items.filter((n) => !n.readAt);
+    }
+    items.sort((a, b) => (a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0));
+    const total = items.length;
+    const offset = (page - 1) * limit;
+    return { items: items.slice(offset, offset + limit), total };
+  }
+
+  async getNotificationForUser(userId: string, notificationId: string): Promise<InAppNotification | undefined> {
+    const n = this.inAppNotifications.get(notificationId);
+    if (!n || n.userId !== userId) {
+      return undefined;
+    }
+    return n;
+  }
+
+  async createInAppNotification(
+    input: Omit<InAppNotification, "id" | "createdAt"> & { id?: string },
+  ): Promise<InAppNotification> {
+    const id = input.id ?? crypto.randomUUID();
+    const row: InAppNotification = {
+      ...input,
+      id,
+      createdAt: new Date().toISOString(),
+      metadata: input.metadata ?? {},
+    };
+    this.inAppNotifications.set(id, row);
+    return row;
+  }
+
+  async markNotificationRead(userId: string, notificationId: string): Promise<InAppNotification | undefined> {
+    const n = this.inAppNotifications.get(notificationId);
+    if (!n || n.userId !== userId) {
+      return undefined;
+    }
+    const readAt = new Date().toISOString();
+    const updated = { ...n, readAt };
+    this.inAppNotifications.set(notificationId, updated);
+    return updated;
+  }
+
+  async markAllNotificationsRead(userId: string): Promise<number> {
+    let count = 0;
+    for (const [id, n] of this.inAppNotifications) {
+      if (n.userId === userId && !n.readAt) {
+        this.inAppNotifications.set(id, { ...n, readAt: new Date().toISOString() });
+        count += 1;
+      }
+    }
+    return count;
+  }
+
+  async updateExpoPushToken(userId: string, token: string | null): Promise<void> {
+    if (token === null || token === "") {
+      this.expoPushTokens.delete(userId);
+      return;
+    }
+    this.expoPushTokens.set(userId, token);
   }
 }
 

@@ -1,7 +1,17 @@
 import Redis from "ioredis";
 import postgres, { type Sql } from "postgres";
 import { generateInviteCode } from "../shared/code.ts";
-import type { Anniversary, AuthProvider, BudgetItem, Couple, EmotionalCycle, Invite, MemoryItem, User } from "../types.ts";
+import type {
+  Anniversary,
+  AuthProvider,
+  BudgetItem,
+  Couple,
+  EmotionalCycle,
+  InAppNotification,
+  Invite,
+  MemoryItem,
+  User,
+} from "../types.ts";
 import type { DataStore } from "./contracts.ts";
 
 const SESSION_PREFIX = "sess:token:";
@@ -203,6 +213,40 @@ function fromAnniversaryRow(row: AnniversaryRow): Anniversary {
     category: row.category as Anniversary["category"],
     isSystemGenerated: row.isSystemGenerated,
     notifySettings: row.notifySettings,
+    createdAt: asIso(row.createdAt) ?? new Date().toISOString(),
+  };
+}
+
+type InAppNotificationRow = {
+  id: string;
+  userId: string;
+  coupleId: string | null;
+  type: string;
+  title: string;
+  body: string | null;
+  iconName: string | null;
+  iconColor: string | null;
+  iconBg: string | null;
+  actionLabel: string | null;
+  metadata: Record<string, unknown> | null;
+  readAt: string | Date | null;
+  createdAt: string | Date;
+};
+
+function fromInAppNotificationRow(row: InAppNotificationRow): InAppNotification {
+  return {
+    id: row.id,
+    userId: row.userId,
+    coupleId: row.coupleId ?? undefined,
+    type: row.type,
+    title: row.title,
+    body: row.body ?? undefined,
+    iconName: row.iconName ?? undefined,
+    iconColor: row.iconColor ?? undefined,
+    iconBg: row.iconBg ?? undefined,
+    actionLabel: row.actionLabel ?? undefined,
+    metadata: row.metadata ?? {},
+    readAt: row.readAt ? asIso(row.readAt) : undefined,
     createdAt: asIso(row.createdAt) ?? new Date().toISOString(),
   };
 }
@@ -1217,6 +1261,175 @@ export class PostgresStore implements DataStore {
       SELECT COUNT(*) as count FROM memories
     `;
     return Number(rows[0]?.count || 0);
+  }
+
+  async listNotificationsForUser(
+    userId: string,
+    options?: { page?: number; limit?: number; unreadOnly?: boolean },
+  ): Promise<{ items: InAppNotification[]; total: number }> {
+    const page = Math.max(1, options?.page ?? 1);
+    const limit = Math.min(50, Math.max(1, options?.limit ?? 20));
+    const offset = (page - 1) * limit;
+    const unreadOnly = options?.unreadOnly ?? false;
+
+    const countRows = unreadOnly
+      ? await this.sql<{ count: string }[]>`
+          SELECT COUNT(*)::text AS count
+          FROM in_app_notifications
+          WHERE user_id = ${userId} AND read_at IS NULL
+        `
+      : await this.sql<{ count: string }[]>`
+          SELECT COUNT(*)::text AS count
+          FROM in_app_notifications
+          WHERE user_id = ${userId}
+        `;
+    const total = Number(countRows[0]?.count ?? 0);
+
+    const rows = unreadOnly
+      ? await this.sql<InAppNotificationRow[]>`
+          SELECT id,
+                 user_id AS "userId",
+                 couple_id AS "coupleId",
+                 type,
+                 title,
+                 body,
+                 icon_name AS "iconName",
+                 icon_color AS "iconColor",
+                 icon_bg AS "iconBg",
+                 action_label AS "actionLabel",
+                 metadata,
+                 read_at AS "readAt",
+                 created_at AS "createdAt"
+          FROM in_app_notifications
+          WHERE user_id = ${userId} AND read_at IS NULL
+          ORDER BY created_at DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `
+      : await this.sql<InAppNotificationRow[]>`
+          SELECT id,
+                 user_id AS "userId",
+                 couple_id AS "coupleId",
+                 type,
+                 title,
+                 body,
+                 icon_name AS "iconName",
+                 icon_color AS "iconColor",
+                 icon_bg AS "iconBg",
+                 action_label AS "actionLabel",
+                 metadata,
+                 read_at AS "readAt",
+                 created_at AS "createdAt"
+          FROM in_app_notifications
+          WHERE user_id = ${userId}
+          ORDER BY created_at DESC
+          LIMIT ${limit} OFFSET ${offset}
+        `;
+
+    return { items: rows.map(fromInAppNotificationRow), total };
+  }
+
+  async getNotificationForUser(userId: string, notificationId: string): Promise<InAppNotification | undefined> {
+    const rows = await this.sql<InAppNotificationRow[]>`
+      SELECT id,
+             user_id AS "userId",
+             couple_id AS "coupleId",
+             type,
+             title,
+             body,
+             icon_name AS "iconName",
+             icon_color AS "iconColor",
+             icon_bg AS "iconBg",
+             action_label AS "actionLabel",
+             metadata,
+             read_at AS "readAt",
+             created_at AS "createdAt"
+      FROM in_app_notifications
+      WHERE id = ${notificationId} AND user_id = ${userId}
+      LIMIT 1
+    `;
+    return rows[0] ? fromInAppNotificationRow(rows[0]) : undefined;
+  }
+
+  async createInAppNotification(
+    input: Omit<InAppNotification, "id" | "createdAt"> & { id?: string },
+  ): Promise<InAppNotification> {
+    const id = input.id ?? crypto.randomUUID();
+    const metadata = input.metadata ?? {};
+    await this.sql`
+      INSERT INTO in_app_notifications (
+        id,
+        user_id,
+        couple_id,
+        type,
+        title,
+        body,
+        icon_name,
+        icon_color,
+        icon_bg,
+        action_label,
+        metadata,
+        read_at
+      ) VALUES (
+        ${id},
+        ${input.userId},
+        ${input.coupleId ?? null},
+        ${input.type},
+        ${input.title},
+        ${input.body ?? null},
+        ${input.iconName ?? null},
+        ${input.iconColor ?? null},
+        ${input.iconBg ?? null},
+        ${input.actionLabel ?? null},
+        ${JSON.stringify(metadata)}::jsonb,
+        ${input.readAt ?? null}
+      )
+    `;
+    const created = await this.getNotificationForUser(input.userId, id);
+    if (!created) {
+      throw new Error("Không thể tạo thông báo.");
+    }
+    return created;
+  }
+
+  async markNotificationRead(userId: string, notificationId: string): Promise<InAppNotification | undefined> {
+    const rows = await this.sql<InAppNotificationRow[]>`
+      UPDATE in_app_notifications
+      SET read_at = COALESCE(read_at, NOW())
+      WHERE id = ${notificationId} AND user_id = ${userId}
+      RETURNING id,
+                user_id AS "userId",
+                couple_id AS "coupleId",
+                type,
+                title,
+                body,
+                icon_name AS "iconName",
+                icon_color AS "iconColor",
+                icon_bg AS "iconBg",
+                action_label AS "actionLabel",
+                metadata,
+                read_at AS "readAt",
+                created_at AS "createdAt"
+    `;
+    return rows[0] ? fromInAppNotificationRow(rows[0]) : undefined;
+  }
+
+  async markAllNotificationsRead(userId: string): Promise<number> {
+    const rows = await this.sql<{ id: string }[]>`
+      UPDATE in_app_notifications
+      SET read_at = NOW()
+      WHERE user_id = ${userId} AND read_at IS NULL
+      RETURNING id
+    `;
+    return rows.length;
+  }
+
+  async updateExpoPushToken(userId: string, token: string | null): Promise<void> {
+    await this.sql`
+      UPDATE users
+      SET expo_push_token = ${token},
+          updated_at = NOW()
+      WHERE id = ${userId}
+    `;
   }
 }
 

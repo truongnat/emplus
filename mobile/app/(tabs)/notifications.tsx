@@ -1,154 +1,180 @@
-import React, { useMemo } from "react";
-import { View, ScrollView, StyleSheet, Dimensions } from "react-native";
+import React, { useEffect, useMemo } from "react";
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { AppText, PressableScale } from "@/src/ui-kit";
 import { useSession } from "@/src/session-context";
+import {
+  useMarkAllNotificationsRead,
+  useMarkNotificationRead,
+  useNotificationsList,
+} from "@/src/presentation/hooks/notifications/useNotifications";
+import type { NotificationModule } from "@/src/domain/entities/schemas";
+import { syncExpoPushTokenToServer } from "@/src/lib/sync-expo-push-token";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
-interface NotificationItem {
-  id: string;
-  icon: string;
-  iconColor: string;
-  iconBg: string;
-  title: string;
-  time: string;
-  action?: string;
-  delay: number;
-  opacity: number;
+function formatRelativeTime(iso: string): string {
+  const t = new Date(iso).getTime();
+  const diff = Date.now() - t;
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "Vừa xong";
+  if (m < 60) return `${m} phút trước`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} giờ trước`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d} ngày trước`;
+  return new Date(iso).toLocaleDateString("vi-VN");
 }
 
 export default function NotificationsScreen() {
-  const { session } = useSession();
+  const { session, isAuthenticated } = useSession();
+  const { data, isPending, isError, error, refetch } = useNotificationsList();
+  const markRead = useMarkNotificationRead();
+  const markAll = useMarkAllNotificationsRead();
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    void syncExpoPushTokenToServer().catch(() => {});
+  }, [isAuthenticated]);
 
   const partnerName = useMemo(() => {
     return !!session?.user?.coupleId ? "Leo" : "Bạn đồng hành";
-  }, [!!session?.user?.coupleId]);
+  }, [session?.user?.coupleId]);
 
-  const notifications: NotificationItem[] = [
-    {
-      id: "1",
-      icon: "heart",
-      iconColor: "#E48B9B",
-      iconBg: "#FAF0F2",
-      title: "Minh Anh đã gửi cho bạn một nhịp đập yêu thương",
-      time: "Vừa xong",
-      action: "Phản hồi",
-      delay: 100,
-      opacity: 1,
-    },
-    {
-      id: "2",
-      icon: "wallet",
-      iconColor: "#7C3AED",
-      iconBg: "#F5F3FF",
-      title: "Thanh toán cho 'Tiền đặt cọc địa điểm' đã được phê duyệt",
-      time: "2 giờ trước",
-      delay: 200,
-      opacity: 1,
-    },
-    {
-      id: "3",
-      icon: "checkbox-outline",
-      iconColor: "#3B82F6",
-      iconBg: "#EFF6FF",
-      title: "Bạn có nhiệm vụ mới: 'Chọn thực đơn thử món'",
-      time: "Hôm qua",
-      delay: 300,
-      opacity: 0.9,
-    },
-    {
-      id: "4",
-      icon: "gift-outline",
-      iconColor: "#F59E0B",
-      iconBg: "#FFFBEB",
-      title: "Còn 142 ngày nữa đến ngày trọng đại!",
-      time: "2 ngày trước",
-      delay: 400,
-      opacity: 0.9,
-    },
-    {
-      id: "5",
-      icon: "sparkles-outline",
-      iconColor: "#E48B9B",
-      iconBg: "#FAF0F2",
-      title:
-        "Gợi ý phong cách hoa cưới dựa trên cấu trúc pha lê của bạn đã sẵn sàng",
-      time: "3 ngày trước",
-      delay: 500,
-      opacity: 0.8,
-    },
-  ];
+  const items = data?.items ?? [];
+  const hasUnread = items.some((n) => !n.readAt);
+
+  const latest = items.slice(0, 2);
+  const previous = items.slice(2);
 
   return (
     <AppScreen>
       <View style={styles.container}>
-        {/* Premium Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <AppText style={styles.title}>Thông báo</AppText>
             <AppText style={styles.subtitle}>NHỊP ĐẬP HÔM NAY</AppText>
           </View>
 
-          {/* Refined Status Badge */}
-          <View style={styles.statusBadge}>
-            <View style={styles.avatarWrapper}>
-              <View style={styles.avatar}>
-                <Ionicons
-                  name="person-circle-outline"
-                  size={24}
-                  color="#A8A29E"
-                />
+          <View style={styles.headerRight}>
+            {hasUnread && items.length > 0 && (
+              <TouchableOpacity
+                onPress={() => markAll.mutate()}
+                disabled={markAll.isPending}
+                style={styles.markAllBtn}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <AppText style={styles.markAllText}>
+                  {markAll.isPending ? "…" : "Đọc hết"}
+                </AppText>
+              </TouchableOpacity>
+            )}
+            <View style={styles.statusBadge}>
+              <View style={styles.avatarWrapper}>
+                <View style={styles.avatar}>
+                  <Ionicons
+                    name="person-circle-outline"
+                    size={24}
+                    color="#A8A29E"
+                  />
+                </View>
+                <View style={styles.statusDot} />
               </View>
-              <View style={styles.statusDot} />
-            </View>
-            <View style={styles.badgeTextContainer}>
-              <AppText style={styles.badgeLabel}>
-                {partnerName.toUpperCase()} ĐANG
-              </AppText>
-              <AppText style={styles.badgeValue}>bình tĩnh</AppText>
+              <View style={styles.badgeTextContainer}>
+                <AppText style={styles.badgeLabel}>
+                  {partnerName.toUpperCase()} ĐANG
+                </AppText>
+                <AppText style={styles.badgeValue}>bình tĩnh</AppText>
+              </View>
             </View>
           </View>
         </View>
 
-        {/* Notifications List */}
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Latest Section */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionDot} />
-              <AppText style={styles.sectionTitle}>Mới nhất</AppText>
-            </View>
-
-            {notifications.slice(0, 2).map((notification) => (
-              <NotificationCard
-                key={notification.id}
-                notification={notification}
-              />
-            ))}
+        {isPending && (
+          <View style={styles.centered}>
+            <ActivityIndicator size="large" color="#E48B9B" />
+            <AppText style={styles.hint}>Đang tải thông báo…</AppText>
           </View>
+        )}
 
-          {/* Previous Section */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <View style={[styles.sectionDot, styles.sectionDotMuted]} />
-              <AppText style={[styles.sectionTitle, styles.sectionTitleMuted]}>
-                Trước đó
-              </AppText>
-            </View>
-
-            {notifications.slice(2).map((notification) => (
-              <NotificationCard
-                key={notification.id}
-                notification={notification}
-              />
-            ))}
+        {isError && (
+          <View style={styles.centered}>
+            <AppText style={styles.errorText}>
+              {(error as Error)?.message ?? "Không tải được danh sách."}
+            </AppText>
+            <TouchableOpacity onPress={() => refetch()} style={styles.retryBtn}>
+              <AppText style={styles.retryText}>Thử lại</AppText>
+            </TouchableOpacity>
           </View>
-        </ScrollView>
+        )}
+
+        {!isPending && !isError && (
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {items.length === 0 ? (
+              <View style={styles.centered}>
+                <Ionicons
+                  name="notifications-off-outline"
+                  size={48}
+                  color="#D6D3D1"
+                />
+                <AppText style={styles.emptyTitle}>Chưa có thông báo</AppText>
+                <AppText style={styles.emptySub}>
+                  Khi có hoạt động mới, bạn sẽ thấy tại đây.
+                </AppText>
+              </View>
+            ) : (
+              <>
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <View style={styles.sectionDot} />
+                    <AppText style={styles.sectionTitle}>Mới nhất</AppText>
+                  </View>
+                  {latest.map((n) => (
+                    <NotificationCard
+                      key={n.id}
+                      notification={n}
+                      onOpen={() => {
+                        if (!n.readAt) markRead.mutate(n.id);
+                      }}
+                    />
+                  ))}
+                </View>
+
+                {previous.length > 0 && (
+                  <View style={styles.section}>
+                    <View style={styles.sectionHeader}>
+                      <View
+                        style={[styles.sectionDot, styles.sectionDotMuted]}
+                      />
+                      <AppText
+                        style={[styles.sectionTitle, styles.sectionTitleMuted]}
+                      >
+                        Trước đó
+                      </AppText>
+                    </View>
+                    {previous.map((n) => (
+                      <NotificationCard
+                        key={n.id}
+                        notification={n}
+                        onOpen={() => {
+                          if (!n.readAt) markRead.mutate(n.id);
+                        }}
+                      />
+                    ))}
+                  </View>
+                )}
+              </>
+            )}
+          </ScrollView>
+        )}
       </View>
     </AppScreen>
   );
@@ -156,41 +182,49 @@ export default function NotificationsScreen() {
 
 function NotificationCard({
   notification,
+  onOpen,
 }: {
-  notification: NotificationItem;
+  notification: NotificationModule.InAppNotification;
+  onOpen: () => void;
 }) {
+  const iconName = (notification.iconName || "heart") as keyof typeof Ionicons.glyphMap;
+  const iconColor = notification.iconColor ?? "#E48B9B";
+  const iconBg = notification.iconBg ?? "#FAF0F2";
+  const opacity = notification.readAt ? 0.85 : 1;
+
   return (
-    <PressableScale style={styles.cardContainer}>
+    <PressableScale
+      style={styles.cardContainer}
+      onPress={onOpen}
+    >
       <View
-        style={[styles.notificationContent, { opacity: notification.opacity }]}
+        style={[styles.notificationContent, { opacity }]}
       >
         <View
           style={[
             styles.notificationIcon,
-            { backgroundColor: notification.iconBg },
+            { backgroundColor: iconBg },
           ]}
         >
-          <Ionicons
-            name={notification.icon as any}
-            size={22}
-            color={notification.iconColor}
-          />
+          <Ionicons name={iconName} size={22} color={iconColor} />
         </View>
 
         <View style={styles.notificationTextContainer}>
           <AppText style={styles.notificationTitle} numberOfLines={2}>
             {notification.title}
           </AppText>
-          <AppText style={styles.notificationTime}>{notification.time}</AppText>
+          <AppText style={styles.notificationTime}>
+            {formatRelativeTime(notification.createdAt)}
+          </AppText>
 
-          {notification.action && (
+          {notification.actionLabel ? (
             <View style={styles.notificationAction}>
               <Ionicons name="chatbubble-outline" size={12} color="#FFFFFF" />
               <AppText style={styles.notificationActionText}>
-                {notification.action}
+                {notification.actionLabel}
               </AppText>
             </View>
-          )}
+          ) : null}
         </View>
       </View>
     </PressableScale>
@@ -211,6 +245,22 @@ const styles = StyleSheet.create({
   },
   headerLeft: {
     flex: 1,
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  markAllBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    backgroundColor: "#FFF1F2",
+  },
+  markAllText: {
+    fontSize: 12,
+    fontWeight: "800",
+    color: "#E48B9B",
   },
   title: {
     fontSize: 28,
@@ -372,5 +422,43 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "900",
     color: "#FFFFFF",
+  },
+  centered: {
+    paddingVertical: 48,
+    paddingHorizontal: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  hint: {
+    marginTop: 12,
+    color: "#A8A29E",
+    fontSize: 14,
+  },
+  errorText: {
+    color: "#B91C1C",
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  retryBtn: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: "#E48B9B",
+    borderRadius: 16,
+  },
+  retryText: {
+    color: "#fff",
+    fontWeight: "800",
+  },
+  emptyTitle: {
+    marginTop: 12,
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#44403C",
+  },
+  emptySub: {
+    marginTop: 8,
+    fontSize: 14,
+    color: "#A8A29E",
+    textAlign: "center",
   },
 });

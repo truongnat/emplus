@@ -2,8 +2,9 @@ import { Hono } from "hono";
 import type { AppEnv } from "../app-env.ts";
 import { requireAuth } from "../middleware/auth.ts";
 import { getUserProfile, updateUserProfile } from "../services/user.service.ts";
-import { validateUpdateProfileInput } from "../dto/user.dto.ts";
+import { validatePushTokenInput, validateUpdateProfileInput } from "../dto/user.dto.ts";
 import { readJson, success } from "../utils/http.ts";
+import { store } from "../store.ts";
 
 export const userRoutes = new Hono<AppEnv>();
 
@@ -41,4 +42,12 @@ userRoutes.put("/me", async (context) => {
   });
 
   return success(context, profile);
+});
+
+userRoutes.post("/push-token", async (context) => {
+  const user = context.get("user");
+  const body = await readJson<Record<string, unknown>>(context);
+  const input = validatePushTokenInput(body);
+  await store.updateExpoPushToken(user.id, input.expoPushToken);
+  return success(context, { saved: true });
 });

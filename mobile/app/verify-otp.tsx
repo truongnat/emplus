@@ -29,7 +29,7 @@ import { useThemeColors } from "../src/theme";
 export default function VerifyOtpScreen() {
   const router = useRouter();
   const colors = useThemeColors();
-  const { email: emailParam, flow } = useLocalSearchParams<{ email: string; flow: string }>();
+  const { email: emailParam } = useLocalSearchParams<{ email: string }>();
   const { setSession, hydrated } = useSession();
   const { showToast } = useToast();
 
@@ -50,15 +50,8 @@ export default function VerifyOtpScreen() {
   const verifyMutation = useMutation({
     mutationFn: verifyOTP,
     onSuccess: (session) => {
-      if (flow === "forgot-password") {
-        router.push({
-          pathname: "/reset-password",
-          params: { email: emailToVerify, token: (session as any).accessToken },
-        });
-      } else {
-        setSession(session);
-        router.replace(!!session?.user?.coupleId ? "/(tabs)/home" : "/pairing");
-      }
+      setSession(session);
+      router.replace(!!session?.user?.coupleId ? "/(tabs)/home" : "/pairing");
     },
     onError: (err) => {
       showToast(toDisplayError(err), "error");

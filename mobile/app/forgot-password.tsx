@@ -1,12 +1,12 @@
-import React, { useRef } from "react";
+import React from "react";
 import { useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import {
     View,
     StyleSheet,
     TouchableOpacity,
-    TextInput,
     Keyboard,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -19,11 +19,15 @@ import { Input } from "@/src/components/atoms/Input";
 import { Text } from "@/src/components/atoms";
 import { ForgotPasswordSchema, ForgotPasswordFields } from "@/src/forms";
 import { useThemeColors } from "@/src/theme";
+import { dependencies } from "@/src/framework/di/dependencies";
+import { useToast } from "@/src/toast-context";
+import { toDisplayError } from "@/src/core/api/to-display-error";
 
 export default function ForgotPasswordScreen() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
     const colors = useThemeColors();
+    const { showToast } = useToast();
 
     const form = useForm<ForgotPasswordFields>({
         resolver: zodResolver(ForgotPasswordSchema),
@@ -33,14 +37,24 @@ export default function ForgotPasswordScreen() {
         mode: "onChange",
     });
 
+    const sendOtpMutation = useMutation({
+        mutationFn: (email: string) =>
+            dependencies.auth.requestPasswordReset.execute({ email }),
+        onSuccess: (_, email) => {
+            showToast("Đã gửi mã xác thực đến email của bạn.", "success");
+            router.push({
+                pathname: "/reset-password",
+                params: { email },
+            });
+        },
+        onError: (err) => {
+            showToast(toDisplayError(err), "error");
+        },
+    });
+
     const handleSendOtp = form.handleSubmit((data) => {
         Keyboard.dismiss();
-        // TODO: Call API to send reset OTP
-        // For now, navigate to verify-otp with forgot-password flow
-        router.push({
-            pathname: "/verify-otp",
-            params: { email: data.email, flow: "forgot-password" },
-        });
+        sendOtpMutation.mutate(data.email.trim().toLowerCase());
     });
 
     return (
@@ -96,8 +110,13 @@ export default function ForgotPasswordScreen() {
                     />
 
                     <Button
-                        label="Gửi mã xác thực"
+                        label={
+                            sendOtpMutation.isPending
+                                ? "Đang gửi..."
+                                : "Gửi mã xác thực"
+                        }
                         onPress={handleSendOtp}
+                        disabled={sendOtpMutation.isPending}
                         fullWidth
                         size="lg"
                         style={styles.submitButton}

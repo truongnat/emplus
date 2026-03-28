@@ -1,4 +1,4 @@
-import { AuthModule } from "../../entities/schemas";
+import { AuthModule, UserModule } from "../../entities/schemas";
 import { AuthRepository } from "../../repositories/auth.repository";
 
 /**
@@ -59,5 +59,35 @@ export class GetProfileUseCase {
 
   async execute(): Promise<AuthModule.User> {
     return this.authRepository.getProfile();
+  }
+}
+
+export class RequestPasswordResetUseCase {
+  constructor(private authRepository: AuthRepository) { }
+
+  async execute(
+    params: AuthModule.ForgotPasswordRequest,
+  ): Promise<AuthModule.ForgotPasswordResponse> {
+    return this.authRepository.forgotPassword(params);
+  }
+}
+
+export class ResetPasswordUseCase {
+  constructor(private authRepository: AuthRepository) { }
+
+  async execute(
+    params: AuthModule.ResetPasswordRequest,
+  ): Promise<AuthModule.ResetPasswordResponse> {
+    return this.authRepository.resetPassword(params);
+  }
+}
+
+export class RegisterPushTokenUseCase {
+  constructor(private authRepository: AuthRepository) { }
+
+  async execute(
+    params: UserModule.PushTokenRequest,
+  ): Promise<UserModule.PushTokenResponse> {
+    return this.authRepository.registerPushToken(params);
   }
 }
