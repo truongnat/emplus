@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
   full_name VARCHAR(150) NOT NULL,
   nickname VARCHAR(50),
   avatar_url VARCHAR(500),
+  profile_background_url VARCHAR(500),
   gender VARCHAR(20) NOT NULL,
   dob DATE,
   auth_provider VARCHAR(20) NOT NULL,

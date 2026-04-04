@@ -7,6 +7,10 @@ import { getEventIcon } from "@/src/utils/home-helpers";
 import { useThemeColors, useThemeMode } from "@/src/theme";
 import { elevation } from "@/src/theme/elevation";
 import { typographyRoles } from "@/src/theme/typography-roles";
+import {
+  homeDarkGridCard,
+  homeDarkGridInset,
+} from "@/src/theme/emplus-design-tokens";
 
 export interface UpcomingEventItem {
   id: string;
@@ -52,10 +56,15 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
           scaleTo={0.98}
           style={[
             styles.eventCard,
-            {
-              backgroundColor: colors.surface.raised,
-              borderColor: colors.border.subtle,
-            },
+            isDark
+              ? {
+                  backgroundColor: homeDarkGridCard.backgroundColor,
+                  borderColor: homeDarkGridCard.borderColor,
+                }
+              : {
+                  backgroundColor: colors.surface.raised,
+                  borderColor: colors.border.subtle,
+                },
             elevation.raised,
           ]}
           onPress={handleOpenTimeline}
@@ -153,16 +162,27 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
             <View
               style={[
                 styles.empty,
-                {
-                  backgroundColor: colors.surface.raised,
-                  borderColor: colors.border.subtle,
-                },
+                isDark
+                  ? {
+                      backgroundColor: homeDarkGridCard.backgroundColor,
+                      borderColor: homeDarkGridCard.borderColor,
+                    }
+                  : {
+                      backgroundColor: colors.surface.raised,
+                      borderColor: colors.border.subtle,
+                    },
               ]}
             >
               <View
                 style={[
                   styles.emptyIcon,
-                  { backgroundColor: colors.surface.sunken },
+                  isDark
+                    ? {
+                        backgroundColor: homeDarkGridInset.backgroundColor,
+                        borderWidth: StyleSheet.hairlineWidth,
+                        borderColor: homeDarkGridInset.borderColor,
+                      }
+                    : { backgroundColor: colors.surface.sunken },
                 ]}
               >
                 <Ionicons

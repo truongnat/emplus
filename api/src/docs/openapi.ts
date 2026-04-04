@@ -54,6 +54,7 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             fullName: { type: "string" },
             nickname: { type: "string" },
             avatarUrl: { type: "string", format: "uri" },
+            profileBackgroundUrl: { type: "string", format: "uri" },
             gender: { $ref: "#/components/schemas/Gender" },
             dob: { type: "string", format: "date" },
             timezone: { type: "string" },
@@ -62,6 +63,24 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             coupleId: { type: "string", format: "uuid" },
             createdAt: { type: "string", format: "date-time" },
             updatedAt: { type: "string", format: "date-time" },
+          },
+        },
+        UpdateUserProfile: {
+          type: "object",
+          description: "Các trường tùy chọn; chỉ gửi trường cần đổi.",
+          properties: {
+            fullName: { type: "string" },
+            nickname: { type: "string", description: "Tên hiển thị trong ứng dụng" },
+            avatarUrl: { type: "string", format: "uri", maxLength: 2000 },
+            profileBackgroundUrl: {
+              type: "string",
+              format: "uri",
+              maxLength: 2000,
+              description: "Ảnh bìa hồ sơ (URL sau POST /v1/media/upload)",
+            },
+            gender: { $ref: "#/components/schemas/Gender" },
+            dob: { type: "string", format: "date" },
+            timezone: { type: "string" },
           },
         },
         TokenPair: {
@@ -506,6 +525,32 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
               },
             },
             401: { description: "Chưa xác thực" },
+          },
+        },
+        put: {
+          tags: ["Xác thực"],
+          summary: "Cập nhật hồ sơ người dùng hiện tại",
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/UpdateUserProfile" },
+              },
+            },
+          },
+          responses: {
+            200: {
+              description: "Hồ sơ sau cập nhật",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/User" },
+                },
+              },
+            },
+            400: { description: "Dữ liệu không hợp lệ" },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Không tìm thấy người dùng" },
           },
         },
       },

@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   forwardRef,
   ReactNode,
@@ -32,7 +33,7 @@ import Animated, {
 import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTheme } from "@/src/theme";
+import { useTheme, useThemeMeta } from "@/src/theme";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -142,7 +143,38 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(
     ref,
   ) {
     const theme = useTheme();
+    const { isDark } = useThemeMeta();
     const insets = useSafeAreaInsets();
+
+    const sheetChrome = useMemo(() => {
+      const sh = theme.shadow.xl;
+      const shadow = {
+        ...sh,
+        shadowOffset: { width: 0, height: -10 },
+        shadowOpacity: isDark
+          ? Math.min(sh.shadowOpacity + 0.22, 0.65)
+          : sh.shadowOpacity,
+        shadowRadius: Math.max(sh.shadowRadius, 20),
+        shadowColor: isDark ? "#000000" : sh.shadowColor,
+      };
+      const base = {
+        backgroundColor: theme.colors.surface.default,
+        overflow: "hidden" as const,
+        ...shadow,
+      };
+      if (detached) {
+        return {
+          ...base,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: theme.colors.border.subtle,
+        };
+      }
+      return {
+        ...base,
+        borderTopWidth: StyleSheet.hairlineWidth,
+        borderTopColor: theme.colors.border.subtle,
+      };
+    }, [theme, isDark, detached]);
 
     const resolved = snapPoints.map(resolveSnapPoint);
     const maxHeight = resolved[resolved.length - 1];
@@ -316,14 +348,14 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(
           <Animated.View
             style={[
               styles.sheet,
+              sheetChrome,
               {
                 height: containerHeight,
-                backgroundColor: theme.colors.surface.overlay,
                 bottom: detached ? bottomInset + insets.bottom : 0,
-                marginHorizontal: detached ? 16 : 0,
-                borderRadius: detached ? theme.radius.xl : 0,
-                borderTopLeftRadius: theme.radius.xl,
-                borderTopRightRadius: theme.radius.xl,
+                marginHorizontal: detached ? theme.space[4] : 0,
+                borderRadius: detached ? theme.radius["2xl"] : 0,
+                borderTopLeftRadius: theme.radius["2xl"],
+                borderTopRightRadius: theme.radius["2xl"],
                 paddingBottom: insets.bottom,
               },
               style,
@@ -332,18 +364,26 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(
           >
             <GestureDetector gesture={panGesture}>
               <View
-                style={styles.handleContainer}
+                style={[
+                  styles.handleContainer,
+                  { paddingVertical: theme.space[2] },
+                ]}
                 accessibilityRole="adjustable"
+                accessibilityLabel="Kéo để thay đổi chiều cao"
               >
                 {handleComponent ? (
                   handleComponent()
                 ) : (
-                  <View
-                    style={[
-                      styles.handleBar,
-                      { backgroundColor: theme.colors.border.default },
-                    ]}
-                  />
+                  <View style={styles.handleTrack}>
+                    <View
+                      style={[
+                        styles.handleBar,
+                        {
+                          backgroundColor: theme.colors.border.default,
+                        },
+                      ]}
+                    />
+                  </View>
                 )}
               </View>
             </GestureDetector>
@@ -377,20 +417,22 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    elevation: 24,
   },
   handleContainer: {
-    height: 28,
     alignItems: "center",
     justifyContent: "center",
   },
+  handleTrack: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 4,
+    paddingHorizontal: 24,
+    minHeight: 32,
+  },
   handleBar: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
+    width: 44,
+    height: 5,
+    borderRadius: 2.5,
+    opacity: 0.85,
   },
 });

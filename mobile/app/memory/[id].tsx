@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { AppText, PressableScale } from "@/src/ui-kit";
 import { useThemeColors, useThemeMode } from "@/src/theme";
+import { homeDarkChromeButton } from "@/src/theme/emplus-design-tokens";
 import { typographyRoles } from "@/src/theme/typography-roles";
 import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
 import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
@@ -87,10 +88,15 @@ export default function MemoryDetailScreen() {
             onPress={() => router.back()}
             style={[
               styles.iconBtn,
-              {
-                backgroundColor: colors.surface.default,
-                borderColor: colors.border.subtle,
-              },
+              isDark
+                ? {
+                    backgroundColor: homeDarkChromeButton.backgroundColor,
+                    borderColor: homeDarkChromeButton.borderColor,
+                  }
+                : {
+                    backgroundColor: colors.surface.default,
+                    borderColor: colors.border.subtle,
+                  },
             ]}
             accessibilityRole="button"
             accessibilityLabel="Quay lại"

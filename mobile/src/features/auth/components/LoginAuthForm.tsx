@@ -23,7 +23,11 @@ import { isLiquidGlassSupported } from "@/src/components/glass/LiquidGlassView";
 import { AuthFlowFields, AuthFlowSchema } from "@/src/forms";
 import { useLogin } from "@/src/presentation/hooks/auth/useLogin";
 import { useThemeColors, useThemeMode } from "@/src/theme";
-import { loginFigmaLight } from "@/src/theme/emplus-design-tokens";
+import {
+  authGlassBlurIntensity,
+  authSoftFieldSurface,
+  loginFigmaLight,
+} from "@/src/theme/emplus-design-tokens";
 import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
 import { usePressAnimation } from "@/src/animations/presets";
 
@@ -110,15 +114,9 @@ export function LoginAuthForm() {
 
   const loginPlaceholder = isDark ? placeholderColor : loginFigmaLight.subtitle;
   const loginLabelColor = isDark ? undefined : loginFigmaLight.titleDark;
-  const loginSoft = !isDark
-    ? {
-        backgroundColor: "rgba(255,255,255,0.55)",
-        borderColor: "rgba(255,107,129,0.22)",
-      }
-    : {
-        backgroundColor: "rgba(255,255,255,0.06)",
-        borderColor: "rgba(255,255,255,0.12)",
-      };
+  const loginSoft = isDark
+    ? authSoftFieldSurface.dark
+    : authSoftFieldSurface.light;
   const loginInputRadius = !isDark ? loginFigmaLight.inputPillRadius : 16;
 
   const enteringForm = reducedMotion
@@ -136,7 +134,9 @@ export function LoginAuthForm() {
   return (
     <Animated.View entering={enteringForm} style={styles.formOuter}>
       <GlassCard
-        intensity={isDark ? 30 : 26}
+        intensity={
+          isDark ? authGlassBlurIntensity.dark : authGlassBlurIntensity.light
+        }
         tint={isDark ? "dark" : "light"}
         isLiquid={isLiquidGlassSupported}
         style={styles.glassCard}

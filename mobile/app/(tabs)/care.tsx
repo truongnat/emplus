@@ -30,9 +30,14 @@ import { homeScreenStyles } from "@/src/features/home/homeScreen.styles";
 import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
 import { lottieInventory } from "@/src/lottie/inventory";
 import type { SemanticColors } from "@/src/theme/tokens/semantic";
+import {
+  homeDarkGridCard,
+  homeDarkGridInset,
+} from "@/src/theme/emplus-design-tokens";
 
 function MoodOrb({ color }: { color: string }) {
   const colors = useThemeColors();
+  const { isDark } = useThemeMode();
   const breathe = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -66,7 +71,11 @@ function MoodOrb({ color }: { color: string }) {
         ]}
       >
         <LinearGradient
-          colors={[color, `${color}66`, palette.white]}
+          colors={[
+            color,
+            `${color}66`,
+            isDark ? "rgba(255,245,247,0.22)" : palette.white,
+          ]}
           start={{ x: 0.15, y: 0 }}
           end={{ x: 0.85, y: 1 }}
           style={orbStyles.gradient}
@@ -109,7 +118,13 @@ interface ExtendedMaleSuggestions {
   badge?: string;
 }
 
-function createCareStyles(c: SemanticColors) {
+function createCareStyles(c: SemanticColors, isDark: boolean) {
+  const surf = isDark ? homeDarkGridCard.backgroundColor : c.surface.default;
+  const bord = isDark ? homeDarkGridCard.borderColor : c.border.subtle;
+  const sunk = isDark ? homeDarkGridInset.backgroundColor : c.surface.sunken;
+  const sunkBord = isDark ? homeDarkGridInset.borderColor : c.border.subtle;
+  const shadowClr = isDark ? "#0A0809" : c.text.primary;
+
   return StyleSheet.create({
     scrollContent: {
       paddingHorizontal: 24,
@@ -138,14 +153,14 @@ function createCareStyles(c: SemanticColors) {
     statusBadge: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: c.surface.default,
+      backgroundColor: surf,
       borderRadius: 24,
       paddingLeft: 6,
       paddingRight: 16,
       paddingVertical: 6,
       borderWidth: 1,
-      borderColor: c.border.subtle,
-      shadowColor: c.text.primary,
+      borderColor: bord,
+      shadowColor: shadowClr,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.04,
       shadowRadius: 10,
@@ -159,8 +174,8 @@ function createCareStyles(c: SemanticColors) {
       height: 32,
       borderRadius: 16,
       borderWidth: 1.5,
-      borderColor: c.surface.default,
-      backgroundColor: c.surface.sunken,
+      borderColor: surf,
+      backgroundColor: sunk,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -172,7 +187,7 @@ function createCareStyles(c: SemanticColors) {
       height: 10,
       borderRadius: 5,
       borderWidth: 2,
-      borderColor: c.surface.default,
+      borderColor: surf,
       backgroundColor: c.status.success.icon,
     },
     badgeTextContainer: {
@@ -196,11 +211,11 @@ function createCareStyles(c: SemanticColors) {
       gap: 20,
     },
     statusCard: {
-      backgroundColor: c.surface.default,
+      backgroundColor: surf,
       borderRadius: 24,
       borderWidth: 1,
-      borderColor: c.border.subtle,
-      shadowColor: c.text.primary,
+      borderColor: bord,
+      shadowColor: shadowClr,
       shadowOffset: { width: 0, height: 10 },
       shadowOpacity: 0.05,
       shadowRadius: 20,
@@ -216,7 +231,7 @@ function createCareStyles(c: SemanticColors) {
       width: 48,
       height: 48,
       borderRadius: 24,
-      backgroundColor: c.surface.sunken,
+      backgroundColor: isDark ? sunk : c.brand.muted,
       alignItems: "center",
       justifyContent: "center",
     },
@@ -251,12 +266,12 @@ function createCareStyles(c: SemanticColors) {
       letterSpacing: -0.3,
     },
     suggestionCard: {
-      backgroundColor: c.surface.default,
+      backgroundColor: surf,
       borderRadius: 24,
       padding: 20,
       borderWidth: 1,
-      borderColor: c.border.subtle,
-      shadowColor: c.text.primary,
+      borderColor: bord,
+      shadowColor: shadowClr,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.03,
       shadowRadius: 12,
@@ -276,10 +291,10 @@ function createCareStyles(c: SemanticColors) {
       alignSelf: "flex-start",
       paddingHorizontal: 16,
       paddingVertical: 10,
-      backgroundColor: c.surface.sunken,
+      backgroundColor: sunk,
       borderRadius: 20,
       borderWidth: 1,
-      borderColor: c.border.subtle,
+      borderColor: sunkBord,
     },
     suggestionActionText: {
       fontSize: 14,
@@ -297,12 +312,12 @@ function createCareStyles(c: SemanticColors) {
       fontWeight: "600",
     },
     partnerMoodCard: {
-      backgroundColor: c.surface.default,
+      backgroundColor: surf,
       borderRadius: 24,
       borderWidth: 1,
-      borderColor: c.border.subtle,
+      borderColor: bord,
       padding: 18,
-      shadowColor: c.text.primary,
+      shadowColor: shadowClr,
       shadowOffset: { width: 0, height: 6 },
       shadowOpacity: 0.04,
       shadowRadius: 14,
@@ -400,7 +415,10 @@ export default function CareScreen() {
   const { isDark } = useThemeMode();
   const insets = useSafeAreaInsets();
   useAuthGridChrome(isDark, colors.background.default, true);
-  const styles = useMemo(() => createCareStyles(colors), [colors]);
+  const styles = useMemo(
+    () => createCareStyles(colors, isDark),
+    [colors, isDark],
+  );
   const [notice, setNotice] = useState<string | null>(null);
   const isAuthenticated = !!session;
 
@@ -516,37 +534,16 @@ export default function CareScreen() {
           </View>
 
           {/* Status Badge */}
-          <View
-            style={[
-              styles.statusBadge,
-              {
-                backgroundColor: colors.surface.default,
-                borderColor: colors.border.subtle,
-              },
-            ]}
-          >
+          <View style={styles.statusBadge}>
             <View style={styles.avatarContainer}>
-              <View
-                style={[
-                  styles.avatar,
-                  {
-                    backgroundColor: colors.surface.sunken,
-                    borderColor: colors.surface.default,
-                  },
-                ]}
-              >
+              <View style={styles.avatar}>
                 <Ionicons
                   name="person-circle-outline"
                   size={28}
                   color={colors.text.tertiary}
                 />
               </View>
-              <View
-                style={[
-                  styles.statusDot,
-                  { borderColor: colors.surface.default },
-                ]}
-              />
+              <View style={styles.statusDot} />
             </View>
             <View style={styles.badgeTextContainer}>
               <Text style={[styles.badgeLabel, { color: colors.text.tertiary }]}>
@@ -592,12 +589,7 @@ export default function CareScreen() {
             {/* Status Card */}
             <Card style={styles.statusCard}>
               <View style={styles.statusCardContent}>
-                <View
-                  style={[
-                    styles.statusIconContainer,
-                    { backgroundColor: colors.brand.muted },
-                  ]}
-                >
+                <View style={styles.statusIconContainer}>
                   <MaterialCommunityIcons
                     name="heart-pulse"
                     size={24}
@@ -646,13 +638,7 @@ export default function CareScreen() {
                     </Text>
                     {s.callToAction?.label && (
                       <Pressable
-                        style={[
-                          styles.suggestionAction,
-                          {
-                            backgroundColor: colors.surface.sunken,
-                            borderColor: colors.border.subtle,
-                          },
-                        ]}
+                        style={styles.suggestionAction}
                         onPress={() => {
                           void Haptics.impactAsync(
                             Haptics.ImpactFeedbackStyle.Light,

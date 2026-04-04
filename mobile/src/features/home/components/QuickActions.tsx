@@ -6,6 +6,7 @@ import { PressableScale, Reveal, AppText } from "@/src/ui-kit";
 import { useThemeColors, useThemeMode } from "@/src/theme";
 import { elevation } from "@/src/theme/elevation";
 import { typographyRoles } from "@/src/theme/typography-roles";
+import { homeDarkGridCard } from "@/src/theme/emplus-design-tokens";
 
 interface QuickActionsProps {
   cycleLabel: string;
@@ -28,10 +29,15 @@ export const QuickActions = React.memo(function QuickActions({
     router.push("/timeline");
   }, [router]);
 
-  const cardBase = {
-    backgroundColor: colors.surface.raised,
-    borderColor: colors.border.subtle,
-  } as const;
+  const cardBase = isDark
+    ? {
+        backgroundColor: homeDarkGridCard.backgroundColor,
+        borderColor: homeDarkGridCard.borderColor,
+      }
+    : {
+        backgroundColor: colors.surface.raised,
+        borderColor: colors.border.subtle,
+      };
 
   const iconBgCare = isDark ? "rgba(255, 107, 107, 0.14)" : "rgba(255, 107, 107, 0.12)";
   const iconBgTimeline = isDark ? "rgba(129, 140, 248, 0.16)" : "rgba(99, 102, 241, 0.1)";

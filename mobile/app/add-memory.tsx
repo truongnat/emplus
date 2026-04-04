@@ -24,6 +24,11 @@ import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { Button } from "@/src/components/atoms/Button";
 import { Input } from "@/src/components/atoms/Input";
 import { useThemeColors, useThemeMode } from "@/src/theme";
+import {
+  homeDarkChromeButton,
+  homeDarkGridCard,
+  homeDarkGridInset,
+} from "@/src/theme/emplus-design-tokens";
 import { typographyRoles } from "@/src/theme/typography-roles";
 import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
 import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
@@ -198,10 +203,15 @@ export default function AddMemoryScreen() {
             onPress={() => router.back()}
             style={[
               styles.iconBtn,
-              {
-                backgroundColor: colors.surface.default,
-                borderColor: colors.border.subtle,
-              },
+              isDark
+                ? {
+                    backgroundColor: homeDarkChromeButton.backgroundColor,
+                    borderColor: homeDarkChromeButton.borderColor,
+                  }
+                : {
+                    backgroundColor: colors.surface.default,
+                    borderColor: colors.border.subtle,
+                  },
             ]}
             hitSlop={12}
             accessibilityRole="button"
@@ -250,14 +260,24 @@ export default function AddMemoryScreen() {
                   style={[
                     styles.typeChip,
                     active
-                      ? {
-                          backgroundColor: colors.background.inverse,
-                          borderColor: colors.border.inverse,
-                        }
-                      : {
-                          backgroundColor: colors.surface.default,
-                          borderColor: colors.border.subtle,
-                        },
+                      ? isDark
+                        ? {
+                            backgroundColor: colors.interactive.primary,
+                            borderColor: "rgba(255, 255, 255, 0.22)",
+                          }
+                        : {
+                            backgroundColor: colors.background.inverse,
+                            borderColor: colors.border.inverse,
+                          }
+                      : isDark
+                        ? {
+                            backgroundColor: homeDarkGridCard.backgroundColor,
+                            borderColor: homeDarkGridCard.borderColor,
+                          }
+                        : {
+                            backgroundColor: colors.surface.default,
+                            borderColor: colors.border.subtle,
+                          },
                   ]}
                   accessibilityRole="button"
                   accessibilityState={{ selected: active }}
@@ -267,14 +287,24 @@ export default function AddMemoryScreen() {
                     name={opt.icon}
                     size={18}
                     color={
-                      active ? colors.text.inverse : colors.text.secondary
+                      active
+                        ? isDark
+                          ? colors.text.onBrand
+                          : colors.text.inverse
+                        : colors.text.secondary
                     }
                   />
                   <AppText
                     numberOfLines={1}
                     style={[
                       styles.typeChipLabel,
-                      { color: active ? colors.text.inverse : colors.text.tertiary },
+                      {
+                        color: active
+                          ? isDark
+                            ? colors.text.onBrand
+                            : colors.text.inverse
+                          : colors.text.tertiary,
+                      },
                     ]}
                   >
                     {opt.label}
@@ -287,11 +317,17 @@ export default function AddMemoryScreen() {
           <View
             style={[
               styles.previewCard,
-              {
-                backgroundColor: colors.surface.default,
-                borderColor: colors.border.subtle,
-                shadowColor: colors.text.primary,
-              },
+              isDark
+                ? {
+                    backgroundColor: homeDarkGridCard.backgroundColor,
+                    borderColor: homeDarkGridCard.borderColor,
+                    shadowColor: "#0A0809",
+                  }
+                : {
+                    backgroundColor: colors.surface.default,
+                    borderColor: colors.border.subtle,
+                    shadowColor: colors.text.primary,
+                  },
             ]}
           >
             {assets.length === 0 ? (
@@ -299,7 +335,9 @@ export default function AddMemoryScreen() {
                 onPress={addPhotos}
                 style={[
                   styles.emptyPreview,
-                  { backgroundColor: colors.surface.sunken },
+                  isDark
+                    ? { backgroundColor: homeDarkGridInset.backgroundColor }
+                    : { backgroundColor: colors.surface.sunken },
                 ]}
                 accessibilityRole="button"
                 accessibilityLabel="Thêm ảnh kỷ niệm"
@@ -349,10 +387,15 @@ export default function AddMemoryScreen() {
                       onPress={addPhotos}
                       style={[
                         styles.addMoreTile,
-                        {
-                          borderColor: colors.border.subtle,
-                          backgroundColor: colors.surface.sunken,
-                        },
+                        isDark
+                          ? {
+                              borderColor: homeDarkGridInset.borderColor,
+                              backgroundColor: homeDarkGridInset.backgroundColor,
+                            }
+                          : {
+                              borderColor: colors.border.subtle,
+                              backgroundColor: colors.surface.sunken,
+                            },
                       ]}
                       accessibilityRole="button"
                       accessibilityLabel="Thêm ảnh nữa"
@@ -381,10 +424,15 @@ export default function AddMemoryScreen() {
             onPress={() => setShowDatePicker(true)}
             style={[
               styles.dateField,
-              {
-                backgroundColor: colors.surface.default,
-                borderColor: colors.border.subtle,
-              },
+              isDark
+                ? {
+                    backgroundColor: homeDarkGridCard.backgroundColor,
+                    borderColor: homeDarkGridCard.borderColor,
+                  }
+                : {
+                    backgroundColor: colors.surface.default,
+                    borderColor: colors.border.subtle,
+                  },
             ]}
             accessibilityRole="button"
             accessibilityLabel="Chọn ngày kỷ niệm"
@@ -423,10 +471,15 @@ export default function AddMemoryScreen() {
                   onPress={(e) => e.stopPropagation()}
                   style={[
                     styles.dateModalCard,
-                    {
-                      backgroundColor: colors.surface.default,
-                      borderColor: colors.border.subtle,
-                    },
+                    isDark
+                      ? {
+                          backgroundColor: homeDarkGridCard.backgroundColor,
+                          borderColor: homeDarkGridCard.borderColor,
+                        }
+                      : {
+                          backgroundColor: colors.surface.default,
+                          borderColor: colors.border.subtle,
+                        },
                   ]}
                 >
                   <DateTimePicker

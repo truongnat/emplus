@@ -9,6 +9,8 @@ export interface User {
   fullName: string;
   nickname?: string;
   avatarUrl?: string;
+  /** Ảnh bìa / nền hồ sơ (URL công khai sau upload media). */
+  profileBackgroundUrl?: string;
   gender: Gender;
   dob?: string;
   authProvider: AuthProvider;

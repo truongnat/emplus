@@ -9,6 +9,8 @@ export const gradientLocations = {
   hero: [0, 0.45, 1] as const,
   /** Home hero counter card — warm coral depth + indigo lift at end */
   heroCounter: [0, 0.38, 0.72, 1] as const,
+  /** Dark hero — ít “góc đỏ”, chuyển dần về nền lưới */
+  heroCounterDark: [0, 0.24, 0.55, 1] as const,
   care: [0, 0.55, 1] as const,
   budget: [0, 1] as const,
   subtle: [0, 1] as const,
@@ -24,12 +26,8 @@ export const heroCardGradient = {
     auraPalette.coral300,
     auraPalette.coral500,
   ] as const,
-  dark: [
-    auraPalette.coral900,
-    "#2A1F24",
-    auraPalette.coral800,
-    "#3D2430",
-  ] as const,
+  /** Taupe/cocoa + chút rose — tránh coral900/800 bão hòa trên lưới dark */
+  dark: ["#383032", "#2E282B", "#252022", "#1A1517"] as const,
 } as const;
 
 export type AuraGradientName = keyof typeof gradientLocations;

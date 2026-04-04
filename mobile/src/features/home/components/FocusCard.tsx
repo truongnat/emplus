@@ -7,6 +7,10 @@ import { useToast } from "@/src/toast-context";
 import { useThemeColors, useThemeMode } from "@/src/theme";
 import { elevation } from "@/src/theme/elevation";
 import { typographyRoles } from "@/src/theme/typography-roles";
+import {
+  homeDarkGridCard,
+  homeDarkGridInset,
+} from "@/src/theme/emplus-design-tokens";
 
 export interface FocusCardProps {
   focusTitle: string;
@@ -46,10 +50,15 @@ export const FocusCard = React.memo(function FocusCard({
         <View
           style={[
             styles.card,
-            {
-              backgroundColor: colors.surface.raised,
-              borderColor: colors.border.subtle,
-            },
+            isDark
+              ? {
+                  backgroundColor: homeDarkGridCard.backgroundColor,
+                  borderColor: homeDarkGridCard.borderColor,
+                }
+              : {
+                  backgroundColor: colors.surface.raised,
+                  borderColor: colors.border.subtle,
+                },
           ]}
         >
           <View style={[styles.orb, { backgroundColor: softOrb }]} />
@@ -100,10 +109,15 @@ export const FocusCard = React.memo(function FocusCard({
             <View
               style={[
                 styles.iconTile,
-                {
-                  backgroundColor: colors.surface.default,
-                  borderColor: colors.border.subtle,
-                },
+                isDark
+                  ? {
+                      backgroundColor: homeDarkGridInset.backgroundColor,
+                      borderColor: homeDarkGridInset.borderColor,
+                    }
+                  : {
+                      backgroundColor: colors.surface.default,
+                      borderColor: colors.border.subtle,
+                    },
               ]}
             >
               <Ionicons

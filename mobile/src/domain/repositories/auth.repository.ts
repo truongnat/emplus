@@ -37,6 +37,13 @@ export interface AuthRepository {
   getProfile(): Promise<AuthModule.User>;
 
   /**
+   * Updates the current user profile (partial body).
+   */
+  updateProfile(
+    params: UserModule.UpdateProfileRequest,
+  ): Promise<AuthModule.User>;
+
+  /**
    * Sends OTP to email for password reset.
    */
   forgotPassword(

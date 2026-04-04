@@ -53,6 +53,25 @@ export async function pickImage(options: ImagePicker.ImagePickerOptions = {}) {
   return result.canceled ? null : result.assets[0];
 }
 
+/** Ảnh bìa hồ sơ — không crop, tỉ lệ tự do. */
+export async function pickBannerImage(
+  options: ImagePicker.ImagePickerOptions = {},
+) {
+  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (status !== "granted") {
+    throw new Error("Permission to access media library was denied");
+  }
+
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ["images"],
+    allowsEditing: false,
+    quality: 0.85,
+    ...options,
+  });
+
+  return result.canceled ? null : result.assets[0];
+}
+
 export async function takePhoto(options: ImagePicker.ImagePickerOptions = {}) {
   const { status } = await ImagePicker.requestCameraPermissionsAsync();
   if (status !== "granted") {

@@ -58,6 +58,43 @@ export function getTimeBasedGreeting(date: Date = new Date()): GreetingInfo {
   }
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function stripToUtcDay(input: Date): Date {
+  return new Date(
+    Date.UTC(input.getUTCFullYear(), input.getUTCMonth(), input.getUTCDate()),
+  );
+}
+
+function parseYmdUtc(ymd: string): Date | null {
+  const part = ymd.slice(0, 10);
+  const [y, m, d] = part.split("-").map((x) => Number(x));
+  if (!y || !m || !d) return null;
+  const parsed = new Date(Date.UTC(y, m - 1, d));
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function diffDaysUtc(start: Date, end: Date): number {
+  const a = stripToUtcDay(start).getTime();
+  const b = stripToUtcDay(end).getTime();
+  return Math.floor((b - a) / DAY_MS);
+}
+
+/**
+ * Khớp `api/src/modules/dashboard.ts`: diffDays(loveStart, todayUtc) + 1.
+ * Dùng trên client để số ngày cập nhật theo lịch dù React Query / Redis trả `loveDays` cũ.
+ */
+export function computeLoveDaysFromStart(
+  loveStartDate: string | undefined,
+  now: Date = new Date(),
+): number | null {
+  if (!loveStartDate) return null;
+  const start = parseYmdUtc(loveStartDate);
+  if (!start) return null;
+  const today = stripToUtcDay(now);
+  return diffDaysUtc(start, today) + 1;
+}
+
 export function formatLoveDate(dateString?: string): string {
   if (!dateString) return "Đang tải...";
   const d = new Date(dateString);

@@ -62,6 +62,16 @@ export class GetProfileUseCase {
   }
 }
 
+export class UpdateProfileUseCase {
+  constructor(private authRepository: AuthRepository) { }
+
+  async execute(
+    params: UserModule.UpdateProfileRequest,
+  ): Promise<AuthModule.User> {
+    return this.authRepository.updateProfile(params);
+  }
+}
+
 export class RequestPasswordResetUseCase {
   constructor(private authRepository: AuthRepository) { }
 

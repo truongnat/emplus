@@ -11,7 +11,11 @@ import {
   getMemoryTime,
   getAxisMonthYear,
 } from "@/src/utils/timeline-helpers";
-import { useThemeColors } from "@/src/theme";
+import { useThemeColors, useThemeMode } from "@/src/theme";
+import {
+  homeDarkGridCard,
+  homeDarkGridInset,
+} from "@/src/theme/emplus-design-tokens";
 
 interface TimelineItemProps {
   item: MemoryItem;
@@ -35,6 +39,7 @@ export const TimelineItem = React.memo(function TimelineItem({
   onDeleteActionPress,
 }: TimelineItemProps) {
   const colors = useThemeColors();
+  const { isDark } = useThemeMode();
   const swipeRef = useRef<Swipeable>(null);
   const mediaUrls = useMemo(
     () => parseMediaUrls(item.mediaUrls),
@@ -276,11 +281,17 @@ export const TimelineItem = React.memo(function TimelineItem({
           style={[
             styles.card,
             omitAxis && styles.cardOmitAxis,
-            {
-              backgroundColor: colors.surface.default,
-              borderColor: colors.border.subtle,
-              shadowColor: colors.text.primary,
-            },
+            isDark
+              ? {
+                  backgroundColor: homeDarkGridCard.backgroundColor,
+                  borderColor: homeDarkGridCard.borderColor,
+                  shadowColor: "#0A0809",
+                }
+              : {
+                  backgroundColor: colors.surface.default,
+                  borderColor: colors.border.subtle,
+                  shadowColor: colors.text.primary,
+                },
           ]}
         >
         {hasImages ? (
@@ -330,10 +341,15 @@ export const TimelineItem = React.memo(function TimelineItem({
                 styles.descriptionContainer,
                 isPayment && [
                   styles.paymentDescription,
-                  {
-                    backgroundColor: colors.surface.sunken,
-                    borderColor: colors.border.subtle,
-                  },
+                  isDark
+                    ? {
+                        backgroundColor: homeDarkGridInset.backgroundColor,
+                        borderColor: homeDarkGridInset.borderColor,
+                      }
+                    : {
+                        backgroundColor: colors.surface.sunken,
+                        borderColor: colors.border.subtle,
+                      },
                 ],
               ]}
             >

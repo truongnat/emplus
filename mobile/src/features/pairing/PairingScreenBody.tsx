@@ -26,7 +26,11 @@ import { useToast } from "@/src/toast-context";
 import { dependencies } from "@/src/framework/di/dependencies";
 import { toDisplayError } from "@/src/core/api/to-display-error";
 import { useThemeColors, useThemeMode } from "@/src/theme";
-import { loginFigmaLight } from "@/src/theme/emplus-design-tokens";
+import {
+  authGlassBlurIntensity,
+  authSoftFieldSurface,
+  loginFigmaLight,
+} from "@/src/theme/emplus-design-tokens";
 import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
 import { usePressAnimation } from "@/src/animations/presets";
 import { lottieInventory } from "@/src/lottie/inventory";
@@ -56,15 +60,9 @@ export function PairingScreenBody() {
   const placeholderColor = colors.text.secondary;
   const loginPlaceholder = isDark ? placeholderColor : loginFigmaLight.subtitle;
   const loginLabelColor = isDark ? undefined : loginFigmaLight.titleDark;
-  const loginSoft = !isDark
-    ? {
-        backgroundColor: "rgba(255,255,255,0.55)",
-        borderColor: "rgba(255,107,129,0.22)",
-      }
-    : {
-        backgroundColor: "rgba(255,255,255,0.06)",
-        borderColor: "rgba(255,255,255,0.12)",
-      };
+  const loginSoft = isDark
+    ? authSoftFieldSurface.dark
+    : authSoftFieldSurface.light;
   const loginInputRadius = !isDark ? loginFigmaLight.inputPillRadius : 16;
 
   const generateInviteMutation = useMutation({
@@ -188,7 +186,9 @@ export function PairingScreenBody() {
         </View>
 
         <GlassCard
-          intensity={isDark ? 30 : 26}
+          intensity={
+            isDark ? authGlassBlurIntensity.dark : authGlassBlurIntensity.light
+          }
           tint={isDark ? "dark" : "light"}
           isLiquid={isLiquidGlassSupported}
           style={styles.qrCard}

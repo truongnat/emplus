@@ -105,9 +105,11 @@ export namespace DashboardModule {
 export namespace TimelineModule {
   export type ListQueryParams = ApiQueryParams<"/v1/timeline/memories", "get">;
   export type ListResponse = ApiResponse<"/v1/timeline/memories", "get">;
-  
+
   export type CreateRequest = ApiRequest<"/v1/timeline/memories", "post">;
   export type CreateResponse = ApiResponse<"/v1/timeline/memories", "post">;
+
+  export type DeleteResponse = ApiResponse<"/v1/timeline/memories/{id}", "delete">;
 }
 
 export namespace CareModule {
@@ -140,6 +142,9 @@ export namespace NotificationModule {
 }
 
 export namespace UserModule {
+  export type UpdateProfileRequest = ApiRequest<"/v1/users/me", "put">;
+  export type UpdateProfileResponse = ApiResponse<"/v1/users/me", "put">;
+
   export type PushTokenRequest = ApiRequest<"/v1/users/push-token", "post">;
   export type PushTokenResponse = ApiResponse<"/v1/users/push-token", "post">;
 }

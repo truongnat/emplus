@@ -50,6 +50,7 @@ type UserRow = {
   fullName: string;
   nickname: string | null;
   avatarUrl: string | null;
+  profileBackgroundUrl: string | null;
   gender: User["gender"];
   dob: string | Date | null;
   authProvider: User["authProvider"];
@@ -140,6 +141,7 @@ function fromUserRow(row: UserRow): User {
     fullName: row.fullName,
     nickname: row.nickname ?? undefined,
     avatarUrl: row.avatarUrl ?? undefined,
+    profileBackgroundUrl: row.profileBackgroundUrl ?? undefined,
     gender: row.gender,
     dob: asDate(row.dob),
     authProvider: row.authProvider,
@@ -420,6 +422,7 @@ export class PostgresStore implements DataStore {
              full_name AS "fullName",
              nickname,
              avatar_url AS "avatarUrl",
+             profile_background_url AS "profileBackgroundUrl",
              gender,
              dob,
              auth_provider AS "authProvider",
@@ -427,6 +430,7 @@ export class PostgresStore implements DataStore {
              password_hash AS "passwordHash",
              timezone,
              is_active AS "isActive",
+             is_admin AS "isAdmin",
              created_at AS "createdAt",
              updated_at AS "updatedAt"
       FROM users
@@ -445,6 +449,7 @@ export class PostgresStore implements DataStore {
              full_name AS "fullName",
              nickname,
              avatar_url AS "avatarUrl",
+             profile_background_url AS "profileBackgroundUrl",
              gender,
              dob,
              auth_provider AS "authProvider",
@@ -452,6 +457,7 @@ export class PostgresStore implements DataStore {
              password_hash AS "passwordHash",
              timezone,
              is_active AS "isActive",
+             is_admin AS "isAdmin",
              created_at AS "createdAt",
              updated_at AS "updatedAt"
       FROM users
@@ -470,6 +476,7 @@ export class PostgresStore implements DataStore {
         full_name,
         nickname,
         avatar_url,
+        profile_background_url,
         gender,
         dob,
         auth_provider,
@@ -486,6 +493,7 @@ export class PostgresStore implements DataStore {
         ${user.fullName},
         ${user.nickname ?? null},
         ${user.avatarUrl ?? null},
+        ${user.profileBackgroundUrl ?? null},
         ${user.gender},
         ${user.dob ?? null},
         ${user.authProvider},
@@ -503,6 +511,7 @@ export class PostgresStore implements DataStore {
         full_name = EXCLUDED.full_name,
         nickname = EXCLUDED.nickname,
         avatar_url = EXCLUDED.avatar_url,
+        profile_background_url = EXCLUDED.profile_background_url,
         gender = EXCLUDED.gender,
         dob = EXCLUDED.dob,
         password_hash = EXCLUDED.password_hash,
@@ -1110,6 +1119,7 @@ export class PostgresStore implements DataStore {
              full_name AS "fullName",
              nickname,
              avatar_url AS "avatarUrl",
+             profile_background_url AS "profileBackgroundUrl",
              gender,
              dob,
              auth_provider AS "authProvider",
@@ -1324,6 +1334,7 @@ export class PostgresStore implements DataStore {
              full_name AS "fullName",
              nickname,
              avatar_url AS "avatarUrl",
+             profile_background_url AS "profileBackgroundUrl",
              gender,
              dob,
              auth_provider AS "authProvider",

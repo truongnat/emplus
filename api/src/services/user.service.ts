@@ -12,6 +12,7 @@ export interface UserProfile {
   fullName: string;
   nickname?: string;
   avatarUrl?: string;
+  profileBackgroundUrl?: string;
   gender: Gender;
   dob?: string;
   timezone: string;
@@ -40,6 +41,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     fullName: user.fullName,
     nickname: user.nickname,
     avatarUrl: user.avatarUrl,
+    profileBackgroundUrl: user.profileBackgroundUrl,
     gender: user.gender,
     dob: user.dob,
     timezone: user.timezone,
@@ -60,6 +62,7 @@ export async function updateUserProfile(
     fullName?: string;
     nickname?: string;
     avatarUrl?: string;
+    profileBackgroundUrl?: string;
     gender?: string;
     dob?: string;
     timezone?: string;
@@ -77,7 +80,18 @@ export async function updateUserProfile(
     ...user,
     fullName: data.fullName?.trim() ?? user.fullName,
     nickname: data.nickname !== undefined ? (data.nickname?.trim() || undefined) : user.nickname,
-    avatarUrl: data.avatarUrl !== undefined ? (data.avatarUrl?.trim() || undefined) : user.avatarUrl,
+    avatarUrl:
+      data.avatarUrl === undefined
+        ? user.avatarUrl
+        : data.avatarUrl === ""
+          ? undefined
+          : data.avatarUrl.trim(),
+    profileBackgroundUrl:
+      data.profileBackgroundUrl === undefined
+        ? user.profileBackgroundUrl
+        : data.profileBackgroundUrl === ""
+          ? undefined
+          : data.profileBackgroundUrl.trim(),
     gender: data.gender ? chuanHoaGioiTinhDauVao(data.gender) : user.gender,
     dob: data.dob ?? user.dob,
     timezone: data.timezone ?? user.timezone,
@@ -95,6 +109,7 @@ export async function updateUserProfile(
     fullName: updatedUser.fullName,
     nickname: updatedUser.nickname,
     avatarUrl: updatedUser.avatarUrl,
+    profileBackgroundUrl: updatedUser.profileBackgroundUrl,
     gender: updatedUser.gender,
     dob: updatedUser.dob,
     timezone: updatedUser.timezone,

@@ -3,7 +3,11 @@ import { View, ScrollView, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { AppText, PressableScale } from "@/src/ui-kit";
 import { Ionicons } from "@expo/vector-icons";
-import { useThemeColors } from "@/src/theme";
+import { useThemeColors, useThemeMode } from "@/src/theme";
+import {
+  homeDarkChromeButton,
+  homeDarkGridCard,
+} from "@/src/theme/emplus-design-tokens";
 import { typographyRoles } from "@/src/theme/typography-roles";
 
 export interface FilterChip {
@@ -30,6 +34,7 @@ export function TimelineHeader({
   filters = DEFAULT_FILTERS,
 }: TimelineHeaderProps) {
   const colors = useThemeColors();
+  const { isDark } = useThemeMode();
   const router = useRouter();
 
   const handleAddMemory = () => {
@@ -56,11 +61,17 @@ export function TimelineHeader({
           onPress={handleAddMemory}
           style={[
             styles.plusButton,
-            {
-              backgroundColor: colors.surface.default,
-              borderColor: colors.border.subtle,
-              shadowColor: colors.text.primary,
-            },
+            isDark
+              ? {
+                  backgroundColor: homeDarkChromeButton.backgroundColor,
+                  borderColor: homeDarkChromeButton.borderColor,
+                  shadowColor: "#000",
+                }
+              : {
+                  backgroundColor: colors.surface.default,
+                  borderColor: colors.border.subtle,
+                  shadowColor: colors.text.primary,
+                },
           ]}
           accessibilityRole="button"
           accessibilityLabel="Thêm kỷ niệm"
@@ -82,15 +93,27 @@ export function TimelineHeader({
               style={[
                 styles.filterChip,
                 isActive
-                  ? {
-                      backgroundColor: colors.background.inverse,
-                      borderColor: colors.border.inverse,
-                      shadowColor: colors.text.primary,
-                    }
-                  : {
-                      backgroundColor: colors.surface.default,
-                      borderColor: colors.border.subtle,
-                    },
+                  ? isDark
+                    ? {
+                        backgroundColor: colors.interactive.primary,
+                        borderColor: "rgba(255, 255, 255, 0.22)",
+                        shadowColor: "#000",
+                      }
+                    : {
+                        backgroundColor: colors.background.inverse,
+                        borderColor: colors.border.inverse,
+                        shadowColor: colors.text.primary,
+                      }
+                  : isDark
+                    ? {
+                        backgroundColor: homeDarkGridCard.backgroundColor,
+                        borderColor: homeDarkGridCard.borderColor,
+                        shadowColor: "#000",
+                      }
+                    : {
+                        backgroundColor: colors.surface.default,
+                        borderColor: colors.border.subtle,
+                      },
               ]}
               onPress={() => setActiveFilter(chip.id)}
               scaleTo={0.95}
@@ -103,7 +126,9 @@ export function TimelineHeader({
                   styles.filterLabel,
                   {
                     color: isActive
-                      ? colors.text.inverse
+                      ? isDark
+                        ? colors.text.onBrand
+                        : colors.text.inverse
                       : colors.text.tertiary,
                   },
                 ]}

@@ -12,13 +12,15 @@ import Animated, {
   interpolate,
 } from "react-native-reanimated";
 import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
+import { auraPalette } from "@/src/theme/aura-colors";
 
 const { width: W0, height: H0 } = Dimensions.get("window");
 const G = 26;
 
 /** Top gradient stop — sync StatusBar / system root background on login */
 export const LOGIN_GRID_TOP_LIGHT = "#fff5f7";
-export const LOGIN_GRID_TOP_DARK = "#0a0c10";
+/** Khớp Aura darkBg — tránh nền xanh-lạnh lệch với theme */
+export const LOGIN_GRID_TOP_DARK = auraPalette.darkBg;
 
 /**
  * Nền toàn màn: lưới + wash gradient chuyển động nhẹ (transition).
@@ -68,14 +70,20 @@ export function LoginGridAnimatedBackground({ isDark }: { isDark: boolean }) {
   const pad = G * 3;
   const W = W0 + pad * 2;
   const H = H0 + pad * 2;
-  const stroke = isDark ? "rgba(255,255,255,0.07)" : "rgba(123,97,255,0.14)";
+  const stroke = isDark
+    ? "rgba(244,240,230,0.055)"
+    : "rgba(123,97,255,0.14)";
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       <LinearGradient
         colors={
           isDark
-            ? [LOGIN_GRID_TOP_DARK, "#12151f", "#0e1018"]
+            ? [
+                LOGIN_GRID_TOP_DARK,
+                auraPalette.darkSurf,
+                auraPalette.taupe900,
+              ]
             : [LOGIN_GRID_TOP_LIGHT, "#f8f5ff", "#f0fdf9"]
         }
         locations={[0, 0.5, 1]}
@@ -119,7 +127,7 @@ export function LoginGridAnimatedBackground({ isDark }: { isDark: boolean }) {
         <LinearGradient
           colors={
             isDark
-              ? ["rgba(255,107,129,0.35)", "transparent", "transparent"]
+              ? ["rgba(255,107,129,0.16)", "transparent", "transparent"]
               : ["rgba(255,107,129,0.22)", "transparent", "transparent"]
           }
           locations={[0, 0.45, 1]}
@@ -135,7 +143,11 @@ export function LoginGridAnimatedBackground({ isDark }: { isDark: boolean }) {
         <LinearGradient
           colors={
             isDark
-              ? ["transparent", "transparent", "rgba(123,97,255,0.25)"]
+              ? [
+                  "transparent",
+                  "rgba(168,85,247,0.10)",
+                  "rgba(45,212,191,0.07)",
+                ]
               : ["transparent", "rgba(142,124,255,0.15)", "rgba(79,209,197,0.12)"]
           }
           locations={[0, 0.4, 1]}

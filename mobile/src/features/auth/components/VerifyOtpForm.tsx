@@ -18,7 +18,11 @@ import { toDisplayError, verifyOTP } from "@/src/api";
 import { useSession } from "@/src/session-context";
 import { useToast } from "@/src/toast-context";
 import { useThemeColors, useThemeMode } from "@/src/theme";
-import { loginFigmaLight } from "@/src/theme/emplus-design-tokens";
+import {
+  authGlassBlurIntensity,
+  authSoftFieldSurface,
+  loginFigmaLight,
+} from "@/src/theme/emplus-design-tokens";
 import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
 import { usePressAnimation } from "@/src/animations/presets";
 
@@ -114,15 +118,9 @@ export function VerifyOtpForm({ email }: VerifyOtpFormProps) {
     ? FadeIn.duration(0)
     : FadeInDown.delay(120).springify().damping(22).stiffness(180);
 
-  const loginSoft = !isDark
-    ? {
-        backgroundColor: "rgba(255,255,255,0.55)",
-        borderColor: "rgba(255,107,129,0.22)",
-      }
-    : {
-        backgroundColor: "rgba(255,255,255,0.06)",
-        borderColor: "rgba(255,255,255,0.12)",
-      };
+  const loginSoft = isDark
+    ? authSoftFieldSurface.dark
+    : authSoftFieldSurface.light;
   const otpCellRadius = !isDark ? loginFigmaLight.inputPillRadius : 16;
 
   const activeCellShadow = useMemo(
@@ -144,7 +142,9 @@ export function VerifyOtpForm({ email }: VerifyOtpFormProps) {
       style={[shellStyles.formOuter, styles.formOuterSpacing]}
     >
       <GlassCard
-        intensity={isDark ? 30 : 26}
+        intensity={
+          isDark ? authGlassBlurIntensity.dark : authGlassBlurIntensity.light
+        }
         tint={isDark ? "dark" : "light"}
         isLiquid={isLiquidGlassSupported}
         style={shellStyles.glassCard}

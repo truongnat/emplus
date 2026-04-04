@@ -142,11 +142,26 @@ function RootLayoutInner() {
               <Stack.Screen name="add-expense" />
               <Stack.Screen name="add-memory" />
               <Stack.Screen name="memory/[id]" />
-              <Stack.Screen name="profile-details/personal-info" />
-              <Stack.Screen name="profile-details/notifications" />
-              <Stack.Screen name="profile-details/appearance" />
-              <Stack.Screen name="profile-details/privacy" />
-              <Stack.Screen name="profile-details/help" />
+              <Stack.Screen
+                name="profile-details/personal-info"
+                options={{ contentStyle: { backgroundColor: "transparent" } }}
+              />
+              <Stack.Screen
+                name="profile-details/notifications"
+                options={{ contentStyle: { backgroundColor: "transparent" } }}
+              />
+              <Stack.Screen
+                name="profile-details/appearance"
+                options={{ contentStyle: { backgroundColor: "transparent" } }}
+              />
+              <Stack.Screen
+                name="profile-details/privacy"
+                options={{ contentStyle: { backgroundColor: "transparent" } }}
+              />
+              <Stack.Screen
+                name="profile-details/help"
+                options={{ contentStyle: { backgroundColor: "transparent" } }}
+              />
             </Stack>
           </>
         </ApiProvider>

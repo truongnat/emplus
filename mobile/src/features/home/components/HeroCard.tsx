@@ -11,6 +11,7 @@ import Animated, {
 import { NumberTicker, ClockTicker } from "./HomeClock";
 import { useThemeColors, useThemeMode } from "@/src/theme";
 import { heroCardGradient, gradientLocations } from "@/src/theme/gradients";
+import { homeDarkGridCard } from "@/src/theme/emplus-design-tokens";
 import { typographyRoles } from "@/src/theme/typography-roles";
 import { AppText } from "@/src/ui-kit";
 import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
@@ -39,16 +40,23 @@ export const HeroCard = React.memo(function HeroCard({
   }));
 
   const gradientColors = isDark ? heroCardGradient.dark : heroCardGradient.light;
-  const shadowColor = colors.brand.default;
-  const outerRing = isDark ? "rgba(142, 124, 255, 0.22)" : "rgba(123, 97, 255, 0.18)";
+  const counterLocations = isDark
+    ? gradientLocations.heroCounterDark
+    : gradientLocations.heroCounter;
+  const digitColor = isDark ? colors.brand.strong : colors.brand.default;
+  const shadowColor = isDark ? "#0A0809" : colors.brand.default;
+  const shadowOpacity = isDark ? 0.2 : 0.15;
+  const outerRing = isDark
+    ? homeDarkGridCard.borderColor
+    : "rgba(123, 97, 255, 0.18)";
 
   return (
-    <View style={[styles.container, { shadowColor }]}>
+    <View style={[styles.container, { shadowColor, shadowOpacity }]}>
       <View style={[styles.content, { borderColor: outerRing }]}>
         <LinearGradient
           pointerEvents="none"
           colors={[...gradientColors]}
-          locations={[...gradientLocations.heroCounter]}
+          locations={[...counterLocations]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradient}
@@ -75,7 +83,7 @@ export const HeroCard = React.memo(function HeroCard({
           pointerEvents="none"
         >
           <View style={styles.counterColumn} pointerEvents="none">
-            <NumberTicker value={loveDays} digitColor={colors.brand.default} />
+            <NumberTicker value={loveDays} digitColor={digitColor} />
             <AppText
               style={[
                 styles.unitBelow,
@@ -91,6 +99,7 @@ export const HeroCard = React.memo(function HeroCard({
               pointerEvents="none"
               accessibilityElementsHidden
               importantForAccessibility="no"
+              style={isDark ? styles.lottieDimDark : undefined}
             >
               <EmplusLottie
                 source={lottieInventory.homeCounterBirdPairSky}
@@ -109,14 +118,21 @@ export const HeroCard = React.memo(function HeroCard({
           style={[
             styles.timeDividerWrap,
             Platform.OS === "ios"
-              ? { shadowColor: colors.brand.default }
+              ? {
+                  shadowColor: isDark ? "#000" : colors.brand.default,
+                  shadowOpacity: isDark ? 0.25 : 0.45,
+                }
               : null,
           ]}
         >
           <View
             style={[
               styles.timeDividerLine,
-              { backgroundColor: colors.brand.muted },
+              {
+                backgroundColor: isDark
+                  ? "rgba(255,255,255,0.14)"
+                  : colors.brand.muted,
+              },
             ]}
           />
         </View>
@@ -142,7 +158,6 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     backgroundColor: "transparent",
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
     shadowRadius: 24,
     elevation: 8,
   },
@@ -209,6 +224,9 @@ const styles = StyleSheet.create({
   /** Lottie native view ăn pan — không nhận touch để ScrollView vuốt được */
   lottiePassthrough: {
     pointerEvents: "none",
+  },
+  lottieDimDark: {
+    opacity: 0.88,
   },
   timeDividerWrap: {
     width: "78%",

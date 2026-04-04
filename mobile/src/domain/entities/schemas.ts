@@ -494,7 +494,52 @@ export interface paths {
                 };
             };
         };
-        put?: never;
+        /** Cập nhật hồ sơ người dùng hiện tại */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateUserProfile"];
+                };
+            };
+            responses: {
+                /** @description Hồ sơ sau cập nhật */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["User"];
+                    };
+                };
+                /** @description Dữ liệu không hợp lệ */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Chưa xác thực */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Không tìm thấy người dùng */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         post?: never;
         delete?: never;
         options?: never;
@@ -948,7 +993,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Chi tiết một mục */
+        /** Chi tiết một mục timeline */
         get: {
             parameters: {
                 query?: never;
@@ -960,6 +1005,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description Memory */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -968,6 +1014,7 @@ export interface paths {
                         "application/json": components["schemas"]["Memory"];
                     };
                 };
+                /** @description Không tìm thấy */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -978,7 +1025,7 @@ export interface paths {
         };
         put?: never;
         post?: never;
-        /** Xoá mục */
+        /** Xoá mục timeline */
         delete: {
             parameters: {
                 query?: never;
@@ -990,6 +1037,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description Đã xoá */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -1000,6 +1048,7 @@ export interface paths {
                         };
                     };
                 };
+                /** @description Không tìm thấy */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -1008,6 +1057,69 @@ export interface paths {
                 };
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/media/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload một ảnh lên MinIO (timeline) */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description URL công khai của ảnh */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                            data: {
+                                /** Format: uri */
+                                url: string;
+                            };
+                        };
+                    };
+                };
+                /** @description File không hợp lệ */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description MinIO chưa cấu hình */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1129,7 +1241,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Tâm trạng cặp đôi (bản thân + đối phương) */
+        /**
+         * Tâm trạng cặp đôi (bản thân + đối phương)
+         * @description Trả về mood đã lưu của user hiện tại và của partner (nếu đã ghép đôi). Partner null khi chưa có couple.
+         */
         get: {
             parameters: {
                 query?: never;
@@ -1148,12 +1263,14 @@ export interface paths {
                         "application/json": {
                             self: {
                                 value: number;
+                                /** Format: date-time */
                                 updatedAt: string;
                             } | null;
                             partner: {
                                 userId: string;
                                 fullName: string;
                                 value: number | null;
+                                /** Format: date-time */
                                 updatedAt: string | null;
                             } | null;
                         };
@@ -1185,6 +1302,7 @@ export interface paths {
                     content: {
                         "application/json": {
                             value: number;
+                            /** Format: date-time */
                             updatedAt: string;
                         };
                     };
@@ -1488,6 +1606,8 @@ export interface components {
             nickname?: string;
             /** Format: uri */
             avatarUrl?: string;
+            /** Format: uri */
+            profileBackgroundUrl?: string;
             gender: components["schemas"]["Gender"];
             /** Format: date */
             dob?: string;
@@ -1500,6 +1620,23 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+        };
+        /** @description Các trường tùy chọn; chỉ gửi trường cần đổi. */
+        UpdateUserProfile: {
+            fullName?: string;
+            /** @description Tên hiển thị trong ứng dụng */
+            nickname?: string;
+            /** Format: uri */
+            avatarUrl?: string;
+            /**
+             * Format: uri
+             * @description Ảnh bìa hồ sơ (URL sau POST /v1/media/upload)
+             */
+            profileBackgroundUrl?: string;
+            gender?: components["schemas"]["Gender"];
+            /** Format: date */
+            dob?: string;
+            timezone?: string;
         };
         TokenPair: {
             accessToken: string;
@@ -1716,11 +1853,10 @@ export namespace DashboardModule {
 export namespace TimelineModule {
   export type ListQueryParams = ApiQueryParams<"/v1/timeline/memories", "get">;
   export type ListResponse = ApiResponse<"/v1/timeline/memories", "get">;
-  
+
   export type CreateRequest = ApiRequest<"/v1/timeline/memories", "post">;
   export type CreateResponse = ApiResponse<"/v1/timeline/memories", "post">;
 
-  export type DetailResponse = ApiResponse<"/v1/timeline/memories/{id}", "get">;
   export type DeleteResponse = ApiResponse<"/v1/timeline/memories/{id}", "delete">;
 }
 
@@ -1754,6 +1890,9 @@ export namespace NotificationModule {
 }
 
 export namespace UserModule {
+  export type UpdateProfileRequest = ApiRequest<"/v1/users/me", "put">;
+  export type UpdateProfileResponse = ApiResponse<"/v1/users/me", "put">;
+
   export type PushTokenRequest = ApiRequest<"/v1/users/push-token", "post">;
   export type PushTokenResponse = ApiResponse<"/v1/users/push-token", "post">;
 }

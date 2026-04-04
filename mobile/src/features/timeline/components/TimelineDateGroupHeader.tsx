@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { View, Animated, StyleSheet } from "react-native";
 import { formatGroupDate } from "@/src/utils/timeline-helpers";
-import { useThemeColors } from "@/src/theme";
+import { useThemeColors, useThemeMode } from "@/src/theme";
+import { homeDarkGridInset } from "@/src/theme/emplus-design-tokens";
 import { AppText } from "@/src/ui-kit";
 
 export interface TimelineDateGroupHeaderProps {
@@ -51,6 +52,7 @@ export const TimelineDateGroupHeader = React.memo(function TimelineDateGroupHead
   dateString,
 }: TimelineDateGroupHeaderProps) {
   const colors = useThemeColors();
+  const { isDark } = useThemeMode();
   const isToday = formatGroupDate(dateString) === "HÔM NAY";
 
   return (
@@ -63,10 +65,15 @@ export const TimelineDateGroupHeader = React.memo(function TimelineDateGroupHead
         <View
           style={[
             styles.dotOuter,
-            {
-              backgroundColor: colors.surface.default,
-              borderColor: colors.border.subtle,
-            },
+            isDark
+              ? {
+                  backgroundColor: homeDarkGridInset.backgroundColor,
+                  borderColor: homeDarkGridInset.borderColor,
+                }
+              : {
+                  backgroundColor: colors.surface.default,
+                  borderColor: colors.border.subtle,
+                },
           ]}
         >
           <View

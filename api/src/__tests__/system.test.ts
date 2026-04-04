@@ -110,6 +110,7 @@ describe('OpenAPI Documentation', () => {
 
       const requiredSchemas = [
         'User',
+        'UpdateUserProfile',
         'TokenPair',
         'AuthResponse',
         'LoginResult',

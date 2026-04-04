@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import type { ReactNode } from "react";
+import type { Dispatch, ReactNode, SetStateAction } from "react";
 
 import { storage } from "@/src/core/common/storage";
 import appConfig from "@/src/core/config/app-config";
@@ -27,7 +27,7 @@ interface SessionContextValue {
   session: AuthModule.SessionPayload | null;
   hydrated: boolean;
   isAuthenticated: boolean;
-  setSession: (session: AuthModule.SessionPayload | null) => void;
+  setSession: Dispatch<SetStateAction<AuthModule.SessionPayload | null>>;
   clearSession: () => void;
   refreshAuth: () => Promise<boolean>;
   withAccessToken: <T>(

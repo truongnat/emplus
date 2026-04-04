@@ -1,10 +1,18 @@
-import React, { useState, useMemo } from "react";
-import { View, ScrollView, Switch, StyleSheet } from "react-native";
+import React, { useState, useMemo, useCallback } from "react";
+import {
+  View,
+  ScrollView,
+  Switch,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
+import { Image } from "expo-image";
+import { useMutation } from "@tanstack/react-query";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { TOAST_TAB_BAR_OFFSET } from "@/src/components/atoms/Toast";
 import { AppText, PressableScale } from "@/src/ui-kit";
@@ -17,6 +25,11 @@ import { useThemeColors, useThemeMode } from "@/src/theme";
 import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
 import { lottieInventory } from "@/src/lottie/inventory";
 import type { SemanticColors } from "@/src/theme/tokens/semantic";
+import { pickImage, pickBannerImage } from "@/src/utils/expo-helpers";
+import { uploadTimelineMemoryPhoto, toDisplayError } from "@/src/api";
+import { useToast } from "@/src/toast-context";
+import { dependencies } from "@/src/framework/di/dependencies";
+import type { UserModule } from "@/src/domain/entities/schemas";
 
 function createProfileStyles(c: SemanticColors) {
   return StyleSheet.create({
@@ -48,12 +61,13 @@ function createProfileStyles(c: SemanticColors) {
       fontSize: 24,
       fontWeight: "900",
       letterSpacing: -0.5,
+      flex: 1,
     },
-    editButton: {
+    /** Một nút duy nhất trên hàng tiêu đề: đổi ảnh bìa (icon, không chữ). */
+    headerBannerEditBtn: {
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: "rgba(255, 255, 255, 0.2)",
       alignItems: "center",
       justifyContent: "center",
     },
@@ -78,6 +92,26 @@ function createProfileStyles(c: SemanticColors) {
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 1,
+      overflow: "hidden",
+    },
+    avatarImage: {
+      width: "100%",
+      height: "100%",
+    },
+    avatarTouchableWrap: {
+      position: "relative",
+    },
+    avatarEditBadge: {
+      position: "absolute",
+      right: 2,
+      bottom: 2,
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 2,
+      zIndex: 6,
     },
     avatarText: {
       fontSize: 40,
@@ -93,6 +127,12 @@ function createProfileStyles(c: SemanticColors) {
       fontWeight: "900",
       color: c.text.primary,
       letterSpacing: -0.5,
+    },
+    userEmailLine: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: c.text.secondary,
+      marginTop: 4,
     },
     statusBadge: {
       flexDirection: "row",
@@ -254,12 +294,67 @@ function SettingItem({
 export default function ProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { session, clearSession, isAuthenticated } = useSession();
+  const { session, clearSession, isAuthenticated, setSession } = useSession();
+  const { showToast } = useToast();
   const colors = useThemeColors();
   const { isDark } = useThemeMode();
   useAuthGridChrome(isDark, colors.background.default, true);
   const styles = useMemo(() => createProfileStyles(colors), [colors]);
   const [syncEnabled, setSyncEnabled] = useState(true);
+  const [bannerBusy, setBannerBusy] = useState(false);
+  const [avatarBusy, setAvatarBusy] = useState(false);
+
+  const updateProfileMutation = useMutation({
+    mutationFn: (body: UserModule.UpdateProfileRequest) =>
+      dependencies.auth.updateProfile.execute(body),
+    onSuccess: (user) => {
+      setSession((prev) => (prev ? { ...prev, user } : null));
+    },
+  });
+
+  const onChangeAvatar = useCallback(async () => {
+    if (bannerBusy || avatarBusy) return;
+    try {
+      setAvatarBusy(true);
+      const asset = await pickImage();
+      if (!asset) return;
+      const fd = new FormData();
+      const name =
+        asset.fileName ??
+        `avatar_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+      const type = asset.mimeType ?? "image/jpeg";
+      fd.append("file", { uri: asset.uri, name, type } as any);
+      const url = await uploadTimelineMemoryPhoto(fd);
+      await updateProfileMutation.mutateAsync({ avatarUrl: url });
+      showToast("Đã cập nhật ảnh đại diện", "success");
+    } catch (e) {
+      showToast(toDisplayError(e), "error");
+    } finally {
+      setAvatarBusy(false);
+    }
+  }, [bannerBusy, avatarBusy, updateProfileMutation, showToast]);
+
+  const onChangeBanner = useCallback(async () => {
+    if (bannerBusy || avatarBusy) return;
+    try {
+      setBannerBusy(true);
+      const asset = await pickBannerImage();
+      if (!asset) return;
+      const fd = new FormData();
+      const name =
+        asset.fileName ??
+        `banner_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+      const type = asset.mimeType ?? "image/jpeg";
+      fd.append("file", { uri: asset.uri, name, type } as any);
+      const url = await uploadTimelineMemoryPhoto(fd);
+      await updateProfileMutation.mutateAsync({ profileBackgroundUrl: url });
+      showToast("Đã cập nhật ảnh bìa", "success");
+    } catch (e) {
+      showToast(toDisplayError(e), "error");
+    } finally {
+      setBannerBusy(false);
+    }
+  }, [bannerBusy, avatarBusy, updateProfileMutation, showToast]);
 
   const scrollPadBottom = Math.max(insets.bottom + TOAST_TAB_BAR_OFFSET, 100);
 
@@ -297,8 +392,18 @@ export default function ProfileScreen() {
     );
   }
 
-  const userInitial = session?.user?.email?.[0]?.toUpperCase() || "U";
-  const userEmail = session?.user?.email || "User";
+  const u = session?.user;
+  const displayName =
+    (u?.nickname?.trim() || u?.fullName || u?.email || "Bạn") ?? "Bạn";
+  const userEmail = u?.email || "";
+  const userInitial =
+    displayName.replace(/\s/g, "").charAt(0)?.toUpperCase() || "U";
+  const hasBanner = Boolean(u?.profileBackgroundUrl);
+  const titleOnBanner = hasBanner ? colors.text.inverse : colors.text.onBrand;
+  const bannerBtnBg = hasBanner
+    ? "rgba(255,255,255,0.22)"
+    : "rgba(255,255,255,0.2)";
+  const bannerBtnIcon = titleOnBanner;
 
   return appShell(
     <View style={styles.screenRoot}>
@@ -313,56 +418,128 @@ export default function ProfileScreen() {
       >
         {/* Premium Header with Overlapping Avatar */}
         <View style={styles.headerContainer}>
-          <LinearGradient
-            colors={[colors.brand.default, colors.brand.muted, colors.surface.default]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.headerGradient}
-          />
+          {hasBanner && u?.profileBackgroundUrl ? (
+            <Image
+              source={{ uri: u.profileBackgroundUrl }}
+              style={styles.headerGradient}
+              contentFit="cover"
+            />
+          ) : (
+            <LinearGradient
+              colors={[colors.brand.default, colors.brand.muted, colors.surface.default]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.headerGradient}
+            />
+          )}
+          {hasBanner ? (
+            <LinearGradient
+              colors={["rgba(0,0,0,0.2)", "rgba(0,0,0,0.55)"]}
+              style={StyleSheet.absoluteFillObject}
+            />
+          ) : null}
+
           <View
-            style={[styles.headerTitleRow, { paddingTop: insets.top + 12 }]}
+            style={[
+              styles.headerTitleRow,
+              { paddingTop: insets.top + 12, zIndex: 5 },
+            ]}
           >
-            <AppText style={[styles.headerTitle, { color: colors.text.onBrand }]}>
+            <AppText style={[styles.headerTitle, { color: titleOnBanner }]}>
               Tài khoản
             </AppText>
-            <PressableScale style={styles.editButton}>
-              <Ionicons
-                name="create-outline"
-                size={20}
-                color={colors.text.onBrand}
-              />
+            <PressableScale
+              style={[
+                styles.headerBannerEditBtn,
+                { backgroundColor: bannerBtnBg },
+              ]}
+              onPress={onChangeBanner}
+              disabled={bannerBusy || avatarBusy}
+              accessibilityRole="button"
+              accessibilityLabel="Đổi ảnh bìa"
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              {bannerBusy ? (
+                <ActivityIndicator color={bannerBtnIcon} size="small" />
+              ) : (
+                <Ionicons
+                  name="image-outline"
+                  size={22}
+                  color={bannerBtnIcon}
+                />
+              )}
             </PressableScale>
           </View>
 
-          <View style={styles.avatarWrapper}>
-            <View
-              style={[
-                styles.avatarShadow,
-                { backgroundColor: colors.surface.default },
-              ]}
-            >
+          <View style={[styles.avatarWrapper, { zIndex: 4 }]}>
+            <View style={styles.avatarTouchableWrap}>
               <View
                 style={[
-                  styles.avatarMain,
-                  {
-                    backgroundColor: colors.surface.sunken,
-                    borderColor: colors.border.subtle,
-                  },
+                  styles.avatarShadow,
+                  { backgroundColor: colors.surface.default },
                 ]}
               >
-                <AppText
-                  style={[styles.avatarText, { color: colors.brand.default }]}
+                <View
+                  style={[
+                    styles.avatarMain,
+                    {
+                      backgroundColor: colors.surface.sunken,
+                      borderColor: colors.border.subtle,
+                    },
+                  ]}
                 >
-                  {userInitial}
-                </AppText>
+                  {u?.avatarUrl ? (
+                    <Image
+                      source={{ uri: u.avatarUrl }}
+                      style={styles.avatarImage}
+                      contentFit="cover"
+                    />
+                  ) : (
+                    <AppText
+                      style={[styles.avatarText, { color: colors.brand.default }]}
+                    >
+                      {userInitial}
+                    </AppText>
+                  )}
+                </View>
               </View>
+              <PressableScale
+                style={[
+                  styles.avatarEditBadge,
+                  {
+                    backgroundColor: colors.surface.default,
+                    borderColor: colors.border.default,
+                  },
+                ]}
+                onPress={onChangeAvatar}
+                disabled={bannerBusy || avatarBusy}
+                accessibilityRole="button"
+                accessibilityLabel="Đổi ảnh đại diện"
+                hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+              >
+                {avatarBusy ? (
+                  <ActivityIndicator
+                    color={colors.brand.default}
+                    size="small"
+                  />
+                ) : (
+                  <Ionicons
+                    name="camera"
+                    size={16}
+                    color={colors.brand.default}
+                  />
+                )}
+              </PressableScale>
             </View>
           </View>
         </View>
 
         {/* User Info Section */}
         <View style={styles.userInfoSection}>
-          <AppText style={styles.userName}>{userEmail}</AppText>
+          <AppText style={styles.userName}>{displayName}</AppText>
+          {userEmail ? (
+            <AppText style={styles.userEmailLine}>{userEmail}</AppText>
+          ) : null}
           <View
             style={[
               styles.statusBadge,
@@ -390,7 +567,8 @@ export default function ProfileScreen() {
           >
             <SettingItem
               icon="person-outline"
-              label="Thông tin cá nhân"
+              label="Thông tin tài khoản"
+              sublabel="Họ tên, tên hiển thị, ngày sinh…"
               onPress={() => router.push("/profile-details/personal-info")}
             />
             <SettingItem

@@ -7,7 +7,8 @@ import {
   type ViewStyle,
 } from "react-native";
 import { Image } from "expo-image";
-import { useThemeColors } from "@/src/theme";
+import { useThemeColors, useThemeMode } from "@/src/theme";
+import { homeDarkGridInset } from "@/src/theme/emplus-design-tokens";
 
 const GAP = 8;
 
@@ -41,7 +42,11 @@ export function MemoryDetailBentoGrid({
   onCellPress,
 }: MemoryDetailBentoGridProps) {
   const colors = useThemeColors();
+  const { isDark } = useThemeMode();
   const n = urls.length;
+  const cellUnderlay = isDark
+    ? homeDarkGridInset.backgroundColor
+    : colors.surface.sunken;
 
   const rowPlan = useMemo(() => (n >= 5 ? bentoRowCounts(n) : []), [n]);
 
@@ -57,7 +62,7 @@ export function MemoryDetailBentoGrid({
         onPress={() => onCellPress(index)}
         style={({ pressed }) => [
           styles.cell,
-          { backgroundColor: colors.surface.sunken },
+          { backgroundColor: cellUnderlay },
           style,
           pressed && styles.cellPressed,
         ]}
@@ -72,7 +77,7 @@ export function MemoryDetailBentoGrid({
         />
       </Pressable>
     ),
-    [colors.surface.sunken, onCellPress],
+    [cellUnderlay, onCellPress],
   );
 
   if (n === 0) return null;

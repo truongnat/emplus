@@ -11,10 +11,37 @@ const normalizedGenderSchema = z.preprocess((value) => {
   return value.trim().toUpperCase();
 }, z.enum(acceptedGenderValues));
 
+/**
+ * URL tuyệt đối http(s) cho ảnh đã upload (MinIO).
+ * Chuỗi rỗng = xóa ảnh (ghi đè bằng null trong DB).
+ */
+function optionalHttpImageUrl(fieldLabel: string) {
+  return z.preprocess((value) => {
+    if (value == null) {
+      return undefined;
+    }
+    if (typeof value !== "string") {
+      return value;
+    }
+    return value.trim();
+  }, z
+    .union([
+      z.literal(""),
+      z
+        .string()
+        .max(2000, `${fieldLabel} tối đa 2000 ký tự.`)
+        .refine((s) => /^https?:\/\//i.test(s), {
+          message: `${fieldLabel} phải là URL http hoặc https.`,
+        }),
+    ])
+    .optional());
+}
+
 const updateProfileSchema = z.object({
   fullName: optionalTrimmedString(),
   nickname: optionalTrimmedString(),
-  avatarUrl: optionalTrimmedString(),
+  avatarUrl: optionalHttpImageUrl("avatarUrl"),
+  profileBackgroundUrl: optionalHttpImageUrl("profileBackgroundUrl"),
   gender: normalizedGenderSchema.optional(),
   dob: z.preprocess((value) => {
     if (typeof value !== "string") {

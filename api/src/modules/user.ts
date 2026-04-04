@@ -36,6 +36,7 @@ userRoutes.put("/me", async (context) => {
     fullName: input.fullName,
     nickname: input.nickname,
     avatarUrl: input.avatarUrl,
+    profileBackgroundUrl: input.profileBackgroundUrl,
     gender: input.gender,
     dob: input.dob,
     timezone: input.timezone,

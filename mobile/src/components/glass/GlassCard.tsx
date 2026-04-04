@@ -21,6 +21,13 @@ interface GlassCardProps {
   intensity?: number;
   tint?: "light" | "dark" | "default";
   isLiquid?: boolean;
+  /** Merged after internal `cardContent` (padding, borderColor, …). */
+  contentStyle?: StyleProp<ViewStyle>;
+  /**
+   * expo-blur path only: custom top→bottom gradient when `tint === "dark"`.
+   * Lower alpha = more grid/aura visible behind the card.
+   */
+  darkOverlayGradient?: readonly [string, string];
 }
 
 /**
@@ -32,7 +39,14 @@ export function GlassCard({
   intensity = 60,
   tint = "default",
   isLiquid = false,
+  contentStyle,
+  darkOverlayGradient,
 }: GlassCardProps) {
+  const darkGradient = darkOverlayGradient ?? [
+    "rgba(38, 28, 32, 0.78)",
+    "rgba(26, 20, 22, 0.72)",
+  ];
+
   // Use LiquidGlassView if requested and supported
   if (isLiquid && isLiquidGlassSupported) {
     return (
@@ -42,11 +56,13 @@ export function GlassCard({
         colorScheme={tint === "dark" ? "dark" : "light"}
         tintColor={
           tint === "dark"
-            ? "rgba(255, 255, 255, 0.08)"
+            ? darkOverlayGradient
+              ? "rgba(255, 143, 159, 0.14)"
+              : "rgba(255, 255, 255, 0.11)"
             : "rgba(255, 255, 255, 0.45)"
         }
       >
-        <View style={styles.cardContent}>{children}</View>
+        <View style={[styles.cardContent, contentStyle]}>{children}</View>
       </LiquidGlassView>
     );
   }
@@ -61,12 +77,12 @@ export function GlassCard({
       <LinearGradient
         colors={
           tint === "dark"
-            ? ["rgba(0, 0, 0, 0.4)", "rgba(0, 0, 0, 0.3)"]
+            ? [...darkGradient]
             : ["rgba(255, 255, 255, 0.72)", "rgba(255, 255, 255, 0.65)"]
         }
         style={styles.gradient}
       >
-        <View style={styles.cardContent}>{children}</View>
+        <View style={[styles.cardContent, contentStyle]}>{children}</View>
       </LinearGradient>
     </BlurView>
   );

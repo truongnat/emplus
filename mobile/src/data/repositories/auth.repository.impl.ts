@@ -70,6 +70,16 @@ export class AuthRepositoryImpl implements AuthRepository {
     return response.data;
   }
 
+  async updateProfile(
+    params: UserModule.UpdateProfileRequest,
+  ): Promise<AuthModule.User> {
+    const response = await apiClient.put<ApiResponse<AuthModule.User>>(
+      "/users/me",
+      params,
+    );
+    return response.data;
+  }
+
   async forgotPassword(
     params: AuthModule.ForgotPasswordRequest,
   ): Promise<AuthModule.ForgotPasswordResponse> {

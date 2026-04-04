@@ -50,13 +50,17 @@ function createNotificationStyles(c: SemanticColors) {
       paddingTop: 4,
       paddingBottom: 16,
     },
+    /** flexShrink: 0 — tránh co cột trái khi nút “Đọc hết” hiện (tiêu đề một dòng). */
     headerLeft: {
-      flex: 1,
+      flexGrow: 1,
+      flexShrink: 0,
+      marginRight: 8,
     },
     headerRight: {
       flexDirection: "row",
       alignItems: "center",
       gap: 8,
+      flexShrink: 0,
     },
     markAllBtn: {
       paddingHorizontal: 10,
@@ -77,61 +81,6 @@ function createNotificationStyles(c: SemanticColors) {
       textTransform: "uppercase",
       letterSpacing: 1.5,
       marginTop: 4,
-    },
-    statusBadge: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: c.surface.default,
-      borderRadius: 20,
-      paddingLeft: 4,
-      paddingRight: 16,
-      paddingVertical: 4,
-      gap: 10,
-      borderWidth: 1,
-      borderColor: c.border.subtle,
-      shadowColor: c.text.primary,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 8,
-      elevation: 2,
-    },
-    avatarWrapper: {
-      position: "relative",
-    },
-    avatar: {
-      width: 32,
-      height: 32,
-      borderRadius: 16,
-      backgroundColor: c.surface.sunken,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    statusDot: {
-      position: "absolute",
-      bottom: 0,
-      right: 0,
-      width: 10,
-      height: 10,
-      borderRadius: 5,
-      borderWidth: 2,
-      borderColor: c.surface.default,
-      backgroundColor: c.status.success.icon,
-    },
-    badgeTextContainer: {
-      justifyContent: "center",
-    },
-    badgeLabel: {
-      fontSize: 8,
-      fontWeight: "800",
-      color: c.text.tertiary,
-      letterSpacing: 1,
-    },
-    badgeValue: {
-      fontSize: 11,
-      fontWeight: "900",
-      color: c.text.primary,
-      textTransform: "lowercase",
-      marginTop: -2,
     },
     scrollContent: {
       paddingHorizontal: 22,
@@ -290,7 +239,7 @@ function createNotificationStyles(c: SemanticColors) {
 
 export default function NotificationsScreen() {
   const insets = useSafeAreaInsets();
-  const { session, isAuthenticated } = useSession();
+  const { isAuthenticated } = useSession();
   const colors = useThemeColors();
   const { isDark } = useThemeMode();
   const styles = useMemo(() => createNotificationStyles(colors), [colors]);
@@ -308,10 +257,6 @@ export default function NotificationsScreen() {
     if (!isAuthenticated) return;
     void syncExpoPushTokenToServer().catch(() => {});
   }, [isAuthenticated]);
-
-  const partnerName = useMemo(() => {
-    return !!session?.user?.coupleId ? "Người ấy" : "Bạn đồng hành";
-  }, [session?.user?.coupleId]);
 
   const items = data?.items ?? [];
   const hasUnread = items.some((n) => !n.readAt);
@@ -339,6 +284,7 @@ export default function NotificationsScreen() {
           <View style={styles.headerLeft}>
             <AppText
               accessibilityRole="header"
+              numberOfLines={1}
               style={[
                 typographyRoles.title,
                 styles.title,
@@ -375,24 +321,6 @@ export default function NotificationsScreen() {
                 </AppText>
               </TouchableOpacity>
             )}
-            <View style={styles.statusBadge}>
-              <View style={styles.avatarWrapper}>
-                <View style={styles.avatar}>
-                  <Ionicons
-                    name="person-circle-outline"
-                    size={24}
-                    color={colors.text.tertiary}
-                  />
-                </View>
-                <View style={styles.statusDot} />
-              </View>
-              <View style={styles.badgeTextContainer}>
-                <AppText style={styles.badgeLabel}>
-                  {partnerName.toUpperCase()} ĐANG
-                </AppText>
-                <AppText style={styles.badgeValue}>—</AppText>
-              </View>
-            </View>
           </View>
         </View>
 

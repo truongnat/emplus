@@ -12,6 +12,11 @@ import { useThemeColors, useThemeMeta, useBlurTint } from "@/src/theme";
 import { elevation } from "@/src/theme/elevation";
 import { radius, borderWidth } from "@/src/theme/tokens";
 import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
+import {
+  LiquidGlassView,
+  isLiquidGlassSupported,
+} from "@/src/components/glass/LiquidGlassView";
 import { useEffect, useMemo } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
@@ -110,6 +115,9 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
     ? "rgba(255, 255, 255, 0.08)"
     : "rgba(255, 255, 255, 0.52)";
   const pillTintUnderlay = isDark ? "rgba(26, 20, 22, 0.88)" : "rgba(252, 249, 248, 0.4)";
+  const barBackdropColors = isDark
+    ? (["rgba(26, 20, 22, 0)", "rgba(26, 20, 22, 0.52)", "rgba(26, 20, 22, 0.94)"] as const)
+    : (["rgba(252, 249, 248, 0)", "rgba(252, 249, 248, 0.42)", "rgba(252, 249, 248, 0.92)"] as const);
   const handlePress = async (route: any, index: number) => {
     // Trigger haptic feedback
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -130,6 +138,107 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
   );
 
   const navPadBottom = 18;
+  const barBackdropHeight =
+    insets.bottom + navPadBottom + PILL_HEIGHT + 56;
+
+  const pillRadius = radius["2xl"];
+  const pillShellStyle = {
+    width: pillWidth,
+    height: PILL_HEIGHT,
+    borderRadius: pillRadius,
+    overflow: "hidden" as const,
+    borderWidth: borderWidth.sm,
+    borderColor: glassBorder,
+  };
+
+  const gridUnderPill = (
+    <View
+      pointerEvents="none"
+      style={[
+        StyleSheet.absoluteFillObject,
+        { borderRadius: pillRadius, overflow: "hidden" },
+      ]}
+    >
+      <TabBarGridAnimatedBackground
+        variant="embed"
+        patternIdSuffix="pill"
+        isDark={isDark}
+        width={pillWidth}
+        height={PILL_HEIGHT}
+      />
+    </View>
+  );
+
+  const pillFrostOverlay = (
+    <View
+      pointerEvents="none"
+      style={[
+        StyleSheet.absoluteFillObject,
+        { borderRadius: pillRadius, backgroundColor: pillGlassFallback },
+      ]}
+    />
+  );
+
+  const tabTrack = (
+    <View
+      style={{
+        flex: 1,
+        flexDirection: "row",
+        paddingHorizontal: PILL_PADDING,
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}
+    >
+      {isPillFocused && (
+        <Reanimated.View
+          style={[
+            styles.activeIndicator,
+            {
+              width: itemWidth,
+              top: INDICATOR_TOP,
+              borderRadius: radius.xl,
+              backgroundColor: colors.interactive.primary,
+              borderWidth: borderWidth.thin,
+              borderColor: "rgba(255, 255, 255, 0.22)",
+            },
+            indicatorStyle,
+          ]}
+        />
+      )}
+
+      {pillRoutes.map((route: any) => {
+        const routeIndex = state.routes.findIndex(
+          (r: any) => r.key === route.key,
+        );
+        const isFocused = state.index === routeIndex;
+        const label = labelForRoute(route.name);
+        return (
+          <TouchableOpacity
+            key={route.key}
+            onPress={() => handlePress(route, routeIndex)}
+            style={styles.tabItem}
+            activeOpacity={0.8}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: isFocused }}
+            accessibilityLabel={label}
+            accessibilityHint={`Chuyển đến ${label.toLowerCase()}`}
+          >
+            <Ionicons
+              name={iconForRoute(route.name, isFocused)}
+              size={isFocused ? 25 : 23}
+              color={
+                isFocused
+                  ? colors.text.onBrand
+                  : isDark
+                    ? "#FFFFFF"
+                    : "#000000"
+              }
+            />
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
 
   return (
     <View
@@ -142,105 +251,68 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
         },
       ]}
     >
-      <View style={styles.tabBarContainer}>
-        <View
-          style={[
-            styles.pillOuter,
-            elevation.raised,
-            {
-              width: pillWidth,
-              height: PILL_HEIGHT,
-              borderRadius: radius["2xl"],
-              borderWidth: borderWidth.sm,
-              borderColor: glassBorder,
-              backgroundColor: pillTintUnderlay,
-            },
-          ]}
-        >
-          <View
-            pointerEvents="none"
-            style={[
-              StyleSheet.absoluteFillObject,
-              { borderRadius: radius["2xl"], overflow: "hidden" },
-            ]}
-          >
-            <TabBarGridAnimatedBackground
-              variant="embed"
-              patternIdSuffix="pill"
-              isDark={isDark}
-              width={pillWidth}
-              height={PILL_HEIGHT}
-            />
-          </View>
-          <View
-            pointerEvents="none"
-            style={[
-              StyleSheet.absoluteFillObject,
-              { borderRadius: radius["2xl"], backgroundColor: pillGlassFallback },
-            ]}
-          />
-          <BlurView
-            intensity={blurIntensity}
-            tint={blurTint}
-            style={[
-              StyleSheet.absoluteFillObject,
-              {
-                borderRadius: radius["2xl"],
-                flexDirection: "row",
-                paddingHorizontal: PILL_PADDING,
-                alignItems: "center",
-                justifyContent: "space-between",
-              },
-            ]}
-          >
-            {isPillFocused && (
-              <Reanimated.View
-                style={[
-                  styles.activeIndicator,
-                  {
-                    width: itemWidth,
-                    top: INDICATOR_TOP,
-                    borderRadius: radius.xl,
-                    backgroundColor: colors.brand.muted,
-                    borderWidth: borderWidth.thin,
-                    borderColor: isDark
-                      ? "rgba(255, 182, 193, 0.12)"
-                      : "rgba(255, 107, 129, 0.18)",
-                  },
-                  indicatorStyle,
-                ]}
-              />
-            )}
+      <LinearGradient
+        pointerEvents="none"
+        colors={[...barBackdropColors]}
+        locations={[0, 0.38, 1]}
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: barBackdropHeight,
+        }}
+      />
 
-            {pillRoutes.map((route: any) => {
-              const routeIndex = state.routes.findIndex(
-                (r: any) => r.key === route.key,
-              );
-              const isFocused = state.index === routeIndex;
-              const label = labelForRoute(route.name);
-              return (
-                <TouchableOpacity
-                  key={route.key}
-                  onPress={() => handlePress(route, routeIndex)}
-                  style={styles.tabItem}
-                  activeOpacity={0.8}
-                  accessibilityRole="tab"
-                  accessibilityState={{ selected: isFocused }}
-                  accessibilityLabel={label}
-                  accessibilityHint={`Chuyển đến ${label.toLowerCase()}`}
-                >
-                  <Ionicons
-                    name={iconForRoute(route.name, isFocused)}
-                    size={isFocused ? 25 : 23}
-                    color={
-                      isFocused ? colors.brand.default : colors.text.tertiary
-                    }
-                  />
-                </TouchableOpacity>
-              );
-            })}
-          </BlurView>
-        </View>
+      <View style={styles.tabBarContainer}>
+        {isLiquidGlassSupported ? (
+          <LiquidGlassView
+            style={[styles.pillOuter, elevation.raised, pillShellStyle]}
+            glassStyle="regular"
+            colorScheme={isDark ? "dark" : "light"}
+            tintColor={
+              isDark
+                ? "rgba(255, 255, 255, 0.12)"
+                : "rgba(255, 255, 255, 0.38)"
+            }
+            isInteractive
+          >
+            {gridUnderPill}
+            {pillFrostOverlay}
+            {tabTrack}
+          </LiquidGlassView>
+        ) : (
+          <View
+            style={[
+              styles.pillOuter,
+              elevation.raised,
+              pillShellStyle,
+              { backgroundColor: pillTintUnderlay },
+            ]}
+          >
+            {gridUnderPill}
+            {pillFrostOverlay}
+            <BlurView
+              intensity={blurIntensity}
+              tint={blurTint}
+              style={[
+                StyleSheet.absoluteFillObject,
+                { borderRadius: pillRadius, overflow: "hidden" },
+              ]}
+            >
+              <LinearGradient
+                pointerEvents="none"
+                colors={
+                  isDark
+                    ? ["rgba(38, 28, 32, 0.58)", "rgba(26, 20, 22, 0.48)"]
+                    : ["rgba(255, 255, 255, 0.58)", "rgba(255, 255, 255, 0.4)"]
+                }
+                style={StyleSheet.absoluteFillObject}
+              />
+              {tabTrack}
+            </BlurView>
+          </View>
+        )}
       </View>
     </View>
   );

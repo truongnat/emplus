@@ -1,5 +1,6 @@
 import { DashboardPayload } from "@/src/api";
 import {
+  computeLoveDaysFromStart,
   formatLoveDate,
   getTimeBasedGreeting,
   normalizeCycleLabel,
@@ -35,9 +36,16 @@ export function mapDashboardData(dashboard: DashboardPayload | null) {
   const nextDateLabel =
     upcomingEvents.length > 0 ? upcomingEvents[0].title : "Chưa có sự kiện";
 
+  const loveStart = dashboard.coupleContext?.loveStartDate;
+  const recomputed = computeLoveDaysFromStart(loveStart, now);
+  const loveDays =
+    recomputed != null
+      ? recomputed
+      : (dashboard.coupleContext?.loveDays ?? 0);
+
   return {
     greetingInfo: cachedGreeting,
-    loveDays: dashboard.coupleContext?.loveDays ?? 0,
+    loveDays,
     startDateLabel: formatLoveDate(dashboard.coupleContext?.loveStartDate),
     cycleLabel: normalizeCycleLabel(dashboard.dailySuggestion?.actionType),
     upcomingEvents,

@@ -111,8 +111,11 @@ export default function ApiContext({ children }: PropsWithChildren) {
       persistOptions={{
         persister: asyncStoragePersister,
         dehydrateOptions: {
-          shouldDehydrateQuery: (query) =>
-            query.queryKey[0] !== "timelineMemories",
+          shouldDehydrateQuery: (query) => {
+            const k = query.queryKey[0];
+            // Bộ nhớ timeline lớn; dashboard có loveDays/sự kiện — không persist để tránh số liệu cũ khi mở app.
+            return k !== "timelineMemories" && k !== "dashboard";
+          },
         },
       }}
     >

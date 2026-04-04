@@ -55,3 +55,12 @@ Thư mục theo dõi ticket nhẹ, đồng bộ với [`workflows/dev/w-ticket.m
 | [ticket-49](./ticket-49/TICKET.md) | Mood center blob — màu theo slider | done |
 | [ticket-50](./ticket-50/TICKET.md) | Toast toàn app — đồng bộ kiểu Care (bottom + semantic) | done |
 | [ticket-51](./ticket-51/TICKET.md) | Mood — API đồng bộ cặp đôi + UI Care (nam/nữ) | done |
+| [ticket-54](./ticket-54/TICKET.md) | Hồ sơ — ảnh bìa, avatar, tên hiển thị (API + mobile) | done |
+| [ticket-55](./ticket-55/TICKET.md) | Dark mode login — nền Aura, glass & input ấm | done |
+| [ticket-56](./ticket-56/TICKET.md) | Dark OTP & pairing — soft field + glass đồng bộ login | done |
+| [ticket-57](./ticket-57/TICKET.md) | Home dark — thẻ trên lưới Aura (quick/focus/events + chuông) | done |
+| [ticket-58](./ticket-58/TICKET.md) | Home hero counter dark — gradient & typography mềm (Aura) | done |
+| [ticket-59](./ticket-59/TICKET.md) | Tab bar — active primary + icon trắng; inactive đen/trắng | done |
+| [ticket-60](./ticket-60/TICKET.md) | Tab bar — liquid glass + gradient nền đáy | done |
+| [ticket-61](./ticket-61/TICKET.md) | Timeline + memory detail/add — dark Aura trên lưới | done |
+| [ticket-62](./ticket-62/TICKET.md) | Care tab + MoodVibeCheck — dark Aura trên lưới | done |

@@ -3,13 +3,15 @@ import { StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { PressableScale } from "@/src/ui-kit";
 import { RingingBell } from "./HomeDecorations";
-import { useThemeColors } from "@/src/theme";
+import { useThemeColors, useThemeMode } from "@/src/theme";
+import { homeDarkChromeButton } from "@/src/theme/emplus-design-tokens";
 
 /**
  * Nút thông báo góc phải — cùng baseline với wordmark "Em+" (home chrome).
  */
 export function HomeChromeNotificationButton() {
   const colors = useThemeColors();
+  const { isDark } = useThemeMode();
   const router = useRouter();
 
   const onPress = useCallback(() => {
@@ -18,7 +20,16 @@ export function HomeChromeNotificationButton() {
 
   return (
     <PressableScale
-      style={[styles.button, { backgroundColor: colors.surface.default }]}
+      style={[
+        styles.button,
+        isDark
+          ? {
+              backgroundColor: homeDarkChromeButton.backgroundColor,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: homeDarkChromeButton.borderColor,
+            }
+          : { backgroundColor: colors.surface.default },
+      ]}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel="Mở thông báo"

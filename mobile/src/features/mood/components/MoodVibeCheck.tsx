@@ -16,7 +16,14 @@ import { AppText } from "@/src/components/atoms/Text";
 import { getCoupleMood, putCoupleMood } from "@/src/api";
 import { tokenManager } from "@/src/core/api/token-manager";
 import { useSession } from "@/src/session-context";
-import { useThemeColors } from "@/src/theme";
+import { useThemeColors, useThemeMode } from "@/src/theme";
+import {
+  authGlassBlurIntensity,
+  homeDarkGridCard,
+  homeDarkGridInset,
+} from "@/src/theme/emplus-design-tokens";
+import { GlassCard } from "@/src/components/glass/GlassCard";
+import { isLiquidGlassSupported } from "@/src/components/glass/LiquidGlassView";
 import { MOOD_BAND_LABEL_VI, moodBandFromValue } from "../mood-band";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -27,6 +34,12 @@ const MOOD_VISUAL_HEIGHT = Math.round((260 * MOOD_BLOB_SIZE) / 280);
 
 const THUMB_WIDTH = 56;
 const THUMB_HALF = 28;
+
+/** expo-blur: overlay mỏng để lưới + aura Care lọt qua (khác form auth đặc hơn). */
+const CARE_MOOD_DARK_GLASS_GRADIENT = [
+  "rgba(30, 20, 24, 0.36)",
+  "rgba(16, 10, 14, 0.28)",
+] as const;
 /** Tối đa ~10 lần/giây cập nhật blob + chữ từ UI thread (đủ mượt, ít setState). */
 const MOOD_LABEL_FLUSH_MS = 100;
 
@@ -210,6 +223,7 @@ export function MoodVibeCheck({
   partnerName = "người ấy",
 }: MoodVibeCheckProps) {
   const colors = useThemeColors();
+  const { isDark } = useThemeMode();
   const { isAuthenticated, hydrated } = useSession();
   const queryClient = useQueryClient();
   const [value, setValue] = useState(initialValue);
@@ -307,6 +321,45 @@ export function MoodVibeCheck({
     };
   }, [floatAnim, phase]);
 
+  const vibeTheme = useMemo(() => {
+    const c = colors;
+    return {
+      card: {
+        backgroundColor: isDark
+          ? homeDarkGridCard.backgroundColor
+          : c.surface.default,
+        borderColor: isDark ? homeDarkGridCard.borderColor : c.border.subtle,
+        shadowColor: isDark ? "#0A0809" : c.text.primary,
+      },
+      moodStatusLabel: { color: c.text.primary },
+      sliderEdgeText: {
+        color: isDark ? c.text.secondary : c.text.tertiary,
+      },
+      track: {
+        backgroundColor: isDark
+          ? "rgba(255,255,255,0.08)"
+          : c.surface.sunken,
+      },
+      thumbOuter: {
+        backgroundColor: isDark
+          ? homeDarkGridCard.backgroundColor
+          : c.surface.default,
+        borderColor: isDark ? homeDarkGridInset.borderColor : c.border.subtle,
+        shadowColor: isDark ? "#0A0809" : "#000000",
+      },
+      tagText: { color: c.text.tertiary },
+      iconMuted: c.text.tertiary,
+      divider: {
+        backgroundColor: isDark ? homeDarkGridInset.borderColor : c.border.subtle,
+      },
+      hintText: { color: c.text.secondary },
+      partnerRowTitle: { color: c.text.tertiary },
+      partnerRowValue: { color: c.text.primary },
+      partnerRowScore: { color: c.text.secondary },
+      partnerRowPending: { color: c.text.secondary },
+    };
+  }, [isDark, colors]);
+
   const moodConfig = useMemo(() => {
     const band = moodBandFromValue(value);
     const text = MOOD_BAND_LABEL_VI[band];
@@ -392,6 +445,108 @@ export function MoodVibeCheck({
     };
   }, [progressSV, trackW]);
 
+  const glassCardContentStyle = useMemo(
+    () => ({
+      padding: 24,
+      borderWidth: 0,
+    }),
+    [],
+  );
+
+  const moodCardBody = (
+    <>
+      <View style={styles.header}>
+        <AppText style={[styles.moodStatusLabel, vibeTheme.moodStatusLabel]}>
+          BẠN ĐANG{" "}
+          <AppText style={[styles.moodStatusValue, { color: moodConfig.color }]}>
+            {moodConfig.text}
+          </AppText>
+        </AppText>
+      </View>
+
+      <View
+        style={styles.sliderArea}
+        onLayout={(e) => {
+          const w = e.nativeEvent.layout.width;
+          sliderWidth.current = w;
+          trackW.value = w;
+        }}
+      >
+        <GestureDetector gesture={panGesture}>
+          <View style={styles.sliderGestureInner} collapsable={false}>
+            <View style={styles.sliderLabels} pointerEvents="none">
+              <AppText style={[styles.sliderEdgeText, vibeTheme.sliderEdgeText]}>
+                BÌNH THẢN
+              </AppText>
+              <AppText style={[styles.sliderEdgeText, vibeTheme.sliderEdgeText]}>
+                CĂNG THẲNG
+              </AppText>
+            </View>
+
+            <View style={[styles.track, vibeTheme.track]} pointerEvents="none">
+              <LinearGradient
+                colors={["#10B981", "#FACC15", "#FB7185"]}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={styles.trackGradient}
+              />
+            </View>
+
+            <Reanimated.View style={[styles.thumbContainer, thumbStyle]}>
+              <View style={[styles.thumbOuter, vibeTheme.thumbOuter]}>
+                <View style={[styles.thumbInner, { backgroundColor: moodConfig.color }]} />
+              </View>
+            </Reanimated.View>
+          </View>
+        </GestureDetector>
+      </View>
+
+      <View style={styles.footerInfo}>
+        <View style={styles.infoTag}>
+          <MaterialCommunityIcons
+            name="waves"
+            size={16}
+            color={vibeTheme.iconMuted}
+          />
+          <AppText style={[styles.tagText, vibeTheme.tagText]}>DỊU ÊM</AppText>
+        </View>
+        <View style={styles.infoTag}>
+          <AppText style={[styles.tagText, vibeTheme.tagText]}>MẠNH MẼ</AppText>
+          <Ionicons name="flash" size={14} color={vibeTheme.iconMuted} />
+        </View>
+      </View>
+
+      {moodPayload?.partner ? (
+        <>
+          <View style={[styles.divider, vibeTheme.divider]} />
+          <View style={styles.partnerRow}>
+            <AppText style={[styles.partnerRowTitle, vibeTheme.partnerRowTitle]}>
+              {partnerDisplayName.toUpperCase()}
+            </AppText>
+            {partnerMoodLabel != null ? (
+              <AppText style={[styles.partnerRowValue, vibeTheme.partnerRowValue]}>
+                {partnerMoodLabel}
+                <AppText style={[styles.partnerRowScore, vibeTheme.partnerRowScore]}>
+                  {" "}
+                  · {partnerMoodValue}
+                </AppText>
+              </AppText>
+            ) : (
+              <AppText style={[styles.partnerRowPending, vibeTheme.partnerRowPending]}>
+                Chưa cập nhật tâm trạng
+              </AppText>
+            )}
+          </View>
+        </>
+      ) : null}
+
+      <View style={[styles.divider, vibeTheme.divider]} />
+      <AppText style={[styles.hintText, vibeTheme.hintText]}>
+        Buông tay để lưu — cả hai sẽ thấy trên tab Cảm xúc khi đã ghép đôi.
+      </AppText>
+    </>
+  );
+
   return (
     <View
       style={styles.mainContainer}
@@ -401,86 +556,20 @@ export function MoodVibeCheck({
     >
       <VisualArea phase={phase} floatAnim={floatAnim} moodT={value / 100} />
 
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <AppText style={styles.moodStatusLabel}>
-            BẠN ĐANG{" "}
-            <AppText style={[styles.moodStatusValue, { color: moodConfig.color }]}>
-              {moodConfig.text}
-            </AppText>
-          </AppText>
-        </View>
-
-        <View
-          style={styles.sliderArea}
-          onLayout={(e) => {
-            const w = e.nativeEvent.layout.width;
-            sliderWidth.current = w;
-            trackW.value = w;
-          }}
+      {isDark ? (
+        <GlassCard
+          intensity={authGlassBlurIntensity.dark}
+          tint="dark"
+          isLiquid={isLiquidGlassSupported}
+          style={styles.cardGlassShell}
+          contentStyle={glassCardContentStyle}
+          darkOverlayGradient={CARE_MOOD_DARK_GLASS_GRADIENT}
         >
-          <GestureDetector gesture={panGesture}>
-            <View style={styles.sliderGestureInner} collapsable={false}>
-              <View style={styles.sliderLabels} pointerEvents="none">
-                <AppText style={styles.sliderEdgeText}>BÌNH THẢN</AppText>
-                <AppText style={styles.sliderEdgeText}>CĂNG THẲNG</AppText>
-              </View>
-
-              <View style={styles.track} pointerEvents="none">
-                <LinearGradient
-                  colors={["#10B981", "#FACC15", "#FB7185"]}
-                  start={{ x: 0, y: 0.5 }}
-                  end={{ x: 1, y: 0.5 }}
-                  style={styles.trackGradient}
-                />
-              </View>
-
-              <Reanimated.View style={[styles.thumbContainer, thumbStyle]}>
-                <View style={styles.thumbOuter}>
-                  <View style={[styles.thumbInner, { backgroundColor: moodConfig.color }]} />
-                </View>
-              </Reanimated.View>
-            </View>
-          </GestureDetector>
-        </View>
-
-        <View style={styles.footerInfo}>
-          <View style={styles.infoTag}>
-            <MaterialCommunityIcons name="waves" size={16} color="#A8A29E" />
-            <AppText style={styles.tagText}>DỊU ÊM</AppText>
-          </View>
-          <View style={styles.infoTag}>
-            <AppText style={styles.tagText}>MẠNH MẼ</AppText>
-            <Ionicons name="flash" size={14} color="#A8A29E" />
-          </View>
-        </View>
-
-        {moodPayload?.partner ? (
-          <>
-            <View style={styles.divider} />
-            <View style={styles.partnerRow}>
-              <AppText style={styles.partnerRowTitle}>
-                {partnerDisplayName.toUpperCase()}
-              </AppText>
-              {partnerMoodLabel != null ? (
-                <AppText style={styles.partnerRowValue}>
-                  {partnerMoodLabel}
-                  <AppText style={styles.partnerRowScore}> · {partnerMoodValue}</AppText>
-                </AppText>
-              ) : (
-                <AppText style={styles.partnerRowPending}>
-                  Chưa cập nhật tâm trạng
-                </AppText>
-              )}
-            </View>
-          </>
-        ) : null}
-
-        <View style={styles.divider} />
-        <AppText style={styles.hintText}>
-          Buông tay để lưu — cả hai sẽ thấy trên tab Cảm xúc khi đã ghép đôi.
-        </AppText>
-      </View>
+          {moodCardBody}
+        </GlassCard>
+      ) : (
+        <View style={[styles.card, vibeTheme.card]}>{moodCardBody}</View>
+      )}
     </View>
   );
 }
@@ -502,16 +591,26 @@ const styles = StyleSheet.create({
   },
   card: {
     width: SCREEN_WIDTH - 48,
-    backgroundColor: "#FFFFFF",
     borderRadius: 32,
     padding: 24,
     borderWidth: 1,
-    borderColor: "#F5F5F4",
-    shadowColor: "#1C1917",
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
     elevation: 4,
+  },
+  cardGlassShell: {
+    width: SCREEN_WIDTH - 48,
+    alignSelf: "center",
+    borderRadius: 32,
+    overflow: "hidden",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: homeDarkGridCard.borderColor,
+    shadowColor: "#0A0809",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.14,
+    shadowRadius: 22,
+    elevation: 5,
   },
   header: {
     alignItems: "center",
@@ -520,7 +619,6 @@ const styles = StyleSheet.create({
   moodStatusLabel: {
     fontSize: 18,
     fontWeight: "900",
-    color: "#1C1917",
     textAlign: "center",
   },
   moodStatusValue: {
@@ -547,13 +645,11 @@ const styles = StyleSheet.create({
   sliderEdgeText: {
     fontSize: 10,
     fontWeight: "800",
-    color: "#A8A29E",
     letterSpacing: 1,
   },
   track: {
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#F5F5F4",
     overflow: "hidden",
   },
   trackGradient: {
@@ -571,12 +667,9 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "#FFFFFF",
     borderWidth: 4,
-    borderColor: "#F5F5F4",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -601,18 +694,15 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 10,
     fontWeight: "800",
-    color: "#A8A29E",
     letterSpacing: 0.5,
   },
   divider: {
     height: 1,
-    backgroundColor: "#F5F5F4",
     marginBottom: 16,
   },
   hintText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#78716C",
     textAlign: "center",
     lineHeight: 18,
   },
@@ -624,23 +714,19 @@ const styles = StyleSheet.create({
   partnerRowTitle: {
     fontSize: 9,
     fontWeight: "800",
-    color: "#A8A29E",
     letterSpacing: 1.2,
   },
   partnerRowValue: {
     fontSize: 15,
     fontWeight: "800",
-    color: "#1C1917",
     textAlign: "center",
   },
   partnerRowScore: {
     fontWeight: "700",
-    color: "#78716C",
   },
   partnerRowPending: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#78716C",
     textAlign: "center",
   },
 });
