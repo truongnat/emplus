@@ -37,11 +37,16 @@ export function GlassCard({
   if (isLiquid && isLiquidGlassSupported) {
     return (
       <LiquidGlassView
-        style={[styles.card, style]}
+        style={[styles.liquidCardShell, style]}
         glassStyle={tint === "dark" ? "regular" : "clear"}
         colorScheme={tint === "dark" ? "dark" : "light"}
+        tintColor={
+          tint === "dark"
+            ? "rgba(255, 255, 255, 0.08)"
+            : "rgba(255, 255, 255, 0.45)"
+        }
       >
-        {children}
+        <View style={styles.cardContent}>{children}</View>
       </LiquidGlassView>
     );
   }
@@ -157,6 +162,13 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 24,
     padding: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.3)",
+  },
+  /** Không padding ở đây — `cardContent` giống nhánh blur. */
+  liquidCardShell: {
+    borderRadius: 24,
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.3)",
   },

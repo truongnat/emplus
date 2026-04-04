@@ -3,7 +3,8 @@ import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { AppScreen, Reveal, AppText } from "@/src/ui-kit";
-import { palette } from "@/src/theme";
+import { palette, useThemeColors } from "@/src/theme";
+import { useThemeMode } from "@/src/theme/theme-mode-context";
 
 const styles = StyleSheet.create({
   header: {
@@ -42,7 +43,6 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 8,
   },
-  themePreviewSelected: { borderColor: palette.violet600 },
   themeLine1: {
     width: "60%",
     height: 6,
@@ -62,7 +62,6 @@ const styles = StyleSheet.create({
     textTransform: "uppercase" as "uppercase",
     letterSpacing: 1,
   },
-  themeLabelSelected: { color: palette.violet600 },
   themeLabelDefault: { color: palette.zinc400 },
   colorRow: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   colorButton: {
@@ -83,11 +82,25 @@ const styles = StyleSheet.create({
 });
 
 export default function AppearanceScreen() {
+  const themeColors = useThemeColors();
   const router = useRouter();
-  const [theme, setTheme] = useState("light");
+  const {
+    colorScheme,
+    setThemePreference,
+    themePreference,
+  } = useThemeMode();
   const [accentColor, setAccentColor] = useState("#ec1334");
 
-  const colors = [
+  const lightSelected =
+    themePreference === "light" ||
+    ((themePreference === "system" || themePreference === "daylight") &&
+      colorScheme === "light");
+  const darkSelected =
+    themePreference === "dark" ||
+    ((themePreference === "system" || themePreference === "daylight") &&
+      colorScheme === "dark");
+
+  const accentSwatches = [
     "#ec1334",
     "#f43f5e",
     "#8b5cf6",
@@ -102,6 +115,9 @@ export default function AppearanceScreen() {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Quay lại"
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <Ionicons name="arrow-back" size={24} color={palette.zinc800} />
         </TouchableOpacity>
@@ -119,12 +135,15 @@ export default function AppearanceScreen() {
           <View style={styles.themeRow}>
             <TouchableOpacity
               style={styles.themeButton}
-              onPress={() => setTheme("light")}
+              onPress={() => setThemePreference("light")}
+              accessibilityRole="button"
+              accessibilityLabel="Chế độ sáng"
+              accessibilityState={{ selected: lightSelected }}
             >
               <View
                 style={[
                   styles.themePreview,
-                  theme === "light" && styles.themePreviewSelected,
+                  lightSelected && { borderColor: themeColors.brand.default },
                 ]}
               >
                 <View style={styles.themeLine1} />
@@ -133,8 +152,8 @@ export default function AppearanceScreen() {
               <AppText
                 style={[
                   styles.themeLabel,
-                  theme === "light"
-                    ? styles.themeLabelSelected
+                  lightSelected
+                    ? { color: themeColors.brand.default }
                     : styles.themeLabelDefault,
                 ]}
               >
@@ -143,13 +162,16 @@ export default function AppearanceScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.themeButton}
-              onPress={() => setTheme("dark")}
+              onPress={() => setThemePreference("dark")}
+              accessibilityRole="button"
+              accessibilityLabel="Chế độ tối"
+              accessibilityState={{ selected: darkSelected }}
             >
               <View
                 style={[
                   styles.themePreview,
                   { backgroundColor: "rgba(39,39,46,0.8)" },
-                  theme === "dark" && styles.themePreviewSelected,
+                  darkSelected && { borderColor: themeColors.brand.default },
                 ]}
               >
                 <View
@@ -173,8 +195,8 @@ export default function AppearanceScreen() {
               <AppText
                 style={[
                   styles.themeLabel,
-                  theme === "dark"
-                    ? styles.themeLabelSelected
+                  darkSelected
+                    ? { color: themeColors.brand.default }
                     : styles.themeLabelDefault,
                 ]}
               >
@@ -182,6 +204,70 @@ export default function AppearanceScreen() {
               </AppText>
             </TouchableOpacity>
           </View>
+          <View
+            style={{
+              marginTop: 16,
+              flexDirection: "row",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: 16,
+              rowGap: 10,
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => setThemePreference("system")}
+              style={{ paddingVertical: 8, paddingHorizontal: 4 }}
+              accessibilityRole="button"
+              accessibilityLabel="Theo cài đặt hệ thống"
+              accessibilityState={{ selected: themePreference === "system" }}
+            >
+              <AppText
+                style={{
+                  fontSize: 14,
+                  fontWeight: "600",
+                  color:
+                    themePreference === "system"
+                      ? themeColors.brand.default
+                      : palette.zinc500,
+                }}
+              >
+                Theo hệ thống
+              </AppText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setThemePreference("daylight")}
+              style={{ paddingVertical: 8, paddingHorizontal: 4 }}
+              accessibilityRole="button"
+              accessibilityLabel="Theo ngày và đêm theo giờ địa phương"
+              accessibilityState={{ selected: themePreference === "daylight" }}
+            >
+              <AppText
+                style={{
+                  fontSize: 14,
+                  fontWeight: "600",
+                  color:
+                    themePreference === "daylight"
+                      ? themeColors.brand.default
+                      : palette.zinc500,
+                }}
+              >
+                Theo ngày / đêm
+              </AppText>
+            </TouchableOpacity>
+          </View>
+          {themePreference === "daylight" ? (
+            <AppText
+              style={{
+                marginTop: 6,
+                textAlign: "center",
+                fontSize: 12,
+                color: palette.zinc500,
+                paddingHorizontal: 12,
+              }}
+            >
+              Tự động: sáng khoảng 6:00–19:00, tối các giờ còn lại (giờ máy).
+            </AppText>
+          ) : null}
         </Reveal>
 
         <Reveal delay={200}>
@@ -189,7 +275,7 @@ export default function AppearanceScreen() {
             Màu nhấn
           </AppText>
           <View style={styles.colorRow}>
-            {colors.map((color) => (
+            {accentSwatches.map((color) => (
               <TouchableOpacity
                 key={color}
                 style={styles.colorButton}

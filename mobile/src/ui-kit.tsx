@@ -10,7 +10,12 @@ import { Card } from "./components/molecules/Card";
 
 // Atoms
 export { Button, type ButtonProps } from "./components/atoms/Button";
-export { Input, type InputProps } from "./components/atoms/Input";
+export {
+  Input,
+  type InputProps,
+  type InputSize,
+} from "./components/atoms/Input";
+export { InputErrorLeadingIcon } from "./components/atoms/InputErrorLeadingIcon";
 export { Text, type TextProps } from "./components/atoms/Text";
 export { Switch, type SwitchProps } from "./components/atoms/Switch";
 export { Avatar, type AvatarProps } from "./components/atoms/Avatar";
@@ -45,6 +50,13 @@ export { LoadingOverlay } from "./components/organisms/LoadingOverlay";
 export type { LoadingOverlayProps } from "./components/organisms/LoadingOverlay";
 
 export { AnimatedFlatList } from "./components/organisms/AnimatedFlatList";
+
+export { EmplusLottie } from "./components/atoms/EmplusLottie";
+export type { EmplusLottieProps } from "./components/atoms/EmplusLottie";
+export { LottieHero } from "./components/molecules/LottieHero";
+export type { LottieHeroProps } from "./components/molecules/LottieHero";
+export { lottieInventory } from "./lottie/inventory";
+export { motionPresets } from "./animations/motion-presets";
 export type {
   AnimatedListProps,
   AnimatedListHandle,

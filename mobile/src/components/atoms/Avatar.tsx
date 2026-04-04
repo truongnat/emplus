@@ -6,6 +6,7 @@
 import React, { memo } from "react";
 import { View, Text, StyleSheet, Image, ViewStyle } from "react-native";
 import { palette } from "@/src/theme/tokens";
+import { auraPalette } from "@/src/theme/aura-colors";
 
 export interface AvatarProps {
   /** User's name for fallback initial */
@@ -79,7 +80,7 @@ export const Avatar = memo(function Avatar({
  */
 function getColorFromName(name: string): string {
   const colors = [
-    palette.violet500,
+    auraPalette.rose500,
     palette.blue500,
     palette.green500,
     palette.amber500,

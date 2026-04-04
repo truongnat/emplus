@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { View, FlatList, RefreshControl, StyleSheet } from "react-native";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { Text } from "@/src/components/atoms/Text";
-import { palette } from "@/src/theme/tokens";
+import { useThemeColors } from "@/src/theme";
 import { useBudgetData } from "@/src/features/budget";
 import {
   BudgetSummaryCard,
@@ -16,9 +16,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/src/toast-context";
 import { useSession } from "@/src/session-context";
 import { useRouter } from "expo-router";
+import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
+import { lottieInventory } from "@/src/lottie/inventory";
 
 export default function BudgetScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
   const { showToast } = useToast();
   const { withAccessToken } = useSession();
   const queryClient = useQueryClient();
@@ -71,7 +74,14 @@ export default function BudgetScreen() {
     return (
       <AppScreen>
         <View style={styles.centerContainer}>
-          <Text style={styles.centerText}>No budget data yet</Text>
+          <EmplusLottie
+            source={lottieInventory.empty}
+            style={{ width: 140, height: 140 }}
+            loop
+          />
+          <Text style={[styles.centerText, { color: colors.text.secondary }]}>
+            Chưa có dữ liệu ngân sách
+          </Text>
         </View>
       </AppScreen>
     );
@@ -108,7 +118,7 @@ export default function BudgetScreen() {
               <RefreshControl
                 refreshing={loading}
                 onRefresh={refresh}
-                tintColor={palette.violet600}
+                tintColor={colors.brand.default}
               />
             }
             onEndReached={fetchNextPage}
@@ -116,7 +126,7 @@ export default function BudgetScreen() {
             ListEmptyComponent={
               !loading ? (
                 <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>
+                  <Text style={[styles.emptyText, { color: colors.text.tertiary }]}>
                     Chưa có hạng mục chi tiêu nào.
                   </Text>
                 </View>
@@ -158,7 +168,6 @@ const styles = StyleSheet.create({
   },
   centerText: {
     fontSize: 16,
-    color: palette.zinc500,
     textAlign: "center",
   },
   emptyContainer: {
@@ -167,6 +176,5 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 15,
-    color: palette.zinc400,
   },
 });

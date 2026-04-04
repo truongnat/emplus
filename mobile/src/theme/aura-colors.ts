@@ -1,25 +1,50 @@
 /**
  * Aura Premium Color Tokens
  * A refined, romantic, and luxury palette.
- * Based on warm rose, champagne gold, and ivory.
+ * Based on warm coral, indigo, teal, champagne gold, and ivory.
  */
+
+import { palette } from "./tokens/palette";
 
 // ─── PRIMITIVE PALETTE ────────────────────────────────────
 export const auraPalette = {
-  // 1. PRIMARY: Velvet Rose (Deep, Luxury Romance)
-  rose50: "#FFF1F3",
-  rose100: "#FFE1E6",
-  rose200: "#FEC4CF",
-  rose300: "#FDA0B2",
-  rose400: "#FB718A",
-  rose500: "#F43F5E", // ← Primary Brand Accent
-  rose600: "#E11D48",
-  rose700: "#BE123C",
-  rose800: "#9F1239",
-  rose900: "#881337",
-  rose950: "#4C0519",
+  // 1. PRIMARY: Warm Coral (Idea doc #FF6B81)
+  coral50: palette.coral50,
+  coral100: palette.coral100,
+  coral200: palette.coral200,
+  coral300: palette.coral300,
+  coral400: palette.coral400,
+  coral500: palette.coral500,   // ← Primary Brand Accent
+  coral600: palette.coral600,
+  coral700: palette.coral700,
+  coral800: palette.coral800,
+  coral900: palette.coral900,
 
-  // 2. NEUTRAL: Warm Taupe (Eliminate eye strain, keep it warm)
+  // 2. SECONDARY: Indigo (Idea doc #7B61FF)
+  indigo50: palette.indigo50,
+  indigo100: palette.indigo100,
+  indigo200: palette.indigo200,
+  indigo300: palette.indigo300,
+  indigo400: palette.indigo400,
+  indigo500: palette.indigo500,
+  indigo600: palette.indigo600,
+  indigo700: palette.indigo700,
+  indigo800: palette.indigo800,
+  indigo900: palette.indigo900,
+
+  // 3. ACCENT: Teal (Idea doc #4FD1C5)
+  teal50: palette.teal50,
+  teal100: palette.teal100,
+  teal200: palette.teal200,
+  teal300: palette.teal300,
+  teal400: palette.teal400,
+  teal500: palette.teal500,
+  teal600: palette.teal600,
+  teal700: palette.teal700,
+  teal800: palette.teal800,
+  teal900: palette.teal900,
+
+  // 4. NEUTRAL: Warm Taupe (Eliminate eye strain, keep it warm)
   taupe50: "#FAFAF9",
   taupe100: "#F5F5F4",
   taupe200: "#E7E5E4",
@@ -29,40 +54,65 @@ export const auraPalette = {
   taupe600: "#57534E",
   taupe700: "#44403C",
   taupe800: "#292524",
-  taupe900: "#1C1917", // Deep warm almost-black
+  taupe900: "#1C1917",
 
-  // 3. BACKGROUND & SURFACE: Cashmere & Cocoa
-  lightBg: "#FCF9F8", // Cashmere (Rich off-white)
-  darkBg: "#1A1416", // Cocoa Black (Warm, intimate dark)
-  darkSurf: "#261C20", // Cocoa Surface
-  darkBord: "#362A2E", // Visible border on dark surface
+  // 5. BACKGROUND & SURFACE: Cashmere & Cocoa
+  lightBg: "#FCF9F8",
+  darkBg: "#1A1416",
+  darkSurf: "#261C20",
+  darkBord: "#362A2E",
 
-  // 4. ACCENT: Amethyst & Champagne (Special Highlights)
+  // 6. SPECIAL: Champagne & Amethyst (highlights)
   champagne: "#FDE047",
   amethyst: "#A855F7",
 
-  // Special/Legacy overrides mappings if needed
-  superlike: "#A855F7", // Remapped to Amethyst for romance
-  heart: "#F43F5E",
+  superlike: "#A855F7",
+  heart: palette.coral500,
 
   // Gradients
-  gradRose: ["#FB718A", "#E11D48"] as [string, string],
+  gradCoral: ["#FF8FA3", "#E5556B"] as [string, string],
+  gradIndigo: ["#A5B4FC", "#6D4AE6"] as [string, string],
+  gradTeal: ["#5EEAD4", "#0D9488"] as [string, string],
   gradChampagne: ["#FEF08A", "#FDE047"] as [string, string],
   gradDeep: ["#261C20", "#1A1416"] as [string, string],
+
+  // Legacy aliases (deprecated — use coral* instead)
+  /** @deprecated Use coral50 */
+  rose50: palette.coral50,
+  /** @deprecated Use coral100 */
+  rose100: palette.coral100,
+  /** @deprecated Use coral200 */
+  rose200: palette.coral200,
+  /** @deprecated Use coral300 */
+  rose300: palette.coral300,
+  /** @deprecated Use coral400 */
+  rose400: palette.coral400,
+  /** @deprecated Use coral500 */
+  rose500: palette.coral500,
+  /** @deprecated Use coral600 */
+  rose600: palette.coral600,
+  /** @deprecated Use coral700 */
+  rose700: palette.coral700,
+  /** @deprecated Use coral800 */
+  rose800: palette.coral800,
+  /** @deprecated Use coral900 */
+  rose900: palette.coral900,
+  /** @deprecated Use gradCoral */
+  gradRose: ["#FF8FA3", "#E5556B"] as [string, string],
 } as const;
 
 // ─── SEMANTIC COLOR MAPPINGS ──────────────────────────────
-// These will be used in themes.ts
 
 export const auraGradients = {
-  primary: auraPalette.gradRose,
+  primary: auraPalette.gradCoral,
+  secondary: auraPalette.gradIndigo,
+  accent: auraPalette.gradTeal,
   premium: auraPalette.gradChampagne,
   surface: auraPalette.gradDeep,
 };
 
-// Avatar Gradients — warm romantic 6 options
 export const auraAvatarGradients: [string, string][] = [
-  ["#FDA4AF", "#E11D48"], // Rose
+  ["#FDA4AF", "#E5556B"], // Coral
   ["#FDE047", "#A16207"], // Gold
   ["#C084FC", "#7E22CE"], // Purple
   ["#60A5FA", "#1D4ED8"], // Blue
@@ -70,9 +120,6 @@ export const auraAvatarGradients: [string, string][] = [
   ["#4ADE80", "#15803D"], // Green
 ];
 
-/**
- * Helper: Get avatar gradient from identifier
- */
 export function getAuraAvatarGradient(id: string | number): [string, string] {
   const index = typeof id === 'number' ? id : (id.length % auraAvatarGradients.length);
   return auraAvatarGradients[index % auraAvatarGradients.length];

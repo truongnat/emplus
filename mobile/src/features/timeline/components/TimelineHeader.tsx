@@ -2,6 +2,7 @@ import React from "react";
 import { View, ScrollView, Alert, StyleSheet } from "react-native";
 import { AppText, PressableScale, pickImage } from "@/src/ui-kit";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/src/theme";
 
 export interface FilterChip {
   id: string;
@@ -26,6 +27,8 @@ export function TimelineHeader({
   setActiveFilter,
   filters = DEFAULT_FILTERS,
 }: TimelineHeaderProps) {
+  const colors = useThemeColors();
+
   const handleAddMemory = async () => {
     try {
       const asset = await pickImage();
@@ -43,9 +46,23 @@ export function TimelineHeader({
   return (
     <View style={styles.container}>
       <View style={styles.topRow}>
-        <AppText style={styles.title}>Dòng thời gian</AppText>
-        <PressableScale onPress={handleAddMemory} style={styles.plusButton}>
-          <Ionicons name="add" size={24} color="#1C1917" />
+        <AppText style={[styles.title, { color: colors.text.primary }]}>
+          Dòng thời gian
+        </AppText>
+        <PressableScale
+          onPress={handleAddMemory}
+          style={[
+            styles.plusButton,
+            {
+              backgroundColor: colors.surface.default,
+              borderColor: colors.border.subtle,
+              shadowColor: colors.text.primary,
+            },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel="Thêm kỷ niệm"
+        >
+          <Ionicons name="add" size={24} color={colors.text.primary} />
         </PressableScale>
       </View>
 
@@ -61,15 +78,31 @@ export function TimelineHeader({
               key={chip.id}
               style={[
                 styles.filterChip,
-                isActive ? styles.activeChip : styles.inactiveChip,
+                isActive
+                  ? {
+                      backgroundColor: colors.background.inverse,
+                      borderColor: colors.border.inverse,
+                      shadowColor: colors.text.primary,
+                    }
+                  : {
+                      backgroundColor: colors.surface.default,
+                      borderColor: colors.border.subtle,
+                    },
               ]}
               onPress={() => setActiveFilter(chip.id)}
               scaleTo={0.95}
+              accessibilityRole="button"
+              accessibilityState={{ selected: isActive }}
+              accessibilityLabel={`Lọc ${chip.label}`}
             >
               <AppText
                 style={[
                   styles.filterLabel,
-                  isActive ? styles.activeLabel : styles.inactiveLabel,
+                  {
+                    color: isActive
+                      ? colors.text.inverse
+                      : colors.text.tertiary,
+                  },
                 ]}
               >
                 {chip.label}
@@ -97,23 +130,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "900",
-    color: "#1C1917", // taupe900
     letterSpacing: -1,
   },
   plusButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
     borderWidth: 1,
-    borderColor: "#F5F5F4",
   },
   filterList: {
     gap: 12,
@@ -125,28 +154,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 24,
     borderWidth: 1,
-  },
-  activeChip: {
-    backgroundColor: "#1C1917",
-    borderColor: "#1C1917",
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
   },
-  inactiveChip: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#F5F5F4",
-  },
   filterLabel: {
     fontSize: 14,
     fontWeight: "800",
-  },
-  activeLabel: {
-    color: "#FFFFFF",
-  },
-  inactiveLabel: {
-    color: "#A8A29E", // taupe400
   },
 });

@@ -1,23 +1,146 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect } from "react";
+import { View, StyleSheet, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { PulseStar } from "./HomeDecorations";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSequence,
+  withSpring,
+} from "react-native-reanimated";
 import { NumberTicker, ClockTicker } from "./HomeClock";
-import { palette, useThemeColors } from "@/src/theme";
+import { useThemeColors, useThemeMode } from "@/src/theme";
+import { heroCardGradient, gradientLocations } from "@/src/theme/gradients";
+import { typographyRoles } from "@/src/theme/typography-roles";
 import { AppText } from "@/src/ui-kit";
+import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
+import { lottieInventory } from "@/src/lottie/inventory";
 
-interface HeroCardProps {
+export interface HeroCardProps {
   loveDays: number;
-  startDateLabel: string;
 }
+
+export const HeroCard = React.memo(function HeroCard({
+  loveDays,
+}: HeroCardProps) {
+  const colors = useThemeColors();
+  const { isDark } = useThemeMode();
+  const pulse = useSharedValue(1);
+
+  useEffect(() => {
+    pulse.value = withSequence(
+      withSpring(1.02, { damping: 16, stiffness: 240 }),
+      withSpring(1, { damping: 16, stiffness: 220 }),
+    );
+  }, [loveDays, pulse]);
+
+  const tickerPulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulse.value }],
+  }));
+
+  const gradientColors = isDark ? heroCardGradient.dark : heroCardGradient.light;
+  const shadowColor = colors.brand.default;
+  const outerRing = isDark ? "rgba(142, 124, 255, 0.22)" : "rgba(123, 97, 255, 0.18)";
+
+  return (
+    <View style={[styles.container, { shadowColor }]}>
+      <View style={[styles.content, { borderColor: outerRing }]}>
+        <LinearGradient
+          pointerEvents="none"
+          colors={[...gradientColors]}
+          locations={[...gradientLocations.heroCounter]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradient}
+        />
+
+        <View style={styles.titleBlock}>
+          <AppText
+            accessibilityRole="text"
+            accessibilityLabel={`Chúng ta đã bắt đầu, ${loveDays} ngày`}
+            style={[
+              styles.eyebrow,
+              {
+                color: colors.text.secondary,
+                fontFamily: typographyRoles.bodyMedium.fontFamily,
+              },
+            ]}
+          >
+            Chúng ta đã bắt đầu
+          </AppText>
+        </View>
+
+        <Animated.View
+          style={[styles.counterBlock, tickerPulseStyle]}
+          pointerEvents="none"
+        >
+          <View style={styles.counterColumn} pointerEvents="none">
+            <NumberTicker value={loveDays} digitColor={colors.brand.default} />
+            <AppText
+              style={[
+                styles.unitBelow,
+                {
+                  color: colors.text.secondary,
+                  fontFamily: typographyRoles.titleSm.fontFamily,
+                },
+              ]}
+            >
+              ngày
+            </AppText>
+            <View
+              pointerEvents="none"
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+            >
+              <EmplusLottie
+                source={lottieInventory.homeCounterBirdPairSky}
+                style={styles.counterLottie}
+                loop
+                autoPlay
+                speed={0.9}
+                containerStyle={styles.lottiePassthrough}
+              />
+            </View>
+          </View>
+        </Animated.View>
+
+        <View
+          pointerEvents="none"
+          style={[
+            styles.timeDividerWrap,
+            Platform.OS === "ios"
+              ? { shadowColor: colors.brand.default }
+              : null,
+          ]}
+        >
+          <View
+            style={[
+              styles.timeDividerLine,
+              { backgroundColor: colors.brand.muted },
+            ]}
+          />
+        </View>
+
+        <View style={styles.timeRow} pointerEvents="none">
+          <Ionicons
+            name="time-outline"
+            size={18}
+            color={colors.text.secondary}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+          <ClockTicker tone="onHero" />
+        </View>
+      </View>
+    </View>
+  );
+});
 
 const styles = StyleSheet.create({
   container: {
     marginBottom: 24,
     borderRadius: 36,
-    backgroundColor: "#E48B9B", // Matched pink color from screenshot
-    shadowColor: "#F43F5E", // Using rose500 hex directly
+    backgroundColor: "transparent",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 24,
@@ -25,12 +148,15 @@ const styles = StyleSheet.create({
   },
   content: {
     position: "relative",
-    minHeight: 360,
+    minHeight: 328,
     borderRadius: 36,
-    padding: 32,
+    paddingVertical: 22,
+    paddingHorizontal: 18,
     overflow: "hidden",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    gap: 10,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   gradient: {
     position: "absolute",
@@ -39,125 +165,82 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
-  topLabelContainer: {
-    flexDirection: "row",
+  titleBlock: {
+    width: "100%",
+    paddingHorizontal: 8,
+    zIndex: 10,
     alignItems: "center",
-    marginBottom: 16,
-    zIndex: 10,
+    marginBottom: 4,
   },
-  topLabel: {
+  eyebrow: {
     fontSize: 14,
-    fontWeight: "900",
-    color: "#F43F5E", // Darker rose for contrast
-    letterSpacing: 2,
-    textTransform: "uppercase",
+    fontWeight: "600",
+    letterSpacing: 0.2,
+    textAlign: "center",
+    lineHeight: 20,
   },
-  tickerContainer: {
-    position: "relative",
-    marginBottom: 20,
+  counterBlock: {
+    alignItems: "center",
     zIndex: 10,
-    flexDirection: "row",
+    width: "100%",
+    maxWidth: 360,
+  },
+  /** Số → “ngày” → Lottie, căn giữa theo chiều dọc */
+  counterColumn: {
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+    width: "100%",
+    gap: 2,
   },
-  badge: {
-    marginBottom: 16,
+  unitBelow: {
+    marginTop: 2,
+    marginBottom: 4,
+    fontSize: 15,
+    fontWeight: "700",
+    letterSpacing: 0.35,
+    textAlign: "center",
+  },
+  /** Khung gốc 350×300 — hiển thị dưới “ngày” */
+  counterLottie: {
+    width: 140,
+    height: 120,
+  },
+  /** Lottie native view ăn pan — không nhận touch để ScrollView vuốt được */
+  lottiePassthrough: {
+    pointerEvents: "none",
+  },
+  timeDividerWrap: {
+    width: "78%",
+    maxWidth: 280,
+    height: 3,
+    borderRadius: 2,
+    marginTop: 6,
+    marginBottom: 2,
     zIndex: 10,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.4)", // White glass effect
-    borderRadius: 9999,
+    justifyContent: "center",
+    alignItems: "center",
+    ...Platform.select({
+      ios: {
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.45,
+        shadowRadius: 8,
+      },
+      android: { elevation: 2 },
+      default: {},
+    }),
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#1C1917", // Taupe 900
-    zIndex: 10,
-    marginBottom: 24,
+  timeDividerLine: {
+    width: "100%",
+    height: StyleSheet.hairlineWidth * 2,
+    borderRadius: 1,
+    opacity: 0.85,
   },
-  dateContainer: {
+  timeRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 9999,
+    gap: 10,
     zIndex: 10,
-  },
-  dateText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#1C1917", // Taupe 900
-  },
-  starLeft: {
-    position: "absolute",
-    left: -40,
-    bottom: 10,
-    zIndex: 10,
-  },
-  starRight1: {
-    position: "absolute",
-    right: -40,
-    top: -10,
-    zIndex: 10,
-  },
-  starRight2: {
-    position: "absolute",
-    right: -20,
-    top: 20,
-    zIndex: 10,
+    paddingVertical: 6,
   },
 });
-
-export const HeroCard = React.memo(function HeroCard({
-  loveDays,
-  startDateLabel,
-}: HeroCardProps) {
-  const { brand } = useThemeColors();
-
-  return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <LinearGradient
-          colors={["#ECA1AE", "#DF7A8B"]} // Soft pink gradient matching screenshot
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.gradient}
-        />
-
-        <View style={styles.topLabelContainer}>
-          <AppText style={styles.topLabel}>✨ NGÀY TRỌNG ĐẠI</AppText>
-        </View>
-
-        <View style={styles.tickerContainer}>
-          {/* Decorative Stars */}
-          <View style={styles.starLeft}>
-            <Ionicons name="star" size={24} color="rgba(255, 255, 255, 0.8)" />
-          </View>
-          <View style={styles.starRight1}>
-            <Ionicons name="sparkles" size={32} color="#FDE047" />
-          </View>
-          <View style={styles.starRight2}>
-            <Ionicons name="sparkles" size={20} color="#FDE047" />
-          </View>
-
-          <NumberTicker value={loveDays} />
-        </View>
-
-        <View style={styles.badge}>
-          <ClockTicker />
-        </View>
-
-        <AppText style={styles.title}>Ngày cho đến Mãi mãi</AppText>
-
-        <View style={styles.dateContainer}>
-          <Ionicons name="calendar-outline" size={16} color="#F43F5E" />
-          <AppText style={styles.dateText}>{startDateLabel}</AppText>
-        </View>
-      </View>
-    </View>
-  );
-});
-
-

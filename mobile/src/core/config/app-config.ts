@@ -19,6 +19,8 @@ export const appConfig = {
     userMetadata: "emplus.user.meta.v1", // AsyncStorage
     appSettings: "emplus.settings.v1", // AsyncStorage
     onboarding: "emplus.onboarding.v1", // AsyncStorage
+    /** Email ghi nhớ trên màn login (không phải token). */
+    loginRememberEmail: "emplus.login.rememberEmail.v1",
   },
 
   // Authentication & Session

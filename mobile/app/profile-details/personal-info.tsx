@@ -3,7 +3,7 @@ import { View, ScrollView, TextInput, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { AppScreen, AppText, AppButton } from "@/src/ui-kit";
-import { palette } from "@/src/theme";
+import { palette, useThemeColors } from "@/src/theme";
 
 const styles = StyleSheet.create({
   header: {
@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
 });
 
 export default function PersonalInfoScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const [name, setName] = useState("John Doe");
   const [email, setEmail] = useState("john@example.com");
@@ -63,7 +64,7 @@ export default function PersonalInfoScreen() {
   return (
     <AppScreen>
       <View style={styles.header}>
-        <Ionicons name="person-outline" size={24} color={palette.violet600} />
+        <Ionicons name="person-outline" size={24} color={colors.brand.default} />
         <AppText
           style={{ fontSize: 20, fontWeight: "bold", color: palette.zinc900 }}
         >

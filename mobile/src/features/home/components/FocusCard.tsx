@@ -2,9 +2,11 @@ import React, { useCallback } from "react";
 import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { AppButton, Reveal, AppText, PressableScale } from "@/src/ui-kit";
+import { AppButton, Reveal, AppText } from "@/src/ui-kit";
 import { useToast } from "@/src/toast-context";
-import { palette } from "@/src/theme";
+import { useThemeColors, useThemeMode } from "@/src/theme";
+import { elevation } from "@/src/theme/elevation";
+import { typographyRoles } from "@/src/theme/typography-roles";
 
 export interface FocusCardProps {
   focusTitle: string;
@@ -19,6 +21,8 @@ export const FocusCard = React.memo(function FocusCard({
   showFocusCard,
   setShowFocusCard,
 }: FocusCardProps) {
+  const colors = useThemeColors();
+  const { isDark } = useThemeMode();
   const router = useRouter();
   const { showToast } = useToast();
 
@@ -33,68 +37,137 @@ export const FocusCard = React.memo(function FocusCard({
 
   if (!showFocusCard) return null;
 
-  return (
-    <Reveal delay={550}>
-      <View style={styles.container}>
-        <View style={styles.cardContent}>
-          <View style={styles.backgroundCircle} />
+  const softOrb = isDark ? "rgba(255, 107, 107, 0.12)" : "rgba(255, 107, 107, 0.08)";
+  const badgeBg = isDark ? "rgba(255, 107, 107, 0.18)" : "rgba(255, 107, 107, 0.12)";
 
-          <View style={styles.headerRow}>
-            <AppText variant="h3" color="slate-900">
-              Trọng tâm hôm nay
-            </AppText>
-            <View style={styles.priorityBadge}>
-              <AppText variant="captionBold" color="rose-600">
-                Ưu tiên cao
+  return (
+    <Reveal delay={520}>
+      <View style={[styles.outer, elevation.floated]}>
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.surface.raised,
+              borderColor: colors.border.subtle,
+            },
+          ]}
+        >
+          <View style={[styles.orb, { backgroundColor: softOrb }]} />
+
+          <View style={styles.topRow}>
+            <View style={styles.titleBlock}>
+              <AppText
+                accessibilityRole="text"
+                style={[
+                  styles.eyebrow,
+                  {
+                    color: colors.text.tertiary,
+                    fontFamily: typographyRoles.caption.fontFamily,
+                  },
+                ]}
+              >
+                Gợi ý trong ngày
+              </AppText>
+              <AppText
+                accessibilityRole="header"
+                style={[
+                  styles.headline,
+                  {
+                    color: colors.text.primary,
+                    fontFamily: typographyRoles.titleSm.fontFamily,
+                  },
+                ]}
+              >
+                Một điều nhỏ cho hai đứa
+              </AppText>
+            </View>
+            <View style={[styles.badge, { backgroundColor: badgeBg }]}>
+              <AppText
+                style={[
+                  styles.badgeText,
+                  {
+                    color: colors.brand.strong,
+                    fontFamily: typographyRoles.caption.fontFamily,
+                  },
+                ]}
+              >
+                Ưu tiên
               </AppText>
             </View>
           </View>
 
-          <View style={styles.mainContentRow}>
-            <View style={styles.iconContainer}>
+          <View style={styles.bodyRow}>
+            <View
+              style={[
+                styles.iconTile,
+                {
+                  backgroundColor: colors.surface.default,
+                  borderColor: colors.border.subtle,
+                },
+              ]}
+            >
               <Ionicons
                 name="mic-outline"
                 size={24}
-                color={(palette as any)["orange-500"]}
+                color={colors.brand.default}
               />
             </View>
-            <View style={styles.textContainer}>
+            <View style={styles.copyCol}>
               <AppText
-                variant="h3"
-                color="slate-800"
-                style={styles.titleText}
+                style={[
+                  styles.focusTitle,
+                  {
+                    color: colors.text.primary,
+                    fontFamily: typographyRoles.titleSm.fontFamily,
+                  },
+                ]}
               >
                 {focusTitle}
               </AppText>
-              <AppText variant="body" color="slate-500" style={styles.subtitleText}>
+              <AppText
+                style={[
+                  styles.focusSub,
+                  {
+                    color: colors.text.secondary,
+                    fontFamily: typographyRoles.body.fontFamily,
+                  },
+                ]}
+              >
                 {focusSubtitle}
               </AppText>
-              <View style={styles.timeContainer}>
+              <View style={styles.metaRow}>
                 <Ionicons
                   name="time-outline"
-                  size={16}
-                  color={(palette as any)["slate-600"]}
+                  size={15}
+                  color={colors.text.tertiary}
                 />
-                <AppText variant="body" color="slate-600" style={styles.timeText}>
-                  {" "}
+                <AppText
+                  style={[
+                    styles.metaText,
+                    {
+                      color: colors.text.tertiary,
+                      fontFamily: typographyRoles.caption.fontFamily,
+                    },
+                  ]}
+                >
                   Hôm nay
                 </AppText>
               </View>
             </View>
           </View>
 
-          <View style={styles.actionRow}>
+          <View style={styles.actions}>
             <AppButton
               label="Để sau"
               variant="ghost"
               fullWidth={false}
-              style={styles.dismissButton}
+              style={styles.dismissBtn}
               onPress={handleDismiss}
             />
             <AppButton
-              label="Ghi lại tâm trạng"
+              label="Mở nhật ký"
               variant="primary"
-              style={styles.recordButton}
+              style={styles.primaryBtn}
               onPress={handleRecord}
             />
           </View>
@@ -105,103 +178,109 @@ export const FocusCard = React.memo(function FocusCard({
 });
 
 const styles = StyleSheet.create({
-  container: {
+  outer: {
     marginBottom: 24,
-    borderRadius: 32,
-    backgroundColor: "#ffffff",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    elevation: 8,
+    borderRadius: 26,
   },
-  cardContent: {
+  card: {
     position: "relative",
-    borderRadius: 32,
-    padding: 24,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#F5F5F4",
+    borderRadius: 26,
+    padding: 22,
+    borderWidth: StyleSheet.hairlineWidth,
     overflow: "hidden",
   },
-  backgroundCircle: {
+  orb: {
     position: "absolute",
-    right: -40,
-    top: -40,
-    width: 120,
-    height: 120,
+    right: -36,
+    top: -36,
+    width: 112,
+    height: 112,
     borderRadius: 9999,
-    backgroundColor: "rgba(225,29,72,0.03)",
   },
-  headerRow: {
+  topRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "space-between",
-    marginBottom: 16,
-    zIndex: 10,
+    marginBottom: 18,
+    zIndex: 2,
+    gap: 12,
   },
-  priorityBadge: {
-    backgroundColor: "rgba(244,63,94,0.1)",
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+  titleBlock: {
+    flex: 1,
+    gap: 4,
   },
-  mainContentRow: {
+  eyebrow: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+  },
+  headline: {
+    fontSize: 17,
+    fontWeight: "700",
+    letterSpacing: -0.2,
+    lineHeight: 24,
+  },
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
+  },
+  bodyRow: {
     flexDirection: "row",
-    gap: 16,
-    marginBottom: 24,
-    zIndex: 10,
+    gap: 14,
+    zIndex: 2,
   },
-  iconContainer: {
-    width: 56,
-    height: 56,
+  iconTile: {
+    width: 54,
+    height: 54,
     borderRadius: 16,
-    backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#F5F5F4",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    borderWidth: StyleSheet.hairlineWidth,
   },
-  textContainer: {
+  copyCol: {
     flex: 1,
+    gap: 6,
   },
-  titleText: {
-    lineHeight: 24,
+  focusTitle: {
     fontSize: 16,
-    fontWeight: "800",
-    color: "#1C1917", // taupe900
+    fontWeight: "700",
+    lineHeight: 22,
   },
-  subtitleText: {
-    marginTop: 6,
-    color: "#A8A29E",
+  focusSub: {
+    fontSize: 14,
+    lineHeight: 20,
   },
-  timeContainer: {
+  metaRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 10,
+    gap: 5,
+    marginTop: 4,
   },
-  timeText: {
-    marginLeft: 4,
-    color: "#A8A29E",
+  metaText: {
+    fontSize: 12,
+    fontWeight: "600",
   },
-  actionRow: {
+  actions: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
-    zIndex: 10,
+    gap: 12,
+    marginTop: 20,
+    zIndex: 2,
     width: "100%",
-    marginTop: 16,
   },
-  dismissButton: {
-    minWidth: 80,
+  dismissBtn: {
+    minWidth: 88,
     paddingHorizontal: 0,
   },
-  recordButton: {
+  primaryBtn: {
     flex: 1,
   },
 });

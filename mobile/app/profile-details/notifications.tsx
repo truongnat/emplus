@@ -3,7 +3,7 @@ import { View, ScrollView, Switch, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { AppScreen, AppText } from "@/src/ui-kit";
-import { palette } from "@/src/theme";
+import { palette, useThemeColors } from "@/src/theme";
 
 const styles = StyleSheet.create({
   header: {
@@ -44,6 +44,7 @@ const styles = StyleSheet.create({
 });
 
 export default function NotificationsScreen() {
+  const colors = useThemeColors();
   const router = useRouter();
   const [pushEnabled, setPushEnabled] = useState(true);
   const [emailEnabled, setEmailEnabled] = useState(false);
@@ -55,7 +56,7 @@ export default function NotificationsScreen() {
         <Ionicons
           name="notifications-outline"
           size={24}
-          color={palette.violet600}
+          color={colors.brand.default}
         />
         <AppText
           style={{ fontSize: 20, fontWeight: "bold", color: palette.zinc900 }}
@@ -92,7 +93,7 @@ export default function NotificationsScreen() {
               />
             </View>
             <View>
-              <AppText style={styles.settingText}>Push Notifications</AppText>
+              <AppText style={styles.settingText}>Thông báo đẩy</AppText>
               <AppText style={styles.settingSubtext}>
                 Thông báo đẩy từ ứng dụng
               </AppText>
@@ -101,8 +102,8 @@ export default function NotificationsScreen() {
           <Switch
             value={pushEnabled}
             onValueChange={setPushEnabled}
-            trackColor={{ false: palette.zinc300, true: palette.violet600 }}
-            thumbColor="#fff"
+            trackColor={{ false: palette.zinc300, true: colors.brand.default }}
+            thumbColor={colors.text.inverse}
           />
         </View>
 
@@ -112,7 +113,7 @@ export default function NotificationsScreen() {
               <Ionicons name="mail-outline" size={20} color={palette.zinc600} />
             </View>
             <View>
-              <AppText style={styles.settingText}>Email Notifications</AppText>
+              <AppText style={styles.settingText}>Thông báo email</AppText>
               <AppText style={styles.settingSubtext}>
                 Thông báo qua email
               </AppText>
@@ -121,8 +122,8 @@ export default function NotificationsScreen() {
           <Switch
             value={emailEnabled}
             onValueChange={setEmailEnabled}
-            trackColor={{ false: palette.zinc300, true: palette.violet600 }}
-            thumbColor="#fff"
+            trackColor={{ false: palette.zinc300, true: colors.brand.default }}
+            thumbColor={colors.text.inverse}
           />
         </View>
 
@@ -141,8 +142,8 @@ export default function NotificationsScreen() {
           <Switch
             value={reminderEnabled}
             onValueChange={setReminderEnabled}
-            trackColor={{ false: palette.zinc300, true: palette.violet600 }}
-            thumbColor="#fff"
+            trackColor={{ false: palette.zinc300, true: colors.brand.default }}
+            thumbColor={colors.text.inverse}
           />
         </View>
       </ScrollView>

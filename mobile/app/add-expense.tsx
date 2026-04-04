@@ -16,7 +16,9 @@ import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { Text } from "@/src/components/atoms/Text";
 import { Button } from "@/src/components/atoms/Button";
 import { Card } from "@/src/components/molecules/Card";
+import { useThemeColors } from "@/src/theme";
 import { palette } from "@/src/theme/tokens";
+import { auraPalette } from "@/src/theme/aura-colors";
 import { createBudgetExpense } from "@/src/api";
 import { useToast } from "@/src/toast-context";
 import { useSession } from "@/src/session-context";
@@ -24,6 +26,8 @@ import { useRouter } from "expo-router";
 import { CATEGORY_CONFIG } from "@/src/features/budget/components/constants";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
+import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
+import { lottieInventory } from "@/src/lottie/inventory";
 
 interface Category {
   icon: string;
@@ -34,6 +38,7 @@ interface Category {
 
 export default function AddExpenseScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
   const { withAccessToken } = useSession();
   const { showToast } = useToast();
   const queryClient = useQueryClient();
@@ -95,6 +100,15 @@ export default function AddExpenseScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
+          <View style={{ alignItems: "center", marginBottom: 8 }}>
+            <EmplusLottie
+              source={lottieInventory.placeholder}
+              style={{ width: 88, height: 88 }}
+              loop
+              speed={0.7}
+            />
+          </View>
+
           {/* Amount Input */}
           <View style={styles.amountContainer}>
             <TextInput
@@ -103,7 +117,7 @@ export default function AddExpenseScreen() {
               value={amount}
               onChangeText={setAmount}
               placeholder="0 ₫"
-              placeholderTextColor={palette.zinc400}
+              placeholderTextColor={colors.text.tertiary}
               keyboardType="numeric"
               returnKeyType="next"
               onSubmitEditing={() => {
@@ -132,7 +146,7 @@ export default function AddExpenseScreen() {
                       <LinearGradient
                         colors={
                           categoryId === id
-                            ? [palette.violet600, palette.violet700]
+                            ? [colors.brand.default, colors.brand.strong]
                             : ["rgba(255,255,255,0.8)", "rgba(255,255,255,0.6)"]
                         }
                         start={{ x: 0, y: 0 }}
@@ -143,7 +157,11 @@ export default function AddExpenseScreen() {
                           <Ionicons
                             name={config.icon as any}
                             size={20}
-                            color={categoryId === id ? "#fff" : palette.zinc700}
+                            color={
+                              categoryId === id
+                                ? colors.text.onBrand
+                                : colors.text.primary
+                            }
                           />
                         </View>
                         <Text
@@ -172,13 +190,13 @@ export default function AddExpenseScreen() {
                 <Ionicons
                   name="document-text-outline"
                   size={20}
-                  color={palette.zinc600}
+                  color={colors.text.secondary}
                 />
                 <TextInput
                   ref={descriptionInputRef}
                   style={styles.fieldInput}
                   placeholder="Nhập ghi chú..."
-                  placeholderTextColor={palette.zinc400}
+                  placeholderTextColor={colors.text.tertiary}
                   value={description}
                   onChangeText={setDescription}
                   onFocus={() => setFocusedField("description")}
@@ -199,13 +217,13 @@ export default function AddExpenseScreen() {
                 <Ionicons
                   name="calendar-outline"
                   size={20}
-                  color={palette.zinc600}
+                  color={colors.text.secondary}
                 />
                 <TextInput
                   ref={dateInputRef}
                   style={styles.fieldInput}
                   placeholder="YYYY-MM-DD"
-                  placeholderTextColor={palette.zinc400}
+                  placeholderTextColor={colors.text.tertiary}
                   value={date}
                   onChangeText={setDate}
                   onFocus={() => setFocusedField("date")}
@@ -304,7 +322,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   categoryButtonActive: {
-    shadowColor: palette.violet600,
+    shadowColor: auraPalette.rose500,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

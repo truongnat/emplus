@@ -1,22 +1,18 @@
 import { Redirect, Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  StyleSheet,
-  View,
-  Platform,
-  Animated,
-  Pressable,
-  Dimensions,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, View, Dimensions, TouchableOpacity } from "react-native";
 import { useSession } from "@/src/session-context";
 import { LiveChannelProvider } from "@/src/features/live";
-import { palette } from "@/src/theme";
-import { PressableScale } from "@/src/ui-kit";
+import { useThemeColors, useThemeMeta, useBlurTint } from "@/src/theme";
 import { BlurView } from "expo-blur";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
+import Reanimated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
 
@@ -57,6 +53,10 @@ function labelForRoute(route: string): string {
 
 function CustomTabBar({ state, descriptors, navigation }: any) {
   const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const { isDark } = useThemeMeta();
+  const blurTint = useBlurTint();
+  const blurIntensity = isDark ? 78 : 90;
 
   // Routes for the pill (excluding care and notifications)
   const pillRoutes = state.routes.filter(
@@ -66,27 +66,42 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
   const careRoute = state.routes[careRouteIndex];
   const isCareFocused = state.index === careRouteIndex;
 
-  // Animation for the sliding background
-  const slideAnim = useRef(new Animated.Value(0)).current;
-  const PILL_PADDING = 8;
-  const PILL_WIDTH = width * 0.72;
-  const ITEM_WIDTH = (PILL_WIDTH - PILL_PADDING * 2) / 4;
+  const PILL_PADDING_LOCAL = 8;
+  const PILL_WIDTH_LOCAL = width * 0.72;
+  const ITEM_WIDTH_LOCAL = (PILL_WIDTH_LOCAL - PILL_PADDING_LOCAL * 2) / 4;
+
+  const pillActiveIndex = pillRoutes.findIndex(
+    (r: any) => r.name === state.routes[state.index].name,
+  );
+  const initialX =
+    pillActiveIndex === -1
+      ? PILL_PADDING_LOCAL
+      : PILL_PADDING_LOCAL + pillActiveIndex * ITEM_WIDTH_LOCAL;
+
+  const slideX = useSharedValue(initialX);
 
   useEffect(() => {
-    // Determine the active index relative to the pill routes
-    const pillActiveIndex = pillRoutes.findIndex(
+    const routes = state.routes.filter(
+      (r: any) => r.name !== "care" && r.name !== "notifications",
+    );
+    const idx = routes.findIndex(
       (r: any) => r.name === state.routes[state.index].name,
     );
+    if (idx === -1) return;
+    const target = PILL_PADDING_LOCAL + idx * ITEM_WIDTH_LOCAL;
+    slideX.value = withSpring(target, {
+      damping: 16,
+      stiffness: 180,
+      mass: 0.85,
+    });
+  }, [state.index, state.routes]);
 
-    if (pillActiveIndex !== -1) {
-      Animated.spring(slideAnim, {
-        toValue: PILL_PADDING + pillActiveIndex * ITEM_WIDTH,
-        useNativeDriver: true,
-        friction: 8,
-        tension: 50,
-      }).start();
-    }
-  }, [state.index]);
+  const indicatorStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: slideX.value }],
+  }));
+
+  const pillOuterBg = isDark ? "rgba(38, 28, 32, 0.78)" : "rgba(255, 255, 255, 0.72)";
+  const careOuterBg = isDark ? "rgba(32, 24, 28, 0.85)" : "rgba(255, 255, 255, 0.82)";
 
   const handlePress = async (route: any, index: number) => {
     // Trigger haptic feedback
@@ -110,18 +125,22 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
   return (
     <View style={[styles.tabBarWrapper, { paddingBottom: insets.bottom + 16 }]}>
       <View style={styles.tabBarContainer}>
-        {/* Main Pill (Light Theme) */}
-        <View style={styles.pillOuter}>
-          <BlurView intensity={90} tint="light" style={styles.pillContainer}>
-            {/* Sliding Background */}
+        {/* Main pill — blur theo theme */}
+        <View style={[styles.pillOuter, { backgroundColor: pillOuterBg }]}>
+          <BlurView
+            intensity={blurIntensity}
+            tint={blurTint}
+            style={styles.pillContainer}
+          >
             {isPillFocused && (
-              <Animated.View
+              <Reanimated.View
                 style={[
                   styles.activeIndicator,
                   {
-                    width: ITEM_WIDTH,
-                    transform: [{ translateX: slideAnim }],
+                    width: ITEM_WIDTH_LOCAL,
+                    backgroundColor: colors.brand.muted,
                   },
+                  indicatorStyle,
                 ]}
               />
             )}
@@ -146,7 +165,9 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
                   <Ionicons
                     name={iconForRoute(route.name, isFocused)}
                     size={24}
-                    color={isFocused ? "#ec1334" : "#94a3b8"}
+                    color={
+                      isFocused ? colors.brand.default : colors.text.tertiary
+                    }
                   />
                 </TouchableOpacity>
               );
@@ -154,29 +175,36 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
           </BlurView>
         </View>
 
-        {/* Detached Care Button (Light Theme) */}
         <TouchableOpacity
           onPress={() => handlePress(careRoute, careRouteIndex)}
-          style={styles.detachedButtonWrapper}
+          style={[
+            styles.detachedButtonWrapper,
+            { shadowColor: colors.brand.default },
+          ]}
           activeOpacity={0.9}
           accessibilityRole="button"
           accessibilityState={{ selected: isCareFocused }}
           accessibilityLabel="Cảm xúc"
           accessibilityHint="Kiểm tra tâm trạng và kết nối với người ấy"
         >
-          <View style={styles.careOuter}>
+          <View style={[styles.careOuter, { backgroundColor: careOuterBg }]}>
             <BlurView
-              intensity={90}
-              tint="light"
+              intensity={blurIntensity}
+              tint={blurTint}
               style={[
                 styles.careButton,
-                isCareFocused && styles.careButtonActive,
+                isCareFocused && {
+                  backgroundColor: colors.brand.default,
+                  borderColor: colors.brand.default,
+                },
               ]}
             >
               <Ionicons
                 name={isCareFocused ? "heart" : "heart-outline"}
                 size={30}
-                color={isCareFocused ? "#ffffff" : "#ec1334"}
+                color={
+                  isCareFocused ? colors.text.onBrand : colors.brand.default
+                }
               />
             </BlurView>
           </View>
@@ -195,7 +223,6 @@ export default function TabsLayout() {
     throw e;
   }
   const { hydrated, isAuthenticated, session } = sessionValue;
-  const isPaired = Boolean(!!session?.user.coupleId);
 
   if (!hydrated) return null;
   if (!isAuthenticated || !!!session?.user.coupleId)
@@ -256,7 +283,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     height: ACTIVE_INDICATOR_HEIGHT,
     borderRadius: 28,
-    backgroundColor: "rgba(236, 19, 52, 0.12)",
     left: 0,
     top: PILL_PADDING,
   },
@@ -268,7 +294,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   detachedButtonWrapper: {
-    shadowColor: "#ec1334",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
     shadowRadius: 15,
@@ -287,9 +312,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.5)",
-  },
-  careButtonActive: {
-    backgroundColor: "#ec1334",
-    borderColor: "#ec1334",
   },
 });

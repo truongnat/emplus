@@ -116,6 +116,16 @@ export function useTheme(): Theme {
   return useContext(ThemeSpaceCtx);
 }
 
+export function useThemeMeta() {
+  return useContext(ThemeMetaCtx);
+}
+
+/** expo-blur BlurView — dark mode dùng tint dark. */
+export function useBlurTint(): "light" | "dark" {
+  const { isDark } = useThemeMeta();
+  return isDark ? "dark" : "light";
+}
+
 export function useThemeColors(): SemanticColors {
   return useContext(ThemeColorsCtx);
 }

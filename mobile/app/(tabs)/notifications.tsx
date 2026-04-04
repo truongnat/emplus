@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
-} from "react-native";
+import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { AppText, PressableScale } from "@/src/ui-kit";
@@ -17,6 +11,10 @@ import {
 } from "@/src/presentation/hooks/notifications/useNotifications";
 import type { NotificationModule } from "@/src/domain/entities/schemas";
 import { syncExpoPushTokenToServer } from "@/src/lib/sync-expo-push-token";
+import { useThemeColors } from "@/src/theme";
+import type { SemanticColors } from "@/src/theme/tokens/semantic";
+import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
+import { lottieInventory } from "@/src/lottie/inventory";
 
 function formatRelativeTime(iso: string): string {
   const t = new Date(iso).getTime();
@@ -31,8 +29,253 @@ function formatRelativeTime(iso: string): string {
   return new Date(iso).toLocaleDateString("vi-VN");
 }
 
+function createNotificationStyles(c: SemanticColors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 24,
+      paddingTop: 16,
+      paddingBottom: 24,
+    },
+    headerLeft: {
+      flex: 1,
+    },
+    headerRight: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    markAllBtn: {
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 12,
+      backgroundColor: c.brand.muted,
+    },
+    markAllText: {
+      fontSize: 12,
+      fontWeight: "800",
+      color: c.brand.text,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "900",
+      color: c.text.primary,
+      letterSpacing: -1,
+    },
+    subtitle: {
+      fontSize: 12,
+      fontWeight: "800",
+      color: c.text.tertiary,
+      textTransform: "uppercase",
+      letterSpacing: 2,
+      marginTop: 2,
+    },
+    statusBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: c.surface.default,
+      borderRadius: 20,
+      paddingLeft: 4,
+      paddingRight: 16,
+      paddingVertical: 4,
+      gap: 10,
+      borderWidth: 1,
+      borderColor: c.border.subtle,
+      shadowColor: c.text.primary,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      elevation: 2,
+    },
+    avatarWrapper: {
+      position: "relative",
+    },
+    avatar: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: c.surface.sunken,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    statusDot: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      borderWidth: 2,
+      borderColor: c.surface.default,
+      backgroundColor: c.status.success.icon,
+    },
+    badgeTextContainer: {
+      justifyContent: "center",
+    },
+    badgeLabel: {
+      fontSize: 8,
+      fontWeight: "800",
+      color: c.text.tertiary,
+      letterSpacing: 1,
+    },
+    badgeValue: {
+      fontSize: 11,
+      fontWeight: "900",
+      color: c.text.primary,
+      textTransform: "lowercase",
+      marginTop: -2,
+    },
+    scrollContent: {
+      paddingHorizontal: 20,
+      paddingBottom: 160,
+    },
+    section: {
+      marginBottom: 32,
+    },
+    sectionHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 16,
+      paddingHorizontal: 8,
+    },
+    sectionDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: c.brand.default,
+    },
+    sectionDotMuted: {
+      backgroundColor: c.border.default,
+    },
+    sectionTitle: {
+      fontSize: 13,
+      fontWeight: "900",
+      color: c.brand.text,
+      textTransform: "uppercase",
+      letterSpacing: 1.5,
+    },
+    sectionTitleMuted: {
+      color: c.text.tertiary,
+    },
+    cardContainer: {
+      backgroundColor: c.surface.default,
+      borderRadius: 24,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: c.border.subtle,
+      shadowColor: c.text.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.04,
+      shadowRadius: 12,
+      elevation: 2,
+      overflow: "hidden",
+    },
+    notificationRow: {
+      flexDirection: "row",
+      alignItems: "stretch",
+      minHeight: 88,
+    },
+    leftAccent: {
+      width: 4,
+    },
+    notificationBody: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      padding: 16,
+      gap: 16,
+    },
+    notificationIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: 16,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    notificationTextContainer: {
+      flex: 1,
+    },
+    notificationTitle: {
+      fontSize: 15,
+      fontWeight: "700",
+      color: c.text.primary,
+      lineHeight: 20,
+    },
+    notificationTime: {
+      fontSize: 11,
+      fontWeight: "800",
+      color: c.text.tertiary,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      marginTop: 4,
+    },
+    notificationAction: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      alignSelf: "flex-start",
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      backgroundColor: c.brand.default,
+      borderRadius: 12,
+      marginTop: 10,
+    },
+    notificationActionText: {
+      fontSize: 12,
+      fontWeight: "900",
+      color: c.text.onBrand,
+    },
+    centered: {
+      paddingVertical: 48,
+      paddingHorizontal: 24,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    hint: {
+      marginTop: 12,
+      color: c.text.tertiary,
+      fontSize: 14,
+    },
+    errorText: {
+      color: c.status.error.text,
+      textAlign: "center",
+      marginBottom: 12,
+    },
+    retryBtn: {
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      backgroundColor: c.brand.default,
+      borderRadius: 16,
+    },
+    retryText: {
+      color: c.text.onBrand,
+      fontWeight: "800",
+    },
+    emptyTitle: {
+      marginTop: 12,
+      fontSize: 18,
+      fontWeight: "800",
+      color: c.text.primary,
+    },
+    emptySub: {
+      marginTop: 8,
+      fontSize: 14,
+      color: c.text.tertiary,
+      textAlign: "center",
+    },
+  });
+}
+
 export default function NotificationsScreen() {
   const { session, isAuthenticated } = useSession();
+  const colors = useThemeColors();
+  const styles = useMemo(() => createNotificationStyles(colors), [colors]);
   const { data, isPending, isError, error, refetch } = useNotificationsList();
   const markRead = useMarkNotificationRead();
   const markAll = useMarkAllNotificationsRead();
@@ -43,7 +286,7 @@ export default function NotificationsScreen() {
   }, [isAuthenticated]);
 
   const partnerName = useMemo(() => {
-    return !!session?.user?.coupleId ? "Leo" : "Bạn đồng hành";
+    return !!session?.user?.coupleId ? "Người ấy" : "Bạn đồng hành";
   }, [session?.user?.coupleId]);
 
   const items = data?.items ?? [];
@@ -80,7 +323,7 @@ export default function NotificationsScreen() {
                   <Ionicons
                     name="person-circle-outline"
                     size={24}
-                    color="#A8A29E"
+                    color={colors.text.tertiary}
                   />
                 </View>
                 <View style={styles.statusDot} />
@@ -89,7 +332,7 @@ export default function NotificationsScreen() {
                 <AppText style={styles.badgeLabel}>
                   {partnerName.toUpperCase()} ĐANG
                 </AppText>
-                <AppText style={styles.badgeValue}>bình tĩnh</AppText>
+                <AppText style={styles.badgeValue}>—</AppText>
               </View>
             </View>
           </View>
@@ -97,13 +340,22 @@ export default function NotificationsScreen() {
 
         {isPending && (
           <View style={styles.centered}>
-            <ActivityIndicator size="large" color="#E48B9B" />
+            <EmplusLottie
+              source={lottieInventory.loader}
+              style={{ width: 120, height: 120 }}
+              loop
+            />
             <AppText style={styles.hint}>Đang tải thông báo…</AppText>
           </View>
         )}
 
         {isError && (
           <View style={styles.centered}>
+            <EmplusLottie
+              source={lottieInventory.error}
+              style={{ width: 120, height: 120 }}
+              loop={false}
+            />
             <AppText style={styles.errorText}>
               {(error as Error)?.message ?? "Không tải được danh sách."}
             </AppText>
@@ -120,10 +372,10 @@ export default function NotificationsScreen() {
           >
             {items.length === 0 ? (
               <View style={styles.centered}>
-                <Ionicons
-                  name="notifications-off-outline"
-                  size={48}
-                  color="#D6D3D1"
+                <EmplusLottie
+                  source={lottieInventory.empty}
+                  style={{ width: 140, height: 140 }}
+                  loop
                 />
                 <AppText style={styles.emptyTitle}>Chưa có thông báo</AppText>
                 <AppText style={styles.emptySub}>
@@ -141,6 +393,7 @@ export default function NotificationsScreen() {
                     <NotificationCard
                       key={n.id}
                       notification={n}
+                      styles={styles}
                       onOpen={() => {
                         if (!n.readAt) markRead.mutate(n.id);
                       }}
@@ -164,6 +417,7 @@ export default function NotificationsScreen() {
                       <NotificationCard
                         key={n.id}
                         notification={n}
+                        styles={styles}
                         onOpen={() => {
                           if (!n.readAt) markRead.mutate(n.id);
                         }}
@@ -182,283 +436,65 @@ export default function NotificationsScreen() {
 
 function NotificationCard({
   notification,
+  styles,
   onOpen,
 }: {
   notification: NotificationModule.InAppNotification;
+  styles: ReturnType<typeof createNotificationStyles>;
   onOpen: () => void;
 }) {
+  const colors = useThemeColors();
   const iconName = (notification.iconName || "heart") as keyof typeof Ionicons.glyphMap;
-  const iconColor = notification.iconColor ?? "#E48B9B";
-  const iconBg = notification.iconBg ?? "#FAF0F2";
+  const iconColor = notification.iconColor ?? colors.brand.default;
+  const iconBg = notification.iconBg ?? colors.brand.muted;
   const opacity = notification.readAt ? 0.85 : 1;
+
+  const accentColor = notification.readAt
+    ? colors.border.subtle
+    : colors.brand.default;
 
   return (
     <PressableScale
-      style={styles.cardContainer}
+      style={[styles.cardContainer, { opacity }]}
       onPress={onOpen}
     >
-      <View
-        style={[styles.notificationContent, { opacity }]}
-      >
+      <View style={styles.notificationRow}>
         <View
-          style={[
-            styles.notificationIcon,
-            { backgroundColor: iconBg },
-          ]}
-        >
-          <Ionicons name={iconName} size={22} color={iconColor} />
-        </View>
+          style={[styles.leftAccent, { backgroundColor: accentColor }]}
+        />
+        <View style={styles.notificationBody}>
+          <View
+            style={[
+              styles.notificationIcon,
+              { backgroundColor: iconBg },
+            ]}
+          >
+            <Ionicons name={iconName} size={22} color={iconColor} />
+          </View>
 
-        <View style={styles.notificationTextContainer}>
-          <AppText style={styles.notificationTitle} numberOfLines={2}>
-            {notification.title}
-          </AppText>
-          <AppText style={styles.notificationTime}>
-            {formatRelativeTime(notification.createdAt)}
-          </AppText>
+          <View style={styles.notificationTextContainer}>
+            <AppText style={styles.notificationTitle} numberOfLines={2}>
+              {notification.title}
+            </AppText>
+            <AppText style={styles.notificationTime}>
+              {formatRelativeTime(notification.createdAt)}
+            </AppText>
 
-          {notification.actionLabel ? (
-            <View style={styles.notificationAction}>
-              <Ionicons name="chatbubble-outline" size={12} color="#FFFFFF" />
-              <AppText style={styles.notificationActionText}>
-                {notification.actionLabel}
-              </AppText>
-            </View>
-          ) : null}
+            {notification.actionLabel ? (
+              <View style={styles.notificationAction}>
+                <Ionicons
+                  name="chatbubble-outline"
+                  size={12}
+                  color={colors.text.onBrand}
+                />
+                <AppText style={styles.notificationActionText}>
+                  {notification.actionLabel}
+                </AppText>
+              </View>
+            ) : null}
+          </View>
         </View>
       </View>
     </PressableScale>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 24,
-  },
-  headerLeft: {
-    flex: 1,
-  },
-  headerRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  markAllBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-    backgroundColor: "#FFF1F2",
-  },
-  markAllText: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: "#E48B9B",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "900",
-    color: "#1C1917",
-    letterSpacing: -1,
-  },
-  subtitle: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: "#A8A29E",
-    textTransform: "uppercase",
-    letterSpacing: 2,
-    marginTop: 2,
-  },
-  statusBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    paddingLeft: 4,
-    paddingRight: 16,
-    paddingVertical: 4,
-    gap: 10,
-    borderWidth: 1,
-    borderColor: "#F5F5F4",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  avatarWrapper: {
-    position: "relative",
-  },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#FAF7F6",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  statusDot: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    borderWidth: 2,
-    borderColor: "#FFFFFF",
-    backgroundColor: "#10B981",
-  },
-  badgeTextContainer: {
-    justifyContent: "center",
-  },
-  badgeLabel: {
-    fontSize: 8,
-    fontWeight: "800",
-    color: "#A8A29E",
-    letterSpacing: 1,
-  },
-  badgeValue: {
-    fontSize: 11,
-    fontWeight: "900",
-    color: "#44403C",
-    textTransform: "lowercase",
-    marginTop: -2,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 160,
-  },
-  section: {
-    marginBottom: 32,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 16,
-    paddingHorizontal: 8,
-  },
-  sectionDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#E48B9B",
-  },
-  sectionDotMuted: {
-    backgroundColor: "#D6D3D1",
-  },
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: "900",
-    color: "#E48B9B",
-    textTransform: "uppercase",
-    letterSpacing: 1.5,
-  },
-  sectionTitleMuted: {
-    color: "#A8A29E",
-  },
-  cardContainer: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: "#F5F5F4",
-    shadowColor: "#1C1917",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
-    elevation: 2,
-    overflow: "hidden",
-  },
-  notificationContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-    gap: 16,
-  },
-  notificationIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  notificationTextContainer: {
-    flex: 1,
-  },
-  notificationTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#1C1917",
-    lineHeight: 20,
-  },
-  notificationTime: {
-    fontSize: 11,
-    fontWeight: "800",
-    color: "#A8A29E",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginTop: 4,
-  },
-  notificationAction: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: "#E48B9B",
-    borderRadius: 12,
-    marginTop: 10,
-  },
-  notificationActionText: {
-    fontSize: 12,
-    fontWeight: "900",
-    color: "#FFFFFF",
-  },
-  centered: {
-    paddingVertical: 48,
-    paddingHorizontal: 24,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  hint: {
-    marginTop: 12,
-    color: "#A8A29E",
-    fontSize: 14,
-  },
-  errorText: {
-    color: "#B91C1C",
-    textAlign: "center",
-    marginBottom: 12,
-  },
-  retryBtn: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    backgroundColor: "#E48B9B",
-    borderRadius: 16,
-  },
-  retryText: {
-    color: "#fff",
-    fontWeight: "800",
-  },
-  emptyTitle: {
-    marginTop: 12,
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#44403C",
-  },
-  emptySub: {
-    marginTop: 8,
-    fontSize: 14,
-    color: "#A8A29E",
-    textAlign: "center",
-  },
-});

@@ -1,10 +1,10 @@
 import { View, StyleSheet, ScrollView, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { AppScreen, AppText, GlassCard, Reveal } from "../src/ui-kit";
-import { palette } from "../src/theme";
+import { palette, useThemeColors } from "../src/theme";
 
 const styles = StyleSheet.create({
   sectionWrap: { marginBottom: 16 },
@@ -112,54 +112,58 @@ function PolicySection({
 
 export default function PolicyScreen() {
   const router = useRouter();
+  const colors = useThemeColors();
   const [openSection, setOpenSection] = useState<string | null>("collect");
 
   const toggleSection = (key: string) => {
     setOpenSection(openSection === key ? null : key);
   };
 
-  const sections = [
-    {
-      key: "collect",
-      icon: "datacontainers-outline",
-      title: "Thu thập dữ liệu",
-      color: palette.violet600,
-      content:
-        "Chúng tôi chỉ thu thập những thông tin cần thiết để cung cấp dịch vụ Em Plus, bao gồm: email, mật khẩu (mã hóa), giới tính, và ID người dùng. Không thu thập dữ liệu cá nhân nhạy cảm khác.",
-    },
-    {
-      key: "use",
-      icon: "settings-outline",
-      title: "Sử dụng thông tin",
-      color: palette.violet500,
-      content:
-        "Thông tin được sử dụng để: (1) Xác thực tài khoản, (2) Ghép đôi giữa hai người dùng, (3) Cá nhân hóa trải nghiệm, (4) Sao lưu dữ liệu đám mây (tùy chọn).",
-    },
-    {
-      key: "share",
-      icon: "share-outline",
-      title: "Chia sẻ dữ liệu",
-      color: palette.violet400,
-      content:
-        "Chúng tôi KHÔNG bán hoặc chia sẻ dữ liệu của bạn cho bên thứ ba. Dữ liệu chỉ được chia sẻ giữa hai tài khoản đã ghép đôi và với nhà cung cấp dịch vụ đám mây (Firebase) để sao lưu.",
-    },
-    {
-      key: "security",
-      icon: "shield-checkmark-outline",
-      title: "Bảo mật",
-      color: palette.green500,
-      content:
-        "Mật khẩu được mã hóa bcrypt. Dữ liệu truyền qua HTTPS. Bạn có thể xóa toàn bộ dữ liệu bất cứ lúc nào bằng cách hủy tài khoản trong phần Cài đặt.",
-    },
-    {
-      key: "rights",
-      icon: "person-outline",
-      title: "Quyền của bạn",
-      color: palette.blue500,
-      content:
-        "Bạn có quyền: (1) Truy cập dữ liệu cá nhân, (2) Sửa thông tin, (3) Xóa tài khoản và dữ liệu, (4) Ngừng sử dụng dịch vụ bất cứ lúc nào.",
-    },
-  ];
+  const sections = useMemo(
+    () => [
+      {
+        key: "collect",
+        icon: "datacontainers-outline",
+        title: "Thu thập dữ liệu",
+        color: colors.brand.default,
+        content:
+          "Chúng tôi chỉ thu thập những thông tin cần thiết để cung cấp dịch vụ Em Plus, bao gồm: email, mật khẩu (mã hóa), giới tính, và ID người dùng. Không thu thập dữ liệu cá nhân nhạy cảm khác.",
+      },
+      {
+        key: "use",
+        icon: "settings-outline",
+        title: "Sử dụng thông tin",
+        color: colors.brand.strong,
+        content:
+          "Thông tin được sử dụng để: (1) Xác thực tài khoản, (2) Ghép đôi giữa hai người dùng, (3) Cá nhân hóa trải nghiệm, (4) Sao lưu dữ liệu đám mây (tùy chọn).",
+      },
+      {
+        key: "share",
+        icon: "share-outline",
+        title: "Chia sẻ dữ liệu",
+        color: colors.brand.text,
+        content:
+          "Chúng tôi KHÔNG bán hoặc chia sẻ dữ liệu của bạn cho bên thứ ba. Dữ liệu chỉ được chia sẻ giữa hai tài khoản đã ghép đôi và với nhà cung cấp dịch vụ đám mây (Firebase) để sao lưu.",
+      },
+      {
+        key: "security",
+        icon: "shield-checkmark-outline",
+        title: "Bảo mật",
+        color: colors.status.success.icon,
+        content:
+          "Mật khẩu được mã hóa bcrypt. Dữ liệu truyền qua HTTPS. Bạn có thể xóa toàn bộ dữ liệu bất cứ lúc nào bằng cách hủy tài khoản trong phần Cài đặt.",
+      },
+      {
+        key: "rights",
+        icon: "person-outline",
+        title: "Quyền của bạn",
+        color: colors.status.info.icon,
+        content:
+          "Bạn có quyền: (1) Truy cập dữ liệu cá nhân, (2) Sửa thông tin, (3) Xóa tài khoản và dữ liệu, (4) Ngừng sử dụng dịch vụ bất cứ lúc nào.",
+      },
+    ],
+    [colors],
+  );
 
   return (
     <AppScreen>
@@ -180,9 +184,9 @@ export default function PolicyScreen() {
             <Ionicons
               name="document-text-outline"
               size={24}
-              color={palette.violet600}
+              color={colors.brand.default}
             />
-            <AppText style={styles.headerText}>Em Plus Policy</AppText>
+            <AppText style={styles.headerText}>Chính sách Em Plus</AppText>
           </View>
         </Reveal>
 

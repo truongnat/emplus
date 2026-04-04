@@ -1,10 +1,11 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { PressableScale, Reveal, AppText } from "@/src/ui-kit";
-import { RingingBell } from "./HomeDecorations";
-import { palette } from "@/src/theme";
+import { Reveal, AppText } from "@/src/ui-kit";
+import { useThemeColors, useThemeMode } from "@/src/theme";
+import { auraPalette } from "@/src/theme/aura-colors";
+import { fontSize } from "@/src/theme/tokens";
+import { typographyRoles } from "@/src/theme/typography-roles";
 
 interface HomeHeaderProps {
   userInitial: string;
@@ -13,13 +14,107 @@ interface HomeHeaderProps {
   iconName: string;
 }
 
+export const HomeHeader = React.memo(function HomeHeader({
+  userInitial,
+  greeting,
+  subGreeting,
+  iconName,
+}: HomeHeaderProps) {
+  const colors = useThemeColors();
+  const { isDark } = useThemeMode();
+
+  const ring = colors.surface.default;
+  const avatarPartnerBg = isDark ? auraPalette.taupe800 : auraPalette.taupe100;
+  const avatarMeBg = isDark ? "rgba(255, 107, 107, 0.22)" : auraPalette.coral100;
+
+  return (
+    <Reveal>
+      <View style={styles.container}>
+        <View style={styles.leftContainer}>
+          <View style={styles.avatarContainer}>
+            <View style={[styles.avatar2, { borderColor: ring, backgroundColor: avatarPartnerBg }]}>
+              <Ionicons
+                name="person"
+                size={18}
+                color={colors.secondary.default}
+              />
+            </View>
+            <View style={[styles.avatar1, { borderColor: ring, backgroundColor: avatarMeBg }]}>
+              <AppText
+                style={{
+                  fontSize: 14,
+                  fontWeight: "bold",
+                  color: colors.brand.strong,
+                }}
+              >
+                {userInitial}
+              </AppText>
+              <View
+                style={[
+                  styles.statusDot,
+                  {
+                    borderColor: ring,
+                    backgroundColor: colors.status.success.icon,
+                  },
+                ]}
+              />
+            </View>
+          </View>
+
+          <View style={styles.textContainer}>
+            <AppText
+              numberOfLines={1}
+              accessibilityRole="header"
+              style={[
+                typographyRoles.title,
+                {
+                  color: colors.text.primary,
+                  fontFamily: typographyRoles.display.fontFamily,
+                },
+              ]}
+            >
+              {greeting}
+            </AppText>
+            <View style={styles.subRow}>
+              {iconName ? (
+                <Ionicons
+                  name={iconName as React.ComponentProps<typeof Ionicons>["name"]}
+                  size={14}
+                  color={colors.accent.default}
+                  style={{ marginRight: 5 }}
+                />
+              ) : null}
+              <AppText
+                numberOfLines={1}
+                accessibilityRole="text"
+                style={[
+                  typographyRoles.caption,
+                  {
+                    fontSize: fontSize["2xs"],
+                    fontFamily: typographyRoles.titleSm.fontFamily,
+                    color: colors.text.tertiary,
+                    textTransform: "uppercase",
+                    letterSpacing: 1.5,
+                  },
+                ]}
+              >
+                {subGreeting}
+              </AppText>
+            </View>
+          </View>
+        </View>
+      </View>
+    </Reveal>
+  );
+});
+
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     paddingHorizontal: 20,
-    paddingTop: 12,
+    paddingTop: 0,
     paddingBottom: 24,
     zIndex: 10,
     width: "100%",
@@ -44,8 +139,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: "#FCF9F8", // lightBg
-    backgroundColor: "#F5F5F4", // taupe100
     alignItems: "center",
     justifyContent: "center",
     zIndex: 10,
@@ -57,8 +150,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: "#FCF9F8", // lightBg
-    backgroundColor: "#FCE7F3", // soft pink
     alignItems: "center",
     justifyContent: "center",
     zIndex: 20,
@@ -72,100 +163,7 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
     borderWidth: 2,
-    borderColor: "#FCF9F8",
-    backgroundColor: "#22c55e",
   },
   textContainer: { justifyContent: "center", flex: 1, gap: 2 },
   subRow: { flexDirection: "row", alignItems: "center" },
-  button: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
-    marginLeft: 8,
-  },
-});
-
-export const HomeHeader = React.memo(function HomeHeader({
-  userInitial,
-  greeting,
-  subGreeting,
-  iconName,
-}: HomeHeaderProps) {
-  const router = useRouter();
-
-  const handlePress = useCallback(() => {
-    router.push("/notifications");
-  }, [router]);
-
-  return (
-    <Reveal>
-      <View style={styles.container}>
-        <View style={styles.leftContainer}>
-          <View style={styles.avatarContainer}>
-            <View style={styles.avatar2}>
-              <Ionicons name="person" size={18} color="#D6D3D1" />
-            </View>
-            <View style={styles.avatar1}>
-              <AppText
-                style={{
-                  fontSize: 14,
-                  fontWeight: "bold",
-                  color: "#F43F5E",
-                }}
-              >
-                {userInitial}
-              </AppText>
-              <View style={styles.statusDot} />
-            </View>
-          </View>
-
-          <View style={styles.textContainer}>
-            <AppText
-              numberOfLines={1}
-              style={{
-                fontSize: 18,
-                fontWeight: "800",
-                color: "#1C1917", // taupe900
-              }}
-            >
-              {greeting}
-            </AppText>
-            <View style={styles.subRow}>
-              {iconName && (
-                <Ionicons
-                  name={iconName as any}
-                  size={12}
-                  color="#FBBF24"
-                  style={{ marginRight: 4 }}
-                />
-              )}
-              <AppText
-                numberOfLines={1}
-                style={{
-                  fontSize: 10,
-                  fontWeight: "800",
-                  color: "#A8A29E", // taupe400
-                  textTransform: "uppercase",
-                  letterSpacing: 1.5,
-                }}
-              >
-                {subGreeting}
-              </AppText>
-            </View>
-          </View>
-        </View>
-        <PressableScale style={styles.button} onPress={handlePress}>
-          <RingingBell />
-        </PressableScale>
-      </View>
-    </Reveal>
-  );
 });

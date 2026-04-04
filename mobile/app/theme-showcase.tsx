@@ -19,15 +19,19 @@ import { Text } from "@/src/components/atoms/Text";
 import { Badge } from "@/src/components/atoms/Badge";
 import { Avatar } from "@/src/components/atoms/Avatar";
 import { useThemeMode, type ThemeName } from "@/src/theme/theme-mode-context";
-import { useTheme } from "@/src/theme";
+import { useTheme, useThemeColors } from "@/src/theme";
 import { palette } from "@/src/theme/tokens";
 import { auraPalette } from "@/src/theme/aura-colors";
 import { useToast } from "@/src/toast-context";
 import { LiquidGlassView, isLiquidGlassSupported } from "@/src/ui-kit";
+import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
+import { lottieInventory } from "@/src/lottie/inventory";
+import { motionPresets } from "@/src/animations/motion-presets";
 
 export default function ThemeShowcaseScreen() {
   const router = useRouter();
   const theme = useTheme();
+  const colors = useThemeColors();
   const { showToast } = useToast();
   const { isDark, setColorScheme, themeName, setThemeName } = useThemeMode();
 
@@ -51,7 +55,9 @@ export default function ThemeShowcaseScreen() {
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Theme Showcase</Text>
+          <Text style={[styles.title, { color: colors.brand.default }]}>
+            Theme Showcase
+          </Text>
           <Text style={styles.subtitle}>Switch between design systems</Text>
         </View>
 
@@ -64,7 +70,7 @@ export default function ThemeShowcaseScreen() {
                 styles.themeButton,
                 {
                   borderColor:
-                    themeName === "telegram" ? palette.violet600 : "transparent",
+                    themeName === "telegram" ? colors.brand.default : "transparent",
                 },
               ]}
               onPress={() => handleThemeChange("telegram")}
@@ -75,7 +81,7 @@ export default function ThemeShowcaseScreen() {
                   {
                     color:
                       themeName === "telegram"
-                        ? palette.violet600
+                        ? colors.brand.default
                         : palette.zinc600,
                   },
                 ]}
@@ -128,10 +134,10 @@ export default function ThemeShowcaseScreen() {
                 styles.modeButton,
                 {
                   backgroundColor: !isDark
-                    ? palette.violet100
+                    ? colors.brand.muted
                     : palette.zinc100,
                   borderWidth: !isDark ? 2 : 0,
-                  borderColor: !isDark ? palette.violet600 : "transparent",
+                  borderColor: !isDark ? colors.brand.default : "transparent",
                 },
               ]}
               onPress={() => handleModeChange("light")}
@@ -143,9 +149,9 @@ export default function ThemeShowcaseScreen() {
               style={[
                 styles.modeButton,
                 {
-                  backgroundColor: isDark ? palette.violet900 : palette.zinc800,
+                  backgroundColor: isDark ? colors.brand.muted : palette.zinc800,
                   borderWidth: isDark ? 2 : 0,
-                  borderColor: isDark ? palette.violet400 : "transparent",
+                  borderColor: isDark ? colors.brand.default : "transparent",
                 },
               ]}
               onPress={() => handleModeChange("dark")}
@@ -165,6 +171,50 @@ export default function ThemeShowcaseScreen() {
             <Badge variant={isDark ? "default" : "info"}>
               {isDark ? "Dark Mode" : "Light Mode"}
             </Badge>
+          </View>
+        </Card>
+
+        <Card style={styles.section}>
+          <Text style={styles.sectionTitle}>Motion & Lottie</Text>
+          <Text style={[styles.subtitle, { marginBottom: 12 }]}>
+            Preset: screen {motionPresets.screenEnter.durationMs}ms · stagger{" "}
+            {motionPresets.stagger.delayMs}ms — asset JSON trong{" "}
+            <RNText style={{ fontFamily: "Courier" }}>assets/lottie/</RNText>
+          </Text>
+          <View style={styles.lottieRow}>
+            <View style={styles.lottieCell}>
+              <EmplusLottie
+                source={lottieInventory.loader}
+                style={{ width: 72, height: 72 }}
+                loop
+              />
+              <Text style={styles.lottieLabel}>loader</Text>
+            </View>
+            <View style={styles.lottieCell}>
+              <EmplusLottie
+                source={lottieInventory.empty}
+                style={{ width: 72, height: 72 }}
+                loop
+              />
+              <Text style={styles.lottieLabel}>empty</Text>
+            </View>
+            <View style={styles.lottieCell}>
+              <EmplusLottie
+                source={lottieInventory.success}
+                style={{ width: 72, height: 72 }}
+                loop
+              />
+              <Text style={styles.lottieLabel}>success</Text>
+            </View>
+            <View style={styles.lottieCell}>
+              <EmplusLottie
+                source={lottieInventory.careHeart}
+                style={{ width: 72, height: 72 }}
+                loop
+                speed={0.85}
+              />
+              <Text style={styles.lottieLabel}>care</Text>
+            </View>
           </View>
         </Card>
 
@@ -326,7 +376,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "800",
-    color: palette.violet600,
   },
   subtitle: {
     fontSize: 14,
@@ -449,6 +498,22 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   glassSubtext: {
+    fontSize: 11,
+    color: palette.zinc500,
+  },
+  lottieRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  lottieCell: {
+    alignItems: "center",
+    width: "22%",
+    minWidth: 72,
+  },
+  lottieLabel: {
+    marginTop: 6,
     fontSize: 11,
     color: palette.zinc500,
   },

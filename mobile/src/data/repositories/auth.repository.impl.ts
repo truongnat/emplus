@@ -28,10 +28,30 @@ export class AuthRepositoryImpl implements AuthRepository {
   async refresh(
     params: AuthModule.RefreshRequest,
   ): Promise<AuthModule.RefreshResponse> {
-    const response = await apiClient.post<
-      ApiResponse<AuthModule.RefreshResponse>
-    >("/auth/refresh", params);
-    return response.data;
+    /** Không gửi Bearer access token — tránh 401 khi access đã hết hạn (chỉ dùng refresh trong body). */
+    const envelope = await apiClient.post<
+      ApiResponse<
+        | AuthModule.RefreshResponse
+        | { user: AuthModule.User; tokens: AuthModule.RefreshResponse }
+      >
+    >("/auth/refresh", params, { skipAuth: true });
+    const inner = envelope.data;
+    /**
+     * Backend trả AuthPayload `{ user, tokens }` trong `data` (giống verify-otp),
+     * không phải chỉ TokenPair. Nếu gán cả object vào `session.tokens` thì
+     * `accessToken` biến mất → reload mất đăng nhập.
+     */
+    if (
+      inner &&
+      typeof inner === "object" &&
+      "tokens" in inner &&
+      inner.tokens &&
+      typeof inner.tokens === "object" &&
+      "accessToken" in inner.tokens
+    ) {
+      return inner.tokens;
+    }
+    return inner as AuthModule.RefreshResponse;
   }
 
   async verifyOtp(

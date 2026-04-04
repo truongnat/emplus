@@ -2,7 +2,7 @@ import { useState } from "react";
 import { View, ScrollView, Switch, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { AppScreen, AppText } from "@/src/ui-kit";
-import { palette } from "@/src/theme";
+import { palette, useThemeColors } from "@/src/theme";
 
 const styles = StyleSheet.create({
   header: {
@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
 });
 
 export default function PrivacyScreen() {
+  const colors = useThemeColors();
   const [profilePrivate, setProfilePrivate] = useState(false);
   const [showOnlineStatus, setShowOnlineStatus] = useState(true);
   const [allowMessages, setAllowMessages] = useState(true);
@@ -46,7 +47,7 @@ export default function PrivacyScreen() {
   return (
     <AppScreen>
       <View style={styles.header}>
-        <Ionicons name="shield-outline" size={24} color={palette.violet600} />
+        <Ionicons name="shield-outline" size={24} color={colors.brand.default} />
         <AppText
           style={{ fontSize: 20, fontWeight: "bold", color: palette.zinc900 }}
         >
@@ -76,8 +77,8 @@ export default function PrivacyScreen() {
             <Switch
               value={profilePrivate}
               onValueChange={setProfilePrivate}
-              trackColor={{ false: palette.zinc300, true: palette.violet600 }}
-              thumbColor="#fff"
+              trackColor={{ false: palette.zinc300, true: colors.brand.default }}
+              thumbColor={colors.text.inverse}
             />
           </View>
 
@@ -96,8 +97,8 @@ export default function PrivacyScreen() {
             <Switch
               value={showOnlineStatus}
               onValueChange={setShowOnlineStatus}
-              trackColor={{ false: palette.zinc300, true: palette.violet600 }}
-              thumbColor="#fff"
+              trackColor={{ false: palette.zinc300, true: colors.brand.default }}
+              thumbColor={colors.text.inverse}
             />
           </View>
 
@@ -118,8 +119,8 @@ export default function PrivacyScreen() {
             <Switch
               value={allowMessages}
               onValueChange={setAllowMessages}
-              trackColor={{ false: palette.zinc300, true: palette.violet600 }}
-              thumbColor="#fff"
+              trackColor={{ false: palette.zinc300, true: colors.brand.default }}
+              thumbColor={colors.text.inverse}
             />
           </View>
         </View>

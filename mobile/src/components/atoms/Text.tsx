@@ -3,7 +3,12 @@
  */
 
 import React, { ReactNode, useMemo } from "react";
-import { Text as RNText, TextStyle, StyleSheet } from "react-native";
+import {
+  Text as RNText,
+  TextStyle,
+  StyleSheet,
+  type AccessibilityProps,
+} from "react-native";
 import { useTheme } from "@/src/theme";
 import { palette } from "@/src/theme/tokens";
 
@@ -18,7 +23,17 @@ type TextVariant =
   | "captionBold";
 type TextColor = keyof typeof palette | string;
 
-export interface TextProps {
+type TextAccessibilityProps = Pick<
+  AccessibilityProps,
+  | "accessible"
+  | "accessibilityRole"
+  | "accessibilityLabel"
+  | "accessibilityHint"
+  | "importantForAccessibility"
+  | "accessibilityElementsHidden"
+>;
+
+export interface TextProps extends Partial<TextAccessibilityProps> {
   children: ReactNode;
   variant?: TextVariant;
   color?: TextColor;
@@ -34,6 +49,12 @@ export function Text({
   style,
   numberOfLines,
   onPress,
+  accessible,
+  accessibilityRole,
+  accessibilityLabel,
+  accessibilityHint,
+  importantForAccessibility,
+  accessibilityElementsHidden,
 }: TextProps) {
   const theme = useTheme();
 
@@ -55,6 +76,12 @@ export function Text({
       style={[styles[variant], dynamicStyles.text, style]}
       numberOfLines={numberOfLines}
       onPress={onPress}
+      accessible={accessible}
+      accessibilityRole={accessibilityRole}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
+      importantForAccessibility={importantForAccessibility}
+      accessibilityElementsHidden={accessibilityElementsHidden}
     >
       {children}
     </RNText>

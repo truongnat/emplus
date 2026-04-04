@@ -8,7 +8,9 @@ export { Button } from "./Button";
 export type { ButtonProps } from "./Button";
 
 export { Input } from "./Input";
-export type { InputProps } from "./Input";
+export type { InputProps, InputSize } from "./Input";
+
+export { InputErrorLeadingIcon } from "./InputErrorLeadingIcon";
 
 export { Text, AppText } from "./Text";
 export type { TextProps } from "./Text";
@@ -39,3 +41,6 @@ export type {
 
 export { BottomSheet } from "./BottomSheet";
 export type { BottomSheetProps, BottomSheetHandle } from "./BottomSheet";
+
+export { EmplusLottie } from "./EmplusLottie";
+export type { EmplusLottieProps } from "./EmplusLottie";

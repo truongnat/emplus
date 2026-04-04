@@ -2,6 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { AppText, PressableScale } from "@/src/ui-kit";
+import { useThemeColors } from "@/src/theme";
 
 interface BudgetHeaderProps {
   showMenu: boolean;
@@ -12,25 +13,41 @@ export default function BudgetHeader({
   showMenu,
   onToggleMenu,
 }: BudgetHeaderProps) {
+  const colors = useThemeColors();
+
   return (
     <View style={styles.container}>
-      <AppText style={styles.title}>Ngân sách</AppText>
+      <AppText style={[styles.title, { color: colors.text.primary }]}>
+        Ngân sách
+      </AppText>
       <PressableScale
         onPress={onToggleMenu}
         style={[
           styles.button,
-          showMenu ? styles.buttonActive : styles.buttonInactive,
+          showMenu
+            ? {
+                backgroundColor: colors.background.inverse,
+                borderColor: colors.border.inverse,
+              }
+            : {
+                backgroundColor: colors.surface.default,
+                borderColor: colors.border.subtle,
+                shadowColor: colors.text.primary,
+              },
         ]}
+        accessibilityRole="button"
+        accessibilityLabel={showMenu ? "Đóng menu quản lý" : "Mở menu quản lý"}
+        accessibilityState={{ expanded: showMenu }}
       >
         <Ionicons
           name={showMenu ? "close" : "options-outline"}
           size={20}
-          color={showMenu ? "#FFFFFF" : "#1C1917"}
+          color={showMenu ? colors.text.inverse : colors.text.primary}
         />
         <AppText
           style={[
             styles.buttonText,
-            { color: showMenu ? "#FFFFFF" : "#1C1917" },
+            { color: showMenu ? colors.text.inverse : colors.text.primary },
           ]}
         >
           {showMenu ? "Đóng" : "Quản lý"}
@@ -53,7 +70,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "900",
-    color: "#1C1917", // taupe900
     letterSpacing: -0.5,
   },
   button: {
@@ -64,15 +80,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
-  },
-  buttonActive: {
-    backgroundColor: "#1C1917",
-    borderColor: "#1C1917",
-  },
-  buttonInactive: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#F5F5F4",
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.04,
     shadowRadius: 10,

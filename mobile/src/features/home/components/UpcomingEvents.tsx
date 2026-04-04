@@ -2,8 +2,11 @@ import React, { useMemo, useCallback } from "react";
 import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { PressableScale, Reveal, AppButton, AppText } from "@/src/ui-kit";
+import { PressableScale, Reveal, AppText } from "@/src/ui-kit";
 import { getEventIcon } from "@/src/utils/home-helpers";
+import { useThemeColors, useThemeMode } from "@/src/theme";
+import { elevation } from "@/src/theme/elevation";
+import { typographyRoles } from "@/src/theme/typography-roles";
 
 export interface UpcomingEventItem {
   id: string;
@@ -16,9 +19,17 @@ export interface UpcomingEventsProps {
   upcomingEvents: UpcomingEventItem[];
 }
 
+function formatCountdown(days: number): string {
+  if (days <= 0) return "Hôm nay hoặc đã qua";
+  if (days === 1) return "Còn 1 ngày nữa";
+  return `Còn ${days} ngày nữa`;
+}
+
 export const UpcomingEvents = React.memo(function UpcomingEvents({
   upcomingEvents,
 }: UpcomingEventsProps) {
+  const colors = useThemeColors();
+  const { isDark } = useThemeMode();
   const router = useRouter();
 
   const visibleEvents = useMemo(
@@ -26,158 +37,256 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
     [upcomingEvents],
   );
 
-  const handleEventPress = useCallback(() => {
+  const handleOpenTimeline = useCallback(() => {
     router.push("/timeline");
   }, [router]);
 
   const renderEventItem = useCallback(
     (event: UpcomingEventItem) => {
       const iconDisplay = getEventIcon(event.category);
+      const tint = `${iconDisplay.color}${isDark ? "30" : "16"}`;
 
-      // We can use a trick to make a tinted background from hex color
-      // Hex to RGBA utility is complex here, so we will just use a generic soft background 
-      // or if we know the colors we could map them. We'll use a soft taupe tint.
       return (
         <PressableScale
           key={event.id}
-          scaleTo={0.96}
-          style={styles.eventCard as any}
-          onPress={handleEventPress}
+          scaleTo={0.98}
+          style={[
+            styles.eventCard,
+            {
+              backgroundColor: colors.surface.raised,
+              borderColor: colors.border.subtle,
+            },
+            elevation.raised,
+          ]}
+          onPress={handleOpenTimeline}
+          accessibilityRole="button"
+          accessibilityLabel={`${event.title}. ${formatCountdown(event.daysLeft)}. Mở dòng thời gian.`}
         >
-          <View style={[styles.eventIconContainer, { backgroundColor: `${iconDisplay.color}15` }]}>
+          <View style={[styles.eventIcon, { backgroundColor: tint }]}>
             <Ionicons
               name={iconDisplay.name}
               size={20}
               color={iconDisplay.color}
             />
           </View>
-          <View style={styles.eventTextContainer}>
-            <AppText numberOfLines={1} style={styles.title}>
+          <View style={styles.eventText}>
+            <AppText
+              numberOfLines={2}
+              style={[
+                styles.eventTitle,
+                {
+                  color: colors.text.primary,
+                  fontFamily: typographyRoles.titleSm.fontFamily,
+                },
+              ]}
+            >
               {event.title}
             </AppText>
             <AppText
-              style={styles.subTitle}
+              style={[
+                styles.eventMeta,
+                {
+                  color: colors.text.tertiary,
+                  fontFamily: typographyRoles.caption.fontFamily,
+                },
+              ]}
             >
-              CÒN {event.daysLeft} NGÀY
+              {formatCountdown(event.daysLeft)}
             </AppText>
           </View>
           <Ionicons
             name="chevron-forward"
-            size={18}
-            color="#D6D3D1"
+            size={20}
+            color={iconDisplay.color}
           />
         </PressableScale>
       );
     },
-    [handleEventPress],
+    [colors, handleOpenTimeline, isDark],
   );
 
   return (
-    <Reveal delay={750}>
-      <View style={styles.container}>
-        <View style={styles.headerRow}>
-          <AppText style={styles.headerTitle}>
-            Kỷ niệm sắp tới
+    <Reveal delay={680}>
+      <View style={styles.section}>
+        <View style={styles.header}>
+          <AppText
+            accessibilityRole="text"
+            style={[
+              styles.headerEyebrow,
+              {
+                color: colors.text.tertiary,
+                fontFamily: typographyRoles.caption.fontFamily,
+              },
+            ]}
+          >
+            Sắp tới
+          </AppText>
+          <AppText
+            accessibilityRole="header"
+            style={[
+              styles.headerTitle,
+              {
+                color: colors.text.primary,
+                fontFamily: typographyRoles.titleSm.fontFamily,
+              },
+            ]}
+          >
+            Kỷ niệm & mốc quan trọng
+          </AppText>
+          <AppText
+            style={[
+              styles.headerSub,
+              {
+                color: colors.text.secondary,
+                fontFamily: typographyRoles.body.fontFamily,
+              },
+            ]}
+          >
+            Những ngày đáng nhớ đang đến gần — chạm để xem trên dòng thời gian.
           </AppText>
         </View>
 
-        <View style={styles.listContainer}>
+        <View style={styles.list}>
           {visibleEvents.length > 0 ? (
             visibleEvents.map(renderEventItem)
           ) : (
-            <View style={styles.emptyState}>
-              <Ionicons
-                name="calendar-outline"
-                size={24}
-                color="#A8A29E"
-              />
-              <AppText style={{ color: "#A8A29E", fontSize: 13 }}>
-                Chưa có sự kiện nào sắp tới
+            <View
+              style={[
+                styles.empty,
+                {
+                  backgroundColor: colors.surface.raised,
+                  borderColor: colors.border.subtle,
+                },
+              ]}
+            >
+              <View
+                style={[
+                  styles.emptyIcon,
+                  { backgroundColor: colors.surface.sunken },
+                ]}
+              >
+                <Ionicons
+                  name="calendar-outline"
+                  size={26}
+                  color={colors.secondary.default}
+                />
+              </View>
+              <AppText
+                style={[
+                  styles.emptyTitle,
+                  {
+                    color: colors.text.primary,
+                    fontFamily: typographyRoles.titleSm.fontFamily,
+                  },
+                ]}
+              >
+                Chưa có mốc sắp tới
+              </AppText>
+              <AppText
+                style={[
+                  styles.emptyBody,
+                  {
+                    color: colors.text.secondary,
+                    fontFamily: typographyRoles.body.fontFamily,
+                  },
+                ]}
+              >
+                Thêm sự kiện trong dòng thời gian để hai đứa cùng đếm ngược.
               </AppText>
             </View>
           )}
         </View>
-
-        <AppButton
-          label="Xem tất cả sự kiện"
-          variant="outline"
-          onPress={handleEventPress}
-          style={styles.allEventsButton}
-          fullWidth
-        />
       </View>
     </Reveal>
   );
 });
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: 32,
+  section: {
+    marginBottom: 28,
   },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+  header: {
     marginBottom: 16,
-    paddingHorizontal: 4,
+    paddingHorizontal: 2,
+    gap: 6,
+  },
+  headerEyebrow: {
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#1C1917", // taupe900
+    fontSize: 20,
+    fontWeight: "700",
+    letterSpacing: -0.3,
   },
-  listContainer: {
+  headerSub: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 2,
+  },
+  list: {
     flexDirection: "column",
     gap: 12,
-    marginBottom: 24,
   },
   eventCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    elevation: 4,
+    borderRadius: 22,
+    paddingVertical: 15,
+    paddingHorizontal: 16,
+    borderWidth: StyleSheet.hairlineWidth,
   },
-  eventIconContainer: {
+  eventIcon: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 16,
+    marginRight: 14,
   },
-  eventTextContainer: {
+  eventText: {
     flex: 1,
     justifyContent: "center",
     gap: 4,
+    minWidth: 0,
   },
-  title: {
+  eventTitle: {
     fontSize: 16,
-    fontWeight: "800",
-    color: "#1C1917", // taupe900
+    fontWeight: "700",
+    letterSpacing: -0.15,
   },
-  subTitle: {
+  eventMeta: {
     fontSize: 11,
-    fontWeight: "900",
-    color: "#A8A29E", // taupe400
-    letterSpacing: 1.5,
+    fontWeight: "700",
+    letterSpacing: 0.4,
     textTransform: "uppercase",
   },
-  emptyState: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 32,
+  empty: {
+    borderRadius: 22,
+    paddingVertical: 28,
+    paddingHorizontal: 22,
     alignItems: "center",
-    gap: 8,
-    borderWidth: 1,
-    borderColor: "#F5F5F4",
+    gap: 10,
+    borderWidth: StyleSheet.hairlineWidth,
   },
-  allEventsButton: {
-    marginHorizontal: 4,
+  emptyIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  emptyBody: {
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: "center",
+    maxWidth: 280,
   },
 });

@@ -9,18 +9,26 @@ import {
   getMemoryTime,
   getAxisMonthYear,
 } from "@/src/utils/timeline-helpers";
+import { useThemeColors } from "@/src/theme";
 
 interface TimelineItemProps {
   item: MemoryItem;
   showAxis?: boolean;
+  /** Lưới 2 cột: ẩn trục, thẻ co giãn theo cột */
+  grid?: boolean;
+  /** Ảnh thấp hơn một chút để tạo nhịp masonry */
+  staggerShort?: boolean;
   onImagePress?: (images: string[], index: number) => void;
 }
 
 export const TimelineItem = React.memo(function TimelineItem({
   item,
   showAxis = false,
+  grid = false,
+  staggerShort = false,
   onImagePress,
 }: TimelineItemProps) {
+  const colors = useThemeColors();
   const mediaUrls = useMemo(
     () => parseMediaUrls(item.mediaUrls),
     [item.mediaUrls],
@@ -40,39 +48,92 @@ export const TimelineItem = React.memo(function TimelineItem({
   const renderIcon = () => {
     if (isPayment) {
       return (
-        <View style={[styles.iconContainer, { backgroundColor: "#FCE7F3" }]}>
-          <Ionicons name="card-outline" size={24} color="#E48B9B" />
+        <View
+          style={[
+            styles.iconContainer,
+            { backgroundColor: colors.brand.muted },
+          ]}
+        >
+          <Ionicons
+            name="card-outline"
+            size={24}
+            color={colors.brand.default}
+          />
         </View>
       );
     }
     if (isTask) {
       return (
-        <View style={[styles.iconContainer, { backgroundColor: "#ECFDF5" }]}>
-          <Ionicons name="checkmark-done" size={24} color="#10B981" />
+        <View
+          style={[
+            styles.iconContainer,
+            { backgroundColor: colors.status.success.bg },
+          ]}
+        >
+          <Ionicons
+            name="checkmark-done"
+            size={24}
+            color={colors.status.success.icon}
+          />
         </View>
       );
     }
     return (
-      <View style={[styles.iconContainer, { backgroundColor: "#F5F5F4" }]}>
-        <Ionicons name="heart-outline" size={24} color="#A8A29E" />
+      <View
+        style={[
+          styles.iconContainer,
+          { backgroundColor: colors.surface.sunken },
+        ]}
+      >
+        <Ionicons
+          name="heart-outline"
+          size={24}
+          color={colors.text.tertiary}
+        />
       </View>
     );
   };
 
-  return (
-    <View style={styles.outerContainer}>
-      <View style={styles.axisContainer}>
-        <View style={styles.axisLine} />
-        {showAxis && (
-          <View style={styles.axisLabelContainer}>
-            <AppText style={styles.axisText}>{getAxisMonthYear(item)}</AppText>
-          </View>
-        )}
-      </View>
+  const imageSectionStyle = [
+    styles.imageSection,
+    grid && staggerShort && styles.imageSectionShort,
+  ];
 
-      <View style={styles.card}>
+  return (
+    <View style={[styles.outerContainer, grid && styles.outerContainerGrid]}>
+      {!grid && (
+        <View style={styles.axisContainer}>
+          <View
+            style={[styles.axisLine, { backgroundColor: colors.border.subtle }]}
+          />
+          {showAxis && (
+            <View
+              style={[
+                styles.axisLabelContainer,
+                { backgroundColor: colors.border.subtle },
+              ]}
+            >
+              <AppText style={[styles.axisText, { color: colors.text.tertiary }]}>
+                {getAxisMonthYear(item)}
+              </AppText>
+            </View>
+          )}
+        </View>
+      )}
+
+      <View
+        style={[
+          styles.card,
+          grid && styles.cardGrid,
+          {
+            backgroundColor: colors.surface.default,
+            borderColor: colors.border.subtle,
+            shadowColor: colors.text.primary,
+          },
+        ]}
+      >
         {hasImages ? (
-          <View style={styles.imageSection}>
+          <View style={imageSectionStyle}>
             <Image
               source={mediaUrls[0]}
               style={styles.mainImage}
@@ -100,10 +161,13 @@ export const TimelineItem = React.memo(function TimelineItem({
           <View style={styles.headerRow}>
             {renderIcon()}
             <View style={styles.titleContainer}>
-              <AppText numberOfLines={2} style={styles.title}>
+              <AppText
+                numberOfLines={2}
+                style={[styles.title, { color: colors.text.primary }]}
+              >
                 {item.title}
               </AppText>
-              <AppText style={styles.timeLabel}>
+              <AppText style={[styles.timeLabel, { color: colors.text.tertiary }]}>
                 {getMemoryTime(item.createdAt)} •{" "}
                 {isPayment ? "Thanh toán" : isTask ? "Nhiệm vụ" : "Kỷ niệm"}
               </AppText>
@@ -114,10 +178,19 @@ export const TimelineItem = React.memo(function TimelineItem({
             <View
               style={[
                 styles.descriptionContainer,
-                isPayment && styles.paymentDescription,
+                isPayment && [
+                  styles.paymentDescription,
+                  {
+                    backgroundColor: colors.surface.sunken,
+                    borderColor: colors.border.subtle,
+                  },
+                ],
               ]}
             >
-              <AppText numberOfLines={3} style={styles.description}>
+              <AppText
+                numberOfLines={3}
+                style={[styles.description, { color: colors.text.primary }]}
+              >
                 {item.description}
               </AppText>
             </View>
@@ -134,6 +207,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     marginBottom: 20,
   },
+  outerContainerGrid: {
+    flex: 1,
+    paddingHorizontal: 0,
+    marginBottom: 0,
+    minWidth: 0,
+  },
   axisContainer: {
     width: 32,
     alignItems: "center",
@@ -143,10 +222,8 @@ const styles = StyleSheet.create({
     top: -24,
     bottom: -20,
     width: 2,
-    backgroundColor: "#F5F5F4",
   },
   axisLabelContainer: {
-    backgroundColor: "#F5F5F4",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
@@ -156,26 +233,29 @@ const styles = StyleSheet.create({
   axisText: {
     fontSize: 10,
     fontWeight: "900",
-    color: "#A8A29E",
     textTransform: "uppercase",
   },
   card: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
     borderRadius: 32,
     overflow: "hidden",
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
     elevation: 8,
     borderWidth: 1,
-    borderColor: "#F5F5F4",
+  },
+  cardGrid: {
+    borderRadius: 24,
+    elevation: 4,
   },
   imageSection: {
     height: 200,
     width: "100%",
     position: "relative",
+  },
+  imageSectionShort: {
+    height: 148,
   },
   mainImage: {
     width: "100%",
@@ -219,28 +299,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#1C1917",
     lineHeight: 22,
   },
   timeLabel: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#A8A29E",
     marginTop: 2,
   },
   descriptionContainer: {
     marginTop: 16,
   },
   paymentDescription: {
-    backgroundColor: "#FCF9F8",
     padding: 16,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#F5F5F4",
   },
   description: {
     fontSize: 14,
-    color: "#44403C",
     lineHeight: 20,
     fontWeight: "500",
   },

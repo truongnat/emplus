@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,7 +7,6 @@ import {
     View,
     StyleSheet,
     TouchableOpacity,
-    TextInput,
     Keyboard,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -35,10 +34,6 @@ export default function ResetPasswordScreen() {
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-    const otpRef = useRef<TextInput>(null);
-    const passwordRef = useRef<TextInput>(null);
-    const confirmPasswordRef = useRef<TextInput>(null);
 
     const form = useForm<ResetPasswordFields>({
         resolver: zodResolver(ResetPasswordSchema),
@@ -93,7 +88,13 @@ export default function ResetPasswordScreen() {
                 keyboardOpeningTime={0}
             >
                 <View style={styles.navHeader}>
-                    <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                    <TouchableOpacity
+                        onPress={() => router.back()}
+                        style={styles.backButton}
+                        accessibilityRole="button"
+                        accessibilityLabel="Quay lại"
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    >
                         <Ionicons name="arrow-back" size={24} color={colors.text.primary} />
                     </TouchableOpacity>
                 </View>
@@ -115,16 +116,14 @@ export default function ResetPasswordScreen() {
                         name="otp"
                         render={({ field: { onChange, value }, fieldState: { error } }) => (
                             <Input
-                                ref={otpRef}
                                 label="Mã OTP (6 số)"
                                 placeholder="000000"
                                 value={value}
-                                onChangeText={(t) => onChange(t.replace(/[^0-9]/g, "").slice(0, 6))}
+                                onChange={(t) => onChange(t.replace(/[^0-9]/g, "").slice(0, 6))}
                                 keyboardType="number-pad"
                                 maxLength={6}
                                 error={error?.message}
                                 returnKeyType="next"
-                                onSubmitEditing={() => passwordRef.current?.focus()}
                                 blurOnSubmit={false}
                             />
                         )}
@@ -135,21 +134,24 @@ export default function ResetPasswordScreen() {
                         name="password"
                         render={({ field: { onChange, value }, fieldState: { error } }) => (
                             <Input
-                                ref={passwordRef}
                                 label="Mật khẩu mới"
                                 placeholder="••••••••"
                                 value={value}
-                                onChangeText={onChange}
+                                onChange={onChange}
                                 secureTextEntry={!showPassword}
                                 error={error?.message}
                                 autoComplete="password-new"
                                 returnKeyType="next"
-                                onSubmitEditing={() => confirmPasswordRef.current?.focus()}
                                 blurOnSubmit={false}
-                                rightElement={
+                                trailingElement={
                                     <TouchableOpacity
                                         onPress={() => setShowPassword(!showPassword)}
                                         style={styles.eyeIcon}
+                                        accessibilityRole="button"
+                                        accessibilityLabel={
+                                            showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"
+                                        }
+                                        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                                     >
                                         <Ionicons
                                             name={showPassword ? "eye-off-outline" : "eye-outline"}
@@ -167,20 +169,24 @@ export default function ResetPasswordScreen() {
                         name="confirmPassword"
                         render={({ field: { onChange, value }, fieldState: { error } }) => (
                             <Input
-                                ref={confirmPasswordRef}
                                 label="Xác nhận mật khẩu mới"
                                 placeholder="••••••••"
                                 value={value}
-                                onChangeText={onChange}
+                                onChange={onChange}
                                 secureTextEntry={!showConfirmPassword}
                                 error={error?.message}
                                 autoComplete="password-new"
                                 returnKeyType="go"
                                 onSubmitEditing={handleResetPassword}
-                                rightElement={
+                                trailingElement={
                                     <TouchableOpacity
                                         onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                                         style={styles.eyeIcon}
+                                        accessibilityRole="button"
+                                        accessibilityLabel={
+                                            showConfirmPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"
+                                        }
+                                        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                                     >
                                         <Ionicons
                                             name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
@@ -194,16 +200,14 @@ export default function ResetPasswordScreen() {
                     />
 
                     <Button
-                        label={
-                            resetMutation.isPending
-                                ? "Đang cập nhật..."
-                                : "Cập nhật mật khẩu"
-                        }
+                        label="Cập nhật mật khẩu"
                         onPress={handleResetPassword}
                         disabled={resetMutation.isPending}
+                        loading={resetMutation.isPending}
                         fullWidth
                         size="lg"
                         style={styles.submitButton}
+                        accessibilityLabel="Cập nhật mật khẩu mới"
                     />
                 </View>
             </KeyboardAwareScrollView>

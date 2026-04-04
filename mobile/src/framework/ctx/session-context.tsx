@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import type { ReactNode } from "react";
@@ -14,7 +15,9 @@ import appConfig from "@/src/core/config/app-config";
 import { AuthModule } from "@/src/domain/entities/schemas";
 import { AuthRepositoryImpl } from "@/src/data/repositories/auth.repository.impl";
 import { RefreshSessionUseCase, GetProfileUseCase } from "@/src/domain/usecases/auth";
+import ApiError from "@/src/core/api/api-error";
 import { tokenManager } from "@/src/core/api/token-manager";
+import { notifySessionOrTokenFailure } from "@/src/utils/session-api-feedback";
 
 const authRepo = new AuthRepositoryImpl();
 const refreshSessionUseCase = new RefreshSessionUseCase(authRepo);
@@ -46,6 +49,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthModule.SessionPayload | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const refreshAuthRef = useRef<() => Promise<string | null>>(async () => null);
 
   useEffect(() => {
     const token = session?.tokens?.accessToken;
@@ -71,13 +75,22 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       const nextTokens = await refreshSessionUseCase.execute(refreshToken);
       setSession((prev) => (prev ? { ...prev, tokens: nextTokens } : null));
       return nextTokens.accessToken;
-    } catch {
-      await clearSession();
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.isNetworkError() || error.status >= 500) {
+          return null;
+        }
+        await clearSession();
+        return null;
+      }
+      console.warn("refreshAuth unexpected error:", error);
       return null;
     } finally {
       setIsRefreshing(false);
     }
   }, [clearSession, isRefreshing]);
+
+  refreshAuthRef.current = refreshAuth;
 
   useEffect(() => {
     tokenManager.setRefreshHandler(refreshAuth);
@@ -104,28 +117,33 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         ]);
         console.log("Session init:", { hasTokens: !!tokens, hasMeta: !!meta });
         if (tokens && active) {
-          let user = meta?.user || null;
+          const user = meta?.user || null;
           setSession({ user, tokens });
 
-          // Refresh AFTER state update completes
-          setTimeout(async () => {
-            if (active) {
+          try {
+            await refreshAuthRef.current();
+            const currentTokens = await storage.auth.getTokens();
+            if (currentTokens?.accessToken && active) {
               try {
-                // Try to refresh token first (ensure we are authenticated)
-                await refreshAuth();
-                const currentTokens = await storage.auth.getTokens();
-                if (currentTokens?.accessToken && active) {
-                  // Then fetch latest profile to sync coupleId
-                  const latestUser = await getProfileUseCase.execute();
+                const latestUser = await getProfileUseCase.execute();
+                if (active) {
                   setSession((prev) =>
                     prev ? { ...prev, user: latestUser } : null,
                   );
                 }
               } catch (err) {
-                console.error("Sync profile error:", err);
+                notifySessionOrTokenFailure(err);
+                if (err instanceof ApiError && err.isUnauthorized()) {
+                  void clearSession();
+                }
               }
             }
-          }, 100);
+          } catch (err) {
+            notifySessionOrTokenFailure(err);
+            if (err instanceof ApiError && err.isUnauthorized()) {
+              void clearSession();
+            }
+          }
         }
       } catch (error) {
         console.error("Session init error:", error);
@@ -133,7 +151,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         if (active) setHydrated(true);
       }
     };
-    init();
+    void init();
     return () => {
       active = false;
     };

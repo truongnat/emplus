@@ -1,7 +1,7 @@
 import { View, ScrollView, StyleSheet, Linking } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { AppScreen, AppText } from "@/src/ui-kit";
-import { palette } from "@/src/theme";
+import { palette, useThemeColors } from "@/src/theme";
 
 const styles = StyleSheet.create({
   header: {
@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: palette.violet100,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -56,6 +55,7 @@ const styles = StyleSheet.create({
 });
 
 export default function HelpScreen() {
+  const colors = useThemeColors();
   const handleEmailPress = () => {
     Linking.openURL("mailto:support@emplus.app");
   };
@@ -66,7 +66,7 @@ export default function HelpScreen() {
         <Ionicons
           name="help-circle-outline"
           size={24}
-          color={palette.violet600}
+          color={colors.brand.default}
         />
         <AppText
           style={{ fontSize: 20, fontWeight: "bold", color: palette.zinc900 }}
@@ -128,11 +128,13 @@ export default function HelpScreen() {
 
         <View style={styles.card}>
           <View style={styles.contactRow}>
-            <View style={styles.contactIcon}>
+            <View
+              style={[styles.contactIcon, { backgroundColor: colors.brand.muted }]}
+            >
               <Ionicons
                 name="mail-outline"
                 size={20}
-                color={palette.violet600}
+                color={colors.brand.default}
               />
             </View>
             <AppText style={styles.contactText}>support@emplus.app</AppText>

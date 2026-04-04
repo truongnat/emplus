@@ -65,18 +65,19 @@ export function formatLoveDate(dateString?: string): string {
   return `${d.getDate()} Tháng ${d.getMonth() + 1}, ${d.getFullYear()}`;
 }
 
+/** Màu có thật trong `palette` — tránh `(palette as any).primary` gây undefined → icon đen. */
 export function getEventIcon(category?: string): {
   name: React.ComponentProps<typeof Ionicons>["name"];
   color: string;
 } {
   switch (category) {
     case "LOVE":
-      return { name: "heart", color: (palette as any).primary };
+      return { name: "heart", color: palette.coral600 };
     case "BIRTHDAY":
-      return { name: "gift", color: (palette as any)["purple-600"] };
+      return { name: "gift", color: palette.violet600 };
     case "HOLIDAY":
-      return { name: "airplane", color: (palette as any).info };
+      return { name: "airplane", color: palette.teal600 };
     default:
-      return { name: "calendar", color: (palette as any).success };
+      return { name: "calendar", color: palette.indigo500 };
   }
 }

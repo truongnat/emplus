@@ -5,6 +5,8 @@ import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import Svg, { Defs, RadialGradient, Stop, Circle, G } from "react-native-svg";
 import { AppText } from "@/src/components/atoms/Text";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { auraPalette } from "@/src/theme/aura-colors";
+import { useThemeColors } from "@/src/theme";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -92,7 +94,7 @@ const VisualArea = React.memo(
               fx="50%"
               fy="50%"
             >
-              <Stop offset="0%" stopColor="#E48B9B" stopOpacity="0.7" />
+              <Stop offset="0%" stopColor={auraPalette.rose300} stopOpacity="0.7" />
               <Stop offset="70%" stopColor="#FBCFE8" stopOpacity="0.2" />
               <Stop offset="100%" stopColor="#FBCFE8" stopOpacity="0" />
             </RadialGradient>
@@ -123,6 +125,7 @@ export function MoodVibeCheck({
   onMoodChange,
   partnerName = "người ấy",
 }: MoodVibeCheckProps) {
+  const colors = useThemeColors();
   const [value, setValue] = useState(initialValue);
   const [isSliding, setIsSliding] = useState(false);
   const sliderWidth = useRef(SCREEN_WIDTH - 96);
@@ -205,14 +208,15 @@ export function MoodVibeCheck({
     };
   }, [floatAnim, phase]);
 
-  const getMoodConfig = (val: number) => {
-    if (val < 25) return { text: "Yên tâm", color: "#10B981" };
-    if (val < 50) return { text: "Ổn định", color: "#EAB308" };
-    if (val < 75) return { text: "Lo lắng", color: "#E48B9B" };
-    return { text: "Căng thẳng", color: "#FB7185" };
-  };
-
-  const moodConfig = useMemo(() => getMoodConfig(value), [value]);
+  const moodConfig = useMemo(() => {
+    if (value < 25)
+      return { text: "Yên tâm", color: colors.status.success.text };
+    if (value < 50)
+      return { text: "Ổn định", color: colors.status.warning.text };
+    if (value < 75)
+      return { text: "Lo lắng", color: colors.brand.default };
+    return { text: "Căng thẳng", color: colors.status.error.text };
+  }, [value, colors]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -317,7 +321,9 @@ export function MoodVibeCheck({
         <View style={styles.divider} />
         <AppText style={styles.hintText}>
           Buông tay để gửi nhịp bộ cảm xúc đến{" "}
-          <AppText style={styles.partnerName}>{partnerName}</AppText>
+          <AppText style={[styles.partnerName, { color: colors.brand.default }]}>
+            {partnerName}
+          </AppText>
         </AppText>
       </View>
     </View>
@@ -458,7 +464,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   partnerName: {
-    color: "#E48B9B",
     fontWeight: "800",
   },
 });

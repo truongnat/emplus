@@ -41,6 +41,18 @@ export interface SemanticColors {
     strong: string;
     text: string;
   };
+  secondary: {
+    default: string;
+    subtle: string;
+    muted: string;
+    text: string;
+  };
+  accent: {
+    default: string;
+    subtle: string;
+    muted: string;
+    text: string;
+  };
   status: {
     error: { bg: string; text: string; border: string; icon: string };
     warning: { bg: string; text: string; border: string; icon: string };
@@ -94,11 +106,23 @@ export const lightColors: SemanticColors = {
     strong: palette.black,
     text: palette.zinc900,
   },
+  secondary: {
+    default: palette.indigo500,
+    subtle: palette.indigo100,
+    muted: palette.indigo50,
+    text: palette.indigo600,
+  },
+  accent: {
+    default: palette.teal500,
+    subtle: palette.teal100,
+    muted: palette.teal50,
+    text: palette.teal600,
+  },
   status: {
     error: { bg: palette.red50, text: palette.red600, border: palette.red500, icon: palette.red500 },
     warning: { bg: palette.amber50, text: palette.amber600, border: palette.amber500, icon: palette.amber500 },
     success: { bg: palette.green50, text: palette.green600, border: palette.green500, icon: palette.green500 },
-    info: { bg: palette.blue50, text: palette.blue600, border: palette.blue500, icon: palette.blue500 },
+    info: { bg: palette.indigo50, text: palette.indigo600, border: palette.indigo300, icon: palette.indigo500 },
   },
   interactive: {
     primary: palette.zinc900,
@@ -147,11 +171,23 @@ export const darkColors: SemanticColors = {
     strong: palette.white,
     text: palette.zinc100,
   },
+  secondary: {
+    default: palette.indigo400,
+    subtle: palette.indigo800,
+    muted: palette.indigo900,
+    text: palette.indigo300,
+  },
+  accent: {
+    default: palette.teal400,
+    subtle: palette.teal800,
+    muted: palette.teal900,
+    text: palette.teal300,
+  },
   status: {
     error: { bg: "#450a0a", text: "#fecaca", border: "#7f1d1d", icon: palette.red500 },
     warning: { bg: "#451a03", text: "#fef3c7", border: "#78350f", icon: palette.amber500 },
     success: { bg: "#064e3b", text: "#d1fae5", border: "#065f46", icon: palette.green500 },
-    info: { bg: "#082f49", text: "#dbeafe", border: "#0c4a6e", icon: palette.blue500 },
+    info: { bg: palette.indigo900, text: palette.indigo200, border: palette.indigo700, icon: palette.indigo400 },
   },
   interactive: {
     primary: palette.zinc100,

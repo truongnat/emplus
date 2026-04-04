@@ -2,6 +2,7 @@ import React, { memo } from "react";
 import { View, ScrollView, Pressable, StyleSheet } from "react-native";
 import { FILTERS } from "./constants";
 import { AppText } from "@/src/ui-kit";
+import { useThemeColors } from "@/src/theme";
 
 const FilterPill = memo(
   ({
@@ -12,18 +13,47 @@ const FilterPill = memo(
     label: string;
     active: boolean;
     onPress: () => void;
-  }) => (
-    <Pressable
-      onPress={onPress}
-      style={[styles.pill, active ? styles.pillActive : styles.pillInactive]}
-    >
-      <AppText
-        style={[styles.pillText, active ? styles.pillTextActive : styles.pillTextInactive]}
+  }) => {
+    const colors = useThemeColors();
+    return (
+      <Pressable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityState={{ selected: active }}
+        accessibilityLabel={`Lọc ${label}`}
+        style={[
+          styles.pill,
+          active
+            ? {
+                backgroundColor: colors.brand.default,
+                borderColor: colors.brand.default,
+                shadowColor: colors.brand.default,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 8,
+                elevation: 4,
+              }
+            : {
+                backgroundColor: colors.surface.default,
+                borderColor: colors.border.subtle,
+                shadowOpacity: 0,
+                elevation: 0,
+              },
+        ]}
       >
-        {label}
-      </AppText>
-    </Pressable>
-  ),
+        <AppText
+          style={[
+            styles.pillText,
+            {
+              color: active ? colors.text.onBrand : colors.text.tertiary,
+            },
+          ]}
+        >
+          {label}
+        </AppText>
+      </Pressable>
+    );
+  },
 );
 
 export default function BudgetFilter({
@@ -69,28 +99,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  pillActive: {
-    backgroundColor: "#E48B9B", // rose
-    borderColor: "#E48B9B",
-    shadowColor: "#E48B9B",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  pillInactive: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#F5F5F4",
   },
   pillText: {
     fontSize: 13,
     fontWeight: "800",
-  },
-  pillTextActive: {
-    color: "#FFFFFF",
-  },
-  pillTextInactive: {
-    color: "#A8A29E",
   },
 });

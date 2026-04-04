@@ -1,11 +1,17 @@
 /**
  * Skeleton Component
- * Loading placeholder with shimmer animation
+ * Loading placeholder — shimmer quét ngang + tint brand (P4)
  */
 
-import React, { memo, useEffect, useRef } from "react";
-import { View, Animated, StyleSheet, ViewStyle } from "react-native";
-import { useTheme } from "@/src/theme";
+import React, { memo, useEffect, useRef, useState } from "react";
+import {
+  View,
+  Animated,
+  StyleSheet,
+  ViewStyle,
+  LayoutChangeEvent,
+} from "react-native";
+import { useThemeColors } from "@/src/theme";
 
 export type SkeletonVariant = "text" | "circular" | "rounded" | "square";
 
@@ -18,7 +24,7 @@ export interface SkeletonProps {
   height?: number;
   /** Disable animation */
   animated?: boolean;
-  /** Animation duration in ms */
+  /** Animation duration in ms (một vòng quét) */
   duration?: number;
   /** Additional style */
   style?: ViewStyle;
@@ -33,41 +39,43 @@ export const Skeleton = memo(function Skeleton({
   width = "100%",
   height = 16,
   animated = true,
-  duration = 1000,
+  duration = 1400,
   style,
   testID,
   accessibilityLabel,
 }: SkeletonProps) {
-  const theme = useTheme();
-  const animatedValue = useRef(new Animated.Value(0)).current;
+  const colors = useThemeColors();
+  const [trackW, setTrackW] = useState(0);
+  const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (!animated) return;
+    if (!animated || trackW <= 0) return;
 
-    const animation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(animatedValue, {
-          toValue: 1,
-          duration,
-          useNativeDriver: true,
-        }),
-        Animated.timing(animatedValue, {
-          toValue: 0,
-          duration,
-          useNativeDriver: true,
-        }),
-      ]),
+    const anim = Animated.loop(
+      Animated.timing(progress, {
+        toValue: 1,
+        duration,
+        useNativeDriver: true,
+      }),
     );
+    anim.start();
+    return () => {
+      anim.stop();
+      progress.setValue(0);
+    };
+  }, [animated, duration, progress, trackW]);
 
-    animation.start();
-
-    return () => animation.stop();
-  }, [animated, duration, animatedValue]);
+  const onLayout = (e: LayoutChangeEvent) => {
+    const w = e.nativeEvent.layout.width;
+    if (w > 0) setTrackW(w);
+  };
 
   const borderRadius = getBorderRadius(variant);
-  const opacity = animatedValue.interpolate({
+  const bandW = Math.max(48, trackW * 0.42);
+
+  const translateX = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: [0.5, 1],
+    outputRange: [-bandW, trackW + bandW * 0.25],
   });
 
   return (
@@ -78,22 +86,27 @@ export const Skeleton = memo(function Skeleton({
           width,
           height,
           borderRadius,
-          backgroundColor: theme.colors.surface.sunken,
+          backgroundColor: colors.surface.sunken,
         } as ViewStyle,
         style,
       ]}
+      onLayout={onLayout}
       testID={testID}
       accessibilityRole="progressbar"
-      accessibilityLabel={accessibilityLabel || "Loading"}
+      accessibilityState={{ busy: true }}
+      accessibilityLabel={accessibilityLabel || "Đang tải"}
     >
-      {animated && (
+      {animated && trackW > 0 && (
         <Animated.View
+          pointerEvents="none"
           style={[
-            styles.shimmer,
+            styles.shimmerBand,
             {
-              opacity,
+              width: bandW,
               borderRadius,
-              backgroundColor: theme.colors.border.subtle,
+              opacity: 0.55,
+              backgroundColor: colors.brand.muted,
+              transform: [{ translateX }],
             },
           ]}
         />
@@ -121,7 +134,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     position: "relative",
   },
-  shimmer: {
-    ...StyleSheet.absoluteFillObject,
+  shimmerBand: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
   },
 });

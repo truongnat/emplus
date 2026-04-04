@@ -1,0 +1,46 @@
+import { StyleSheet } from "react-native";
+
+/**
+ * Trang chủ — shell full-bleed đồng bộ auth (lưới + brand + padding scroll).
+ */
+export const homeScreenStyles = StyleSheet.create({
+  layerRoot: {
+    flex: 1,
+    position: "relative",
+  },
+  brandTopLeft: {
+    position: "absolute",
+    zIndex: 2,
+  },
+  /** Cùng hàng với `LoginBrandGradientTitle` (maskRoot height 40). */
+  brandTopRight: {
+    position: "absolute",
+    zIndex: 2,
+    height: 40,
+    justifyContent: "center",
+  },
+  scrollView: {
+    flex: 1,
+    zIndex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 22,
+    paddingBottom: 128,
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+    zIndex: 1,
+  },
+  centerText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  footer: {
+    marginTop: 32,
+    marginBottom: 20,
+  },
+});

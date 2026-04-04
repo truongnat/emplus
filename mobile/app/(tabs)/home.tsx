@@ -1,29 +1,49 @@
 import React, { useEffect } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { Button } from "@/src/components/atoms/Button";
 import { Text } from "@/src/components/atoms/Text";
 import { useSession } from "@/src/session-context";
 import { useHomeData } from "@/src/features/home";
 import {
+  HomeChromeNotificationButton,
   HomeHeader,
   HeroCard,
   QuickActions,
   FocusCard,
   UpcomingEvents,
 } from "@/src/features/home";
-import { palette } from "@/src/theme/tokens";
+import { useThemeColors, useThemeMode } from "@/src/theme";
+import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
+import { lottieInventory } from "@/src/lottie/inventory";
+import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
+import { LoginBrandGradientTitle } from "@/src/features/auth/components/LoginBrandGradientTitle";
+import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
+import {
+  authGridScrollPaddingTop,
+  AUTH_LOGIN_BRAND_TOP_OFFSET,
+  AUTH_LOGIN_SCROLL_EXTRA_TOP,
+} from "@/src/features/auth/authScreenLayout";
+import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
+import { homeScreenStyles as styles } from "@/src/features/home/homeScreen.styles";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const colors = useThemeColors();
+  const { isDark } = useThemeMode();
   const { session, clearSession, hydrated, isAuthenticated } = useSession();
+
+  useAuthGridChrome(isDark, colors.background.default, true);
 
   const {
     isPaired,
     greetingInfo,
     loveDays,
-    startDateLabel,
     cycleLabel,
     upcomingEvents,
     nextDateLabel,
@@ -33,7 +53,6 @@ export default function HomeScreen() {
     setShowFocusCard,
   } = useHomeData();
 
-  // Prefetch likely navigation targets on mount
   useEffect(() => {
     if (isAuthenticated && isPaired) {
       router.prefetch("/care");
@@ -47,101 +66,136 @@ export default function HomeScreen() {
     router.replace("/login");
   }
 
+  const scrollPaddingTop =
+    authGridScrollPaddingTop(insets.top) + AUTH_LOGIN_SCROLL_EXTRA_TOP;
+
+  const authShell = (
+    children: React.ReactNode,
+    chromeTrailing?: React.ReactNode,
+  ) => (
+    <AppScreen
+      applyTopSafeAreaPadding={false}
+      wrapWithKeyboardDismiss={false}
+      style={{
+        ...loginScreenStyles.appScreenBase,
+        backgroundColor: "transparent",
+      }}
+      contentContainerStyle={loginScreenStyles.appContent}
+      animatedEntrance={false}
+    >
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <View style={styles.layerRoot}>
+        <LoginGridAnimatedBackground isDark={isDark} />
+        <View
+          style={[
+            styles.brandTopLeft,
+            {
+              top: insets.top + AUTH_LOGIN_BRAND_TOP_OFFSET,
+              left: insets.left + 20,
+            },
+          ]}
+          pointerEvents="none"
+          accessible
+          accessibilityRole="text"
+          accessibilityLabel="Em Plus"
+        >
+          <LoginBrandGradientTitle />
+        </View>
+        {chromeTrailing}
+        {children}
+      </View>
+    </AppScreen>
+  );
+
   if (!hydrated) {
     return null;
   }
 
   if (!isAuthenticated) {
-    return (
-      <AppScreen>
-        <View style={styles.centerContainer}>
-          <Text style={styles.centerText}>Please log in to continue</Text>
-          <Button label="Login" onPress={() => router.push("/login")} />
-        </View>
-      </AppScreen>
+    return authShell(
+      <View style={styles.centerContainer}>
+        <EmplusLottie
+          source={lottieInventory.empty}
+          style={{ width: 140, height: 140 }}
+          loop
+        />
+        <Text style={[styles.centerText, { color: colors.text.secondary }]}>
+          Đăng nhập để tiếp tục
+        </Text>
+        <Button
+          label="Đăng nhập"
+          onPress={() => router.push("/login")}
+          accessibilityLabel="Mở màn hình đăng nhập"
+        />
+      </View>,
     );
   }
 
   if (!isPaired) {
-    return (
-      <AppScreen>
-        <View style={styles.centerContainer}>
-          <Text style={styles.centerText}>
-            You need to pair with your partner first
-          </Text>
-          <Button label="Pair Now" onPress={() => router.push("/pairing")} />
-        </View>
-      </AppScreen>
+    return authShell(
+      <View style={styles.centerContainer}>
+        <EmplusLottie
+          source={lottieInventory.careHeart}
+          style={{ width: 140, height: 140 }}
+          loop
+          speed={0.9}
+        />
+        <Text style={[styles.centerText, { color: colors.text.secondary }]}>
+          Ghép đôi với người ấy để dùng đầy đủ tính năng
+        </Text>
+        <Button
+          label="Ghép đôi"
+          onPress={() => router.push("/pairing")}
+          accessibilityLabel="Mở màn hình ghép đôi"
+        />
+      </View>,
     );
   }
 
-  return (
-    <AppScreen>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <HomeHeader
-          userInitial={session?.user?.email?.[0]?.toUpperCase() || "B"}
-          greeting={greetingInfo.greeting}
-          subGreeting={greetingInfo.subGreeting}
-          iconName={greetingInfo.iconName}
+  return authShell(
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={[
+        styles.scrollContent,
+        { paddingTop: scrollPaddingTop },
+      ]}
+      showsVerticalScrollIndicator={false}
+      keyboardDismissMode="on-drag"
+      keyboardShouldPersistTaps="handled"
+      nestedScrollEnabled
+    >
+      <HomeHeader
+        userInitial={session?.user?.email?.[0]?.toUpperCase() || "B"}
+        greeting={greetingInfo.greeting}
+        subGreeting={greetingInfo.subGreeting}
+        iconName={greetingInfo.iconName}
+      />
+
+      <HeroCard loveDays={loveDays} />
+
+      <QuickActions cycleLabel={cycleLabel} nextDateLabel={nextDateLabel} />
+
+      {showFocusCard && (
+        <FocusCard
+          focusTitle={focusTitle}
+          focusSubtitle={focusSubtitle}
+          showFocusCard={showFocusCard}
+          setShowFocusCard={setShowFocusCard}
         />
+      )}
 
-        {/* Hero Card - Love Days Counter */}
-        <HeroCard loveDays={loveDays} startDateLabel={startDateLabel} />
-
-        {/* Quick Actions - Cycle & Next Date */}
-        <QuickActions cycleLabel={cycleLabel} nextDateLabel={nextDateLabel} />
-
-        {/* Focus Card - Mood Check-in */}
-        {showFocusCard && (
-          <FocusCard
-            focusTitle={focusTitle}
-            focusSubtitle={focusSubtitle}
-            showFocusCard={showFocusCard}
-            setShowFocusCard={setShowFocusCard}
-          />
-        )}
-
-        {/* Upcoming Events */}
-        <UpcomingEvents upcomingEvents={upcomingEvents} />
-
-        {/* Logout Button */}
-        <View style={styles.footer}>
-          <Button
-            label="Đăng xuất"
-            onPress={handleLogout}
-            variant="outline"
-            fullWidth
-          />
-        </View>
-      </ScrollView>
-    </AppScreen>
+      <UpcomingEvents upcomingEvents={upcomingEvents} />
+    </ScrollView>,
+    <View
+      style={[
+        styles.brandTopRight,
+        {
+          top: insets.top + AUTH_LOGIN_BRAND_TOP_OFFSET,
+          right: insets.right + 20,
+        },
+      ]}
+    >
+      <HomeChromeNotificationButton />
+    </View>,
   );
 }
-
-const styles = StyleSheet.create({
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 128,
-  },
-  centerContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  centerText: {
-    fontSize: 16,
-    color: palette.zinc500,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  footer: {
-    marginTop: 32,
-    marginBottom: 20,
-  },
-});

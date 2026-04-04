@@ -2,6 +2,7 @@ import React, { memo } from "react";
 import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { type BudgetItem } from "@/src/api";
+import { useThemeColors } from "@/src/theme";
 import { CATEGORY_CONFIG, STATUS_MAP } from "./constants";
 import { AppText } from "@/src/ui-kit";
 
@@ -9,41 +10,81 @@ interface ExpenseItemProps {
   item: BudgetItem;
 }
 
-export const ExpenseItem = memo(({ item }: ExpenseItemProps) => {
+export const ExpenseItem = memo(function ExpenseItem({ item }: ExpenseItemProps) {
+  const colors = useThemeColors();
   const isWarning = item.status === "OVER_BUDGET";
   const config = CATEGORY_CONFIG[item.category] ?? CATEGORY_CONFIG.other;
   const status = STATUS_MAP[item.status] ?? {
     label: item.status,
-    color: "#78716C", // taupe500
+    color: colors.text.secondary,
   };
+
+  const paidBadge = {
+    bg: colors.status.success.bg,
+    border: colors.status.success.border,
+    text: colors.status.success.text,
+  };
+  const warningBadge = {
+    bg: colors.status.error.bg,
+    border: colors.status.error.border,
+    text: colors.status.error.text,
+  };
+  const pendingBadge = {
+    bg: colors.status.warning.bg,
+    border: colors.status.warning.border,
+    text: colors.status.warning.text,
+  };
+
+  const badgeStyle =
+    item.status === "PAID"
+      ? paidBadge
+      : isWarning
+        ? warningBadge
+        : pendingBadge;
 
   return (
     <View style={styles.outerContainer}>
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.surface.default,
+            borderColor: colors.border.subtle,
+            shadowColor: colors.text.primary,
+          },
+        ]}
+      >
         <View style={styles.headerRow}>
           <View
             style={[
               styles.iconContainer,
-              { backgroundColor: config?.bg || "#F5F5F4" },
+              { backgroundColor: config?.bg || colors.surface.sunken },
             ]}
           >
             <Ionicons
               name={(config?.icon as any) || "help"}
               size={24}
-              color={config?.color || "#78716C"}
+              color={config?.color || colors.text.secondary}
             />
           </View>
           <View style={styles.titleContainer}>
-            <AppText numberOfLines={1} style={styles.title}>
+            <AppText numberOfLines={1} style={[styles.title, { color: colors.text.primary }]}>
               {item.title}
             </AppText>
-            <AppText style={styles.metaText}>
+            <AppText style={[styles.metaText, { color: colors.text.tertiary }]}>
               {item.date} {item.place ? `• ${item.place}` : ""}
             </AppText>
           </View>
           <View style={styles.amountContainer}>
             <AppText
-              style={[styles.amount, isWarning ? styles.warningAmount : {}]}
+              style={[
+                styles.amount,
+                {
+                  color: isWarning
+                    ? colors.status.error.text
+                    : colors.text.primary,
+                },
+              ]}
             >
               {item.amount?.toLocaleString() ?? "0"}đ
             </AppText>
@@ -51,34 +92,12 @@ export const ExpenseItem = memo(({ item }: ExpenseItemProps) => {
               style={[
                 styles.statusBadge,
                 {
-                  backgroundColor:
-                    item.status === "PAID"
-                      ? "#ECFDF5"
-                      : isWarning
-                        ? "#FFF1F2"
-                        : "#FEF3C7",
-                  borderColor:
-                    item.status === "PAID"
-                      ? "#D1FAE5"
-                      : isWarning
-                        ? "#FFE4E6"
-                        : "#FDE68A",
+                  backgroundColor: badgeStyle.bg,
+                  borderColor: badgeStyle.border,
                 },
               ]}
             >
-              <AppText
-                style={[
-                  styles.statusText,
-                  {
-                    color:
-                      item.status === "PAID"
-                        ? "#10B981"
-                        : isWarning
-                          ? "#E11D48"
-                          : "#D97706",
-                  },
-                ]}
-              >
+              <AppText style={[styles.statusText, { color: badgeStyle.text }]}>
                 {isWarning ? "Vượt hạn mức" : status.label}
               </AppText>
             </View>
@@ -95,16 +114,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   container: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 24,
     padding: 16,
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.04,
     shadowRadius: 12,
     elevation: 4,
     borderWidth: 1,
-    borderColor: "#F5F5F4",
   },
   headerRow: {
     flexDirection: "row",
@@ -124,12 +140,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#1C1917",
   },
   metaText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#A8A29E",
     marginTop: 2,
   },
   amountContainer: {
@@ -138,10 +152,6 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: 16,
     fontWeight: "900",
-    color: "#1C1917",
-  },
-  warningAmount: {
-    color: "#E11D48",
   },
   statusBadge: {
     marginTop: 6,

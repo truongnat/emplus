@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text, Animated, StyleSheet } from "react-native";
 import { formatGroupDate } from "@/src/utils/timeline-helpers";
+import { useThemeColors } from "@/src/theme";
 
 export interface TimelineDateGroupHeaderProps {
   dateString: string;
 }
 
-const PulsingRing = () => {
+function PulsingRing({ brandColor }: { brandColor: string }) {
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -32,6 +33,7 @@ const PulsingRing = () => {
     <Animated.View
       style={[
         styles.pulseRing,
+        { backgroundColor: brandColor },
         {
           transform: [{ scale: pulseAnim }],
           opacity: pulseAnim.interpolate({
@@ -42,23 +44,49 @@ const PulsingRing = () => {
       ]}
     />
   );
-};
+}
 
 export function TimelineDateGroupHeader({
   dateString,
 }: TimelineDateGroupHeaderProps) {
+  const colors = useThemeColors();
   const isToday = formatGroupDate(dateString) === "HÔM NAY";
 
   return (
     <View style={styles.container}>
       <View style={styles.markerContainer}>
-        <View style={styles.axisLine} />
-        <PulsingRing />
-        <View style={styles.dotOuter}>
-          <View style={[styles.dotInner, isToday && styles.dotInnerToday]} />
+        <View
+          style={[styles.axisLine, { backgroundColor: colors.border.subtle }]}
+        />
+        <PulsingRing brandColor={colors.brand.default} />
+        <View
+          style={[
+            styles.dotOuter,
+            {
+              backgroundColor: colors.surface.default,
+              borderColor: colors.border.subtle,
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.dotInner,
+              {
+                backgroundColor: isToday
+                  ? colors.brand.default
+                  : colors.border.default,
+              },
+            ]}
+          />
         </View>
       </View>
-      <Text style={[styles.dateText, isToday && styles.dateTextToday]}>
+      <Text
+        style={[
+          styles.dateText,
+          { color: colors.text.tertiary },
+          isToday && { color: colors.text.primary },
+        ]}
+      >
         {formatGroupDate(dateString)}
       </Text>
     </View>
@@ -83,22 +111,18 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: -24,
     width: 2,
-    backgroundColor: "#F5F5F4", // taupe100
   },
   pulseRing: {
     position: "absolute",
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "#E48B9B", // rose (main Aura color)
   },
   dotOuter: {
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: "#FFFFFF",
     borderWidth: 2,
-    borderColor: "#F5F5F4",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 10,
@@ -112,20 +136,12 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#E7E5E4", // taupe200
-  },
-  dotInnerToday: {
-    backgroundColor: "#E48B9B", // rose
   },
   dateText: {
     fontSize: 12,
     fontWeight: "900",
-    color: "#A8A29E", // taupe400
     textTransform: "uppercase",
     letterSpacing: 2,
     marginLeft: 8,
-  },
-  dateTextToday: {
-    color: "#1C1917", // taupe900
   },
 });

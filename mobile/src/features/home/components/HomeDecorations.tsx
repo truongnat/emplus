@@ -13,7 +13,7 @@ import Animated, {
   cancelAnimation,
 } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
-import { palette } from "@/src/theme";
+import { palette, useThemeColors } from "@/src/theme";
 
 export interface PulseStarProps {
   delay?: number;
@@ -29,7 +29,7 @@ export interface PulseStarProps {
 export function PulseStar({
   delay = 0,
   size = 18,
-  color = palette["amber-400"],
+  color = palette.amber500,
   top,
   left,
   right,
@@ -103,6 +103,7 @@ export function PulseStar({
 }
 
 export function RingingBell() {
+  const colors = useThemeColors();
   const rotation = useSharedValue(0);
 
   useEffect(() => {
@@ -140,9 +141,14 @@ export function RingingBell() {
       <Ionicons
         name="notifications-outline"
         size={24}
-        color={(palette as any)["slate-600"]}
+        color={colors.brand.default}
       />
-      <View style={styles.notificationDot} />
+      <View
+        style={[
+          styles.notificationDot,
+          { borderColor: colors.surface.default },
+        ]}
+      />
     </Animated.View>
   );
 }
@@ -154,9 +160,8 @@ const styles = StyleSheet.create({
     right: -2,
     width: 12,
     height: 12,
-    backgroundColor: "#f43f5e",
+    backgroundColor: palette.coral500,
     borderRadius: 9999,
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.9)",
   },
 });

@@ -1,52 +1,64 @@
-# 🎨 Em Plus - UI/UX Style Guide
+# Em Plus - UI/UX Style Guide
 
-Tài liệu này định nghĩa các quy chuẩn thiết kế giao diện và trải nghiệm người dùng cho dự án Em Plus, đảm bảo tính nhất quán trên cả Mobile và Web.
+> **Comprehensive spec:** See [`VISUAL_DESIGN_GUIDE.md`](VISUAL_DESIGN_GUIDE.md) for the full design system (tokens, semantic mapping, motion, glass rules, emotional UX, IA).
+>
+> **Canonical token values** live in `mobile/src/theme/tokens/palette.ts` and semantic theme files. Do not duplicate hex in new docs.
 
-## 1. Nguyên tắc thiết kế (Design Principles)
-- **Cảm xúc (Emotional):** Sử dụng các tông màu ấm, mềm mại để tạo cảm giác gần gũi.
-- **Tối giản (Minimalism):** Loại bỏ các thành phần không cần thiết, tập trung vào nội dung và hình ảnh kỷ niệm.
-- **Glassmorphism:** Sử dụng hiệu ứng kính mờ (Glass) để tạo chiều sâu và tính hiện đại cho giao diện.
-- **Trực quan (Intuitive):** Các hành động quan trọng (Pairing, Add Memory) phải dễ dàng truy cập.
+## 1. Design principles
 
-## 2. Bảng màu (Color Palette)
+- **Emotional:** Warm, soft tones that feel intimate and caring.
+- **Minimalism:** Remove unnecessary elements; focus on memories and content.
+- **Glassmorphism:** Liquid glass layers for depth and modernity.
+- **Intuitive:** Key actions (pairing, add memory) are immediately accessible.
 
-Hệ thống màu sắc được xây dựng dựa trên các tokens linh hoạt:
+## 2. Color palette
 
-| Tên màu | Giá trị | Ý nghĩa |
+| Name | Value | Meaning |
 | :--- | :--- | :--- |
-| **Primary** | `#EC1334` | Màu chủ đạo (Tượng trưng cho tình yêu). |
-| **Secondary** | `#7B61FF` | Màu bổ trợ cho các tính năng cảm xúc. |
-| **Accent** | `#2563EB` | Màu nhấn cho các hành động quan trọng. |
-| **Ink** | `#0F172A` | Màu chữ chính (Đậm). |
-| **Muted** | `#64748B` | Màu chữ phụ, trạng thái vô hiệu hóa. |
-| **Success** | `#10B981` | Trạng thái thành công, hoàn thành. |
-| **Danger** | `#EF4444` | Trạng thái lỗi, cảnh báo. |
+| **Primary** | `#FF6B81` (coral500) | Love, warmth |
+| **Secondary** | `#7B61FF` (indigo500) | Connection, trust |
+| **Accent** | `#4FD1C5` (teal500) | Freshness, hope |
+| **Text primary** | `#1C1917` (taupe900) | Main text (light mode) |
+| **Text secondary** | `#78716C` (taupe500) | Supporting text |
+| **Success** | `#10B981` | Completion, positive state |
+| **Error** | `#E11D48` | Error state |
+| **Warning** | `#D97706` | Caution state |
+| **Info** | `#7B61FF` (indigo) | Informational state |
 
-## 3. Kiểu chữ (Typography)
+## 3. Typography
 
-Dự án sử dụng bộ font **Be Vietnam Pro** để mang lại cảm giác hiện đại và hỗ trợ tiếng Việt hoàn hảo.
+Font: **Be Vietnam Pro** for Vietnamese support and modern feel. **Roboto Mono** for numeric data.
 
-- **Body:** `BeVietnamPro_400Regular` - Dùng cho nội dung văn bản.
-- **Medium:** `BeVietnamPro_500Medium` - Dùng cho nhãn (Labels).
-- **SemiBold:** `BeVietnamPro_600SemiBold` - Dùng cho tiêu đề nhỏ.
-- **Bold:** `BeVietnamPro_700Bold` - Dùng cho tiêu đề lớn (Headings).
-- **Mono:** `RobotoMono_400Regular` - Dùng cho mã code hoặc con số kỹ thuật.
+- **Body:** `BeVietnamPro_400Regular` (15px)
+- **Medium:** `BeVietnamPro_500Medium` (15px)
+- **SemiBold:** `BeVietnamPro_600SemiBold` (20px)
+- **Bold:** `BeVietnamPro_700Bold` (24px)
+- **ExtraBold:** `BeVietnamPro_800ExtraBold` (36px display)
+- **Mono:** `RobotoMono_400Regular` / `RobotoMono_700Bold`
 
-## 4. Thành phần giao diện (UI Components)
+## 4. UI components
 
-### 4.1 Glass Cards
-Sử dụng background `rgba(255, 255, 255, 0.4)` kết hợp với `blur` và border nhẹ để tạo hiệu ứng lớp kính.
+### 4.1 Glass cards
 
-### 4.2 Radii (Bo góc)
-- **Small (sm):** `8px` - Cho các input, button nhỏ.
-- **Medium (md):** `12px` - Cho các thẻ (Cards) thông thường.
-- **Large (lg):** `18px` - Cho các section chính.
-- **Extra Large (xl):** `24px` - Cho các banner hoặc modal.
+Background `rgba(255, 255, 255, 0.55)` (light) / `rgba(255, 255, 255, 0.08)` (dark) with blur 12-20 and 1px white border at 20% opacity.
 
-## 5. Trải nghiệm người dùng (UX)
-- **Haptic Feedback:** Rung nhẹ khi người dùng thực hiện các hành động quan trọng trên Mobile.
-- **Skeleton Loading:** Hiển thị khung xương khi đang tải dữ liệu để giảm cảm giác chờ đợi.
-- **Zero State:** Thiết kế màn hình trống thân thiện để hướng dẫn người dùng bắt đầu (VD: Khi chưa có kỷ niệm nào).
+### 4.2 Radii (border radius)
+
+- **xs:** 4px -- tags, chips
+- **sm:** 6px -- badges
+- **md:** 10px -- inputs, standard cards
+- **lg:** 14px -- auth inputs, emphasized cards
+- **xl:** 20px -- glass cards
+- **2xl:** 28px -- hero banners, modals
+- **full:** 9999px -- pills, avatars, primary buttons
+
+## 5. UX patterns
+
+- **Haptic feedback:** Light vibration for important actions on mobile.
+- **Skeleton loading:** Shimmer placeholders during data fetch.
+- **Zero state:** Warm illustrations with encouraging copy for empty screens.
+- **Reduced motion:** All animations collapse when the user prefers reduced motion.
 
 ---
-*Style Guide này là kim chỉ nam cho việc phát triển giao diện đồng bộ và chuyên nghiệp.*
+
+*This guide summarizes key decisions. For the full design system spec, see [`VISUAL_DESIGN_GUIDE.md`](VISUAL_DESIGN_GUIDE.md).*
