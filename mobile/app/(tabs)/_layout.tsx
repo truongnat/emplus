@@ -4,26 +4,37 @@ import { StyleSheet, View, Dimensions, TouchableOpacity } from "react-native";
 import { useSession } from "@/src/session-context";
 import { LiveChannelProvider } from "@/src/features/live";
 import { useThemeColors, useThemeMeta, useBlurTint } from "@/src/theme";
+import { elevation } from "@/src/theme/elevation";
+import { radius, borderWidth } from "@/src/theme/tokens";
 import { BlurView } from "expo-blur";
 import { useEffect } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import Reanimated, {
+  Easing,
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  withSequence,
+  withTiming,
 } from "react-native-reanimated";
+import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
+import { TabBarGridAnimatedBackground } from "@/src/components/molecules/TabBarGridAnimatedBackground";
 
 const { width } = Dimensions.get("window");
 
-// Constants
-const TAB_ITEM_COUNT = 4;
-const PILL_PADDING = 8;
-const PILL_WIDTH = width * 0.72;
-const ITEM_WIDTH = (PILL_WIDTH - PILL_PADDING * 2) / TAB_ITEM_COUNT;
-const PILL_HEIGHT = 72;
-const ACTIVE_INDICATOR_HEIGHT = 56;
-const CARE_BUTTON_SIZE = 80;
+/** Pill holds 4 primary tabs (home, timeline, notifications, budget) — see filter in CustomTabBar. */
+const TAB_SLOTS = 4;
+const PILL_PADDING = 10;
+const PILL_WIDTH = Math.min(width * 0.78, 340);
+const ITEM_WIDTH = (PILL_WIDTH - PILL_PADDING * 2) / TAB_SLOTS;
+const PILL_HEIGHT = 62;
+const ACTIVE_INDICATOR_HEIGHT = 46;
+const INDICATOR_TOP = (PILL_HEIGHT - ACTIVE_INDICATOR_HEIGHT) / 2;
+const CARE_BUTTON_SIZE = 72;
+const CARE_RADIUS = CARE_BUTTON_SIZE / 2;
+/** Smaller than pill icons — detached FAB reads cleaner with a modest heart. */
+const CARE_HEART_ICON_SIZE = 24;
 
 function iconForRoute(
   route: string,
@@ -55,8 +66,10 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
   const insets = useSafeAreaInsets();
   const colors = useThemeColors();
   const { isDark } = useThemeMeta();
+  const reducedMotion = useReducedMotion();
+  const carePressScale = useSharedValue(1);
   const blurTint = useBlurTint();
-  const blurIntensity = isDark ? 78 : 90;
+  const blurIntensity = isDark ? 70 : 88;
 
   // Routes for the pill (excluding care and notifications)
   const pillRoutes = state.routes.filter(
@@ -66,17 +79,13 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
   const careRoute = state.routes[careRouteIndex];
   const isCareFocused = state.index === careRouteIndex;
 
-  const PILL_PADDING_LOCAL = 8;
-  const PILL_WIDTH_LOCAL = width * 0.72;
-  const ITEM_WIDTH_LOCAL = (PILL_WIDTH_LOCAL - PILL_PADDING_LOCAL * 2) / 4;
-
   const pillActiveIndex = pillRoutes.findIndex(
     (r: any) => r.name === state.routes[state.index].name,
   );
   const initialX =
     pillActiveIndex === -1
-      ? PILL_PADDING_LOCAL
-      : PILL_PADDING_LOCAL + pillActiveIndex * ITEM_WIDTH_LOCAL;
+      ? PILL_PADDING
+      : PILL_PADDING + pillActiveIndex * ITEM_WIDTH;
 
   const slideX = useSharedValue(initialX);
 
@@ -88,11 +97,11 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
       (r: any) => r.name === state.routes[state.index].name,
     );
     if (idx === -1) return;
-    const target = PILL_PADDING_LOCAL + idx * ITEM_WIDTH_LOCAL;
+    const target = PILL_PADDING + idx * ITEM_WIDTH;
     slideX.value = withSpring(target, {
-      damping: 16,
-      stiffness: 180,
-      mass: 0.85,
+      damping: 18,
+      stiffness: 200,
+      mass: 0.9,
     });
   }, [state.index, state.routes]);
 
@@ -100,8 +109,35 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
     transform: [{ translateX: slideX.value }],
   }));
 
-  const pillOuterBg = isDark ? "rgba(38, 28, 32, 0.78)" : "rgba(255, 255, 255, 0.72)";
-  const careOuterBg = isDark ? "rgba(32, 24, 28, 0.85)" : "rgba(255, 255, 255, 0.82)";
+  const careBounceStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: carePressScale.value }],
+  }));
+
+  function playCareHeartBounce() {
+    if (reducedMotion) return;
+    // Timing for press-in avoids chained-spring “steps”; spring only on release. Icon-only scale
+    // (not the BlurView chrome) keeps iOS blur from re-rasterizing every frame.
+    carePressScale.value = withSequence(
+      withTiming(0.9, { duration: 95, easing: Easing.out(Easing.cubic) }),
+      withSpring(1, {
+        damping: 19,
+        stiffness: 340,
+        mass: 0.55,
+        overshootClamping: false,
+      }),
+    );
+  }
+
+  /** VISUAL_DESIGN_GUIDE §2.6 — glass primary + warm fallback for Android / low blur. */
+  const glassBorder = isDark ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.38)";
+  const pillGlassFallback = isDark
+    ? "rgba(255, 255, 255, 0.08)"
+    : "rgba(255, 255, 255, 0.52)";
+  const pillTintUnderlay = isDark ? "rgba(26, 20, 22, 0.88)" : "rgba(252, 249, 248, 0.4)";
+  const careGlassFallback = isDark
+    ? "rgba(255, 255, 255, 0.1)"
+    : "rgba(255, 255, 255, 0.58)";
+  const careTintUnderlay = isDark ? "rgba(22, 18, 20, 0.9)" : "rgba(255, 248, 247, 0.45)";
 
   const handlePress = async (route: any, index: number) => {
     // Trigger haptic feedback
@@ -118,27 +154,93 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
     }
   };
 
+  const handleCarePress = async () => {
+    playCareHeartBounce();
+    await handlePress(careRoute, careRouteIndex);
+  };
+
   const isPillFocused = pillRoutes.some(
     (r: any) => r.name === state.routes[state.index].name,
   );
 
+  const navPadH = 16;
+  const navPadBottom = 18;
+
   return (
-    <View style={[styles.tabBarWrapper, { paddingBottom: insets.bottom + 16 }]}>
+    <View
+      style={[
+        styles.tabBarWrapper,
+        {
+          paddingBottom: insets.bottom + navPadBottom,
+          paddingLeft: navPadH + insets.left,
+          paddingRight: navPadH + insets.right,
+        },
+      ]}
+    >
       <View style={styles.tabBarContainer}>
-        {/* Main pill — blur theo theme */}
-        <View style={[styles.pillOuter, { backgroundColor: pillOuterBg }]}>
+        <View
+          style={[
+            styles.pillOuter,
+            elevation.raised,
+            {
+              width: PILL_WIDTH,
+              height: PILL_HEIGHT,
+              borderRadius: radius["2xl"],
+              borderWidth: borderWidth.sm,
+              borderColor: glassBorder,
+              backgroundColor: pillTintUnderlay,
+            },
+          ]}
+        >
+          <View
+            pointerEvents="none"
+            style={[
+              StyleSheet.absoluteFillObject,
+              { borderRadius: radius["2xl"], overflow: "hidden" },
+            ]}
+          >
+            <TabBarGridAnimatedBackground
+              variant="embed"
+              patternIdSuffix="pill"
+              isDark={isDark}
+              width={PILL_WIDTH}
+              height={PILL_HEIGHT}
+            />
+          </View>
+          <View
+            pointerEvents="none"
+            style={[
+              StyleSheet.absoluteFillObject,
+              { borderRadius: radius["2xl"], backgroundColor: pillGlassFallback },
+            ]}
+          />
           <BlurView
             intensity={blurIntensity}
             tint={blurTint}
-            style={styles.pillContainer}
+            style={[
+              StyleSheet.absoluteFillObject,
+              {
+                borderRadius: radius["2xl"],
+                flexDirection: "row",
+                paddingHorizontal: PILL_PADDING,
+                alignItems: "center",
+                justifyContent: "space-between",
+              },
+            ]}
           >
             {isPillFocused && (
               <Reanimated.View
                 style={[
                   styles.activeIndicator,
                   {
-                    width: ITEM_WIDTH_LOCAL,
+                    width: ITEM_WIDTH,
+                    top: INDICATOR_TOP,
+                    borderRadius: radius.xl,
                     backgroundColor: colors.brand.muted,
+                    borderWidth: borderWidth.thin,
+                    borderColor: isDark
+                      ? "rgba(255, 182, 193, 0.12)"
+                      : "rgba(255, 107, 129, 0.18)",
                   },
                   indicatorStyle,
                 ]}
@@ -164,7 +266,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
                 >
                   <Ionicons
                     name={iconForRoute(route.name, isFocused)}
-                    size={24}
+                    size={isFocused ? 25 : 23}
                     color={
                       isFocused ? colors.brand.default : colors.text.tertiary
                     }
@@ -176,37 +278,103 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
         </View>
 
         <TouchableOpacity
-          onPress={() => handlePress(careRoute, careRouteIndex)}
+          onPress={handleCarePress}
           style={[
-            styles.detachedButtonWrapper,
-            { shadowColor: colors.brand.default },
+            elevation.floated,
+            {
+              shadowColor: colors.brand.default,
+              shadowOpacity: isDark ? 0.35 : 0.28,
+            },
           ]}
-          activeOpacity={0.9}
+          activeOpacity={1}
           accessibilityRole="button"
           accessibilityState={{ selected: isCareFocused }}
           accessibilityLabel="Cảm xúc"
           accessibilityHint="Kiểm tra tâm trạng và kết nối với người ấy"
         >
-          <View style={[styles.careOuter, { backgroundColor: careOuterBg }]}>
-            <BlurView
-              intensity={blurIntensity}
-              tint={blurTint}
-              style={[
-                styles.careButton,
-                isCareFocused && {
-                  backgroundColor: colors.brand.default,
-                  borderColor: colors.brand.default,
-                },
-              ]}
-            >
-              <Ionicons
-                name={isCareFocused ? "heart" : "heart-outline"}
-                size={30}
-                color={
-                  isCareFocused ? colors.text.onBrand : colors.brand.default
-                }
-              />
-            </BlurView>
+          <View
+            style={[
+              styles.careOuter,
+              {
+                width: CARE_BUTTON_SIZE,
+                height: CARE_BUTTON_SIZE,
+                borderRadius: CARE_RADIUS,
+                backgroundColor: careTintUnderlay,
+              },
+            ]}
+          >
+            {/*
+              Active: single solid surface — avoids BlurView + solid tint sampling grid/veil (“double bg”).
+              Inactive: glass + grid stack.
+            */}
+            {isCareFocused ? (
+              <View
+                style={[
+                  StyleSheet.absoluteFillObject,
+                  {
+                    borderRadius: CARE_RADIUS,
+                    backgroundColor: colors.brand.default,
+                    borderWidth: borderWidth.sm,
+                    borderColor: colors.brand.strong,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
+                ]}
+              >
+                <Reanimated.View
+                  style={[careBounceStyle, styles.careHeartWrap]}
+                >
+                  <Ionicons
+                    name="heart"
+                    size={CARE_HEART_ICON_SIZE}
+                    color={colors.text.onBrand}
+                  />
+                </Reanimated.View>
+              </View>
+            ) : (
+              <>
+                <View pointerEvents="none" style={StyleSheet.absoluteFillObject}>
+                  <TabBarGridAnimatedBackground
+                    variant="embed"
+                    patternIdSuffix="care"
+                    isDark={isDark}
+                    width={CARE_BUTTON_SIZE}
+                    height={CARE_BUTTON_SIZE}
+                  />
+                </View>
+                <View
+                  pointerEvents="none"
+                  style={[
+                    StyleSheet.absoluteFillObject,
+                    { backgroundColor: careGlassFallback },
+                  ]}
+                />
+                <BlurView
+                  intensity={blurIntensity}
+                  tint={blurTint}
+                  style={[
+                    StyleSheet.absoluteFillObject,
+                    {
+                      borderRadius: CARE_RADIUS,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderWidth: borderWidth.thin,
+                      borderColor: glassBorder,
+                    },
+                  ]}
+                >
+                  <Reanimated.View
+                    style={[careBounceStyle, styles.careHeartWrap]}
+                  >
+                    <Ionicons
+                      name="heart-outline"
+                      size={CARE_HEART_ICON_SIZE}
+                      color={colors.brand.default}
+                    />
+                  </Reanimated.View>
+                </BlurView>
+              </>
+            )}
           </View>
         </TouchableOpacity>
       </View>
@@ -259,32 +427,17 @@ const styles = StyleSheet.create({
   tabBarContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 14,
   },
   pillOuter: {
-    borderRadius: 40,
+    position: "relative",
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
-    elevation: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
-  },
-  pillContainer: {
-    flexDirection: "row",
-    height: PILL_HEIGHT,
-    width: PILL_WIDTH,
-    paddingHorizontal: PILL_PADDING,
-    alignItems: "center",
-    justifyContent: "space-between",
   },
   activeIndicator: {
     position: "absolute",
     height: ACTIVE_INDICATOR_HEIGHT,
-    borderRadius: 28,
     left: 0,
-    top: PILL_PADDING,
+    zIndex: 0,
   },
   tabItem: {
     flex: 1,
@@ -293,24 +446,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 10,
   },
-  detachedButtonWrapper: {
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
-    shadowRadius: 15,
-    elevation: 12,
-  },
   careOuter: {
-    borderRadius: 40,
+    position: "relative",
     overflow: "hidden",
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
   },
-  careButton: {
-    width: CARE_BUTTON_SIZE,
-    height: CARE_BUTTON_SIZE,
-    borderRadius: CARE_BUTTON_SIZE / 2,
+  careHeartWrap: {
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.5)",
   },
 });

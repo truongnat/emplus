@@ -36,7 +36,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const colors = useThemeColors();
   const { isDark } = useThemeMode();
-  const { session, clearSession, hydrated, isAuthenticated } = useSession();
+  const { session, hydrated, isAuthenticated } = useSession();
 
   useAuthGridChrome(isDark, colors.background.default, true);
 
@@ -61,13 +61,10 @@ export default function HomeScreen() {
     }
   }, [isAuthenticated, isPaired, router]);
 
-  function handleLogout(): void {
-    clearSession();
-    router.replace("/login");
-  }
-
   const scrollPaddingTop =
     authGridScrollPaddingTop(insets.top) + AUTH_LOGIN_SCROLL_EXTRA_TOP;
+  /** Floating tab bar (~72px) + wrapper padding + home indicator — never clip last section. */
+  const scrollPaddingBottom = Math.max(128, insets.bottom + 100);
 
   const authShell = (
     children: React.ReactNode,
@@ -157,7 +154,10 @@ export default function HomeScreen() {
       style={styles.scrollView}
       contentContainerStyle={[
         styles.scrollContent,
-        { paddingTop: scrollPaddingTop },
+        {
+          paddingTop: scrollPaddingTop,
+          paddingBottom: scrollPaddingBottom,
+        },
       ]}
       showsVerticalScrollIndicator={false}
       keyboardDismissMode="on-drag"

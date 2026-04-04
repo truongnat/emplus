@@ -30,3 +30,6 @@ Thư mục theo dõi ticket nhẹ, đồng bộ với [`workflows/dev/w-ticket.m
 | [ticket-24](./ticket-24/TICKET.md) | ClockTicker — aligned seconds + odometer wrap (9→0, 5→0) | done   |
 | [ticket-25](./ticket-25/TICKET.md) | Home below hero — meaning + beauty (quick actions, focus, events) | done   |
 | [ticket-26](./ticket-26/TICKET.md) | Home — semantic heading & text hierarchy (H1/H2, AppText a11y) | done   |
+| [ticket-27](./ticket-27/TICKET.md) | Bottom tab bar — glass, elevation, radii per Visual Design Guide | done   |
+| [ticket-28](./ticket-28/TICKET.md) | Care heart navbar — bounce on press (Reanimated, reduce motion) | done   |
+| [ticket-29](./ticket-29/TICKET.md) | Home screen — review pass, scroll inset, dead code | done   |

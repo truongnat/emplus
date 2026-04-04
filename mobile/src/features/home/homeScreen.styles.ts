@@ -25,6 +25,7 @@ export const homeScreenStyles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 22,
+    /** Default; home screen overrides with `insets.bottom` for tab bar. */
     paddingBottom: 128,
   },
   centerContainer: {
