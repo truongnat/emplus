@@ -115,6 +115,10 @@ export namespace CareModule {
   export type FemaleCycleResponse = ApiResponse<"/v1/care/female-cycle", "post">;
   
   export type MaleSuggestionsResponse = ApiResponse<"/v1/care/male-suggestions", "get">;
+
+  export type CoupleMoodResponse = ApiResponse<"/v1/care/mood", "get">;
+  export type SaveMoodRequest = ApiRequest<"/v1/care/mood", "put">;
+  export type SaveMoodResponse = ApiResponse<"/v1/care/mood", "put">;
 }
 
 export namespace BudgetModule {

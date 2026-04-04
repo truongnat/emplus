@@ -9,6 +9,7 @@ import type {
   Invite,
   MemoryItem,
   User,
+  UserMoodState,
 } from "../types.ts";
 import type { DataStore } from "./contracts.ts";
 
@@ -31,6 +32,7 @@ export class InMemoryStore implements DataStore {
   couples = new Map<string, Couple>();
   invites = new Map<string, Invite>();
   memories = new Map<string, MemoryItem>();
+  userMoods = new Map<string, UserMoodState>();
   budgetItems = new Map<string, BudgetItem>();
   anniversaries = new Map<string, Anniversary>();
   cycles = new Map<string, EmotionalCycle>();
@@ -49,6 +51,7 @@ export class InMemoryStore implements DataStore {
     this.couples.clear();
     this.invites.clear();
     this.memories.clear();
+    this.userMoods.clear();
     this.budgetItems.clear();
     this.anniversaries.clear();
     this.cycles.clear();
@@ -276,6 +279,27 @@ export class InMemoryStore implements DataStore {
     this.memories.set(memory.id, memory);
   }
 
+  async updateMemory(memory: MemoryItem): Promise<void> {
+    const existing = this.memories.get(memory.id);
+    if (!existing || existing.coupleId !== memory.coupleId) {
+      return;
+    }
+    this.memories.set(memory.id, memory);
+  }
+
+  async getMemoryByCouple(coupleId: string, memoryId: string): Promise<MemoryItem | undefined> {
+    const m = this.memories.get(memoryId);
+    if (!m || m.coupleId !== coupleId) return undefined;
+    return m;
+  }
+
+  async deleteMemory(coupleId: string, memoryId: string): Promise<boolean> {
+    const m = this.memories.get(memoryId);
+    if (!m || m.coupleId !== coupleId) return false;
+    this.memories.delete(memoryId);
+    return true;
+  }
+
   async listBudgetItemsByCouple(coupleId: string): Promise<BudgetItem[]> {
     return Array.from(this.budgetItems.values()).filter((item) => item.coupleId === coupleId);
   }
@@ -326,6 +350,20 @@ export class InMemoryStore implements DataStore {
 
   async saveCycle(cycle: EmotionalCycle): Promise<void> {
     this.cycles.set(cycle.userId, cycle);
+  }
+
+  async getMoodByUserId(userId: string): Promise<UserMoodState | undefined> {
+    return this.userMoods.get(userId);
+  }
+
+  async upsertUserMood(userId: string, value: number): Promise<UserMoodState> {
+    const state: UserMoodState = {
+      userId,
+      value,
+      updatedAt: nowIso(),
+    };
+    this.userMoods.set(userId, state);
+    return state;
   }
 
   async updateCouple(couple: Couple): Promise<void> {
@@ -441,13 +479,13 @@ export class InMemoryStore implements DataStore {
   }
 
   async createInAppNotification(
-    input: Omit<InAppNotification, "id" | "createdAt"> & { id?: string },
+    input: Omit<InAppNotification, "id" | "createdAt"> & { id?: string; createdAt?: string },
   ): Promise<InAppNotification> {
     const id = input.id ?? crypto.randomUUID();
     const row: InAppNotification = {
       ...input,
       id,
-      createdAt: new Date().toISOString(),
+      createdAt: input.createdAt ?? new Date().toISOString(),
       metadata: input.metadata ?? {},
     };
     this.inAppNotifications.set(id, row);

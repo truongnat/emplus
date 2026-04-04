@@ -19,7 +19,7 @@ export function RegisterHeroSection() {
       style={styles.registerHeader}
       entering={enteringHero}
       accessibilityRole="header"
-      accessibilityLabel="Em Plus, tạo tài khoản"
+      accessibilityLabel="Em+, tạo tài khoản"
     >
       <View style={styles.registerLogoMark}>
         <EmplusLottie

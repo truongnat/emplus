@@ -69,7 +69,7 @@ describe('OpenAPI Documentation', () => {
 
       const data = await res.json();
       expect(data.openapi).toBe('3.0.3');
-      expect(data.info.title).toBe('Em Plus API');
+      expect(data.info.title).toBe('Em+ API');
       expect(data.paths).toBeDefined();
       expect(data.components).toBeDefined();
     });

@@ -20,6 +20,10 @@ export const lottieInventory = {
   placeholder: require("../../assets/lottie/placeholder.json"),
   /** Verify OTP hero — `Password Authentication.lottie` → JSON + embedded PNGs. */
   verifyOtpPasswordAuth: require("../../assets/lottie/verify-otp-password-auth.json"),
+  /** Notifications empty — `Cat playing animation.lottie` → JSON (vector). */
+  notificationsEmptyCat: require("../../assets/lottie/notifications-empty-cat.json"),
+  /** Timeline empty — `Love.lottie` (dotLottie → JSON, vector). */
+  timelineEmptyLove: require("../../assets/lottie/timeline-empty-love.json"),
 } as const;
 
 export type LottieInventoryKey = keyof typeof lottieInventory;

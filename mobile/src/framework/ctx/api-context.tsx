@@ -108,7 +108,13 @@ export default function ApiContext({ children }: PropsWithChildren) {
   return (
     <PersistQueryClientProvider
       client={queryClient}
-      persistOptions={{ persister: asyncStoragePersister }}
+      persistOptions={{
+        persister: asyncStoragePersister,
+        dehydrateOptions: {
+          shouldDehydrateQuery: (query) =>
+            query.queryKey[0] !== "timelineMemories",
+        },
+      }}
     >
       {children}
     </PersistQueryClientProvider>

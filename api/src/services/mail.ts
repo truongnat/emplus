@@ -13,12 +13,12 @@ const transporter = nodemailer.createTransport({
 
 export async function sendOtpMail(email: string, otp: string) {
     const mailOptions = {
-        from: `"Em Plus" <${env.smtpFrom}>`,
+        from: `"Em+" <${env.smtpFrom}>`,
         to: email,
         subject: `Mã xác thực OTP của bạn: ${otp}`,
         html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; borderRadius: 10px;">
-        <h2 style="color: #FF4D67; text-align: center;">Xác thực tài khoản Em Plus</h2>
+        <h2 style="color: #FF4D67; text-align: center;">Xác thực tài khoản Em+</h2>
         <p>Chào bạn,</p>
         <p>Để hoàn tất quá trình đăng nhập/đăng ký, vui lòng sử dụng mã OTP dưới đây:</p>
         <div style="background: #f9f9f9; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #333; margin: 20px 0; border-radius: 8px;">

@@ -51,10 +51,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const refreshAuthRef = useRef<() => Promise<string | null>>(async () => null);
 
-  useEffect(() => {
-    const token = session?.tokens?.accessToken;
-    tokenManager.setAccessToken(token ?? null);
-  }, [session?.tokens?.accessToken]);
+  /**
+   * Đồng bộ token vào singleton ngay trong render (không chỉ useEffect).
+   * Nếu chỉ dùng useEffect, effect con (Query, debounce, unmount flush) có thể
+   * gọi API trước effect cha → ApiClient không có Bearer → 401/“Thiếu bearer token”.
+   */
+  tokenManager.setAccessToken(session?.tokens?.accessToken ?? null);
 
   const clearSession = useCallback(async () => {
     setSession(null);

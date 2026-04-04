@@ -4,6 +4,7 @@ import {
   CoupleModule,
   CareModule,
   BudgetModule,
+  type Memory,
 } from "../../domain/entities/schemas";
 import {
   TimelineRepository,
@@ -26,6 +27,20 @@ export class TimelineRepositoryImpl implements TimelineRepository {
     const response = await apiClient.post<
       ApiResponse<TimelineModule.CreateResponse>
     >("/timeline/memories", params);
+    return response.data;
+  }
+
+  async getMemory(id: string): Promise<Memory> {
+    const response = await apiClient.get<ApiResponse<Memory>>(
+      `/timeline/memories/${encodeURIComponent(id)}`,
+    );
+    return response.data;
+  }
+
+  async deleteMemory(id: string): Promise<TimelineModule.DeleteResponse> {
+    const response = await apiClient.delete<
+      ApiResponse<TimelineModule.DeleteResponse>
+    >(`/timeline/memories/${encodeURIComponent(id)}`);
     return response.data;
   }
 }
@@ -67,6 +82,20 @@ export class CareRepositoryImpl implements CareRepository {
     const response = await apiClient.get<
       ApiResponse<CareModule.MaleSuggestionsResponse>
     >("/care/male-suggestions");
+    return response.data;
+  }
+
+  async getCoupleMood() {
+    const response = await apiClient.get<
+      ApiResponse<CareModule.CoupleMoodResponse>
+    >("/care/mood");
+    return response.data;
+  }
+
+  async putCoupleMood(params: CareModule.SaveMoodRequest) {
+    const response = await apiClient.put<
+      ApiResponse<CareModule.SaveMoodResponse>
+    >("/care/mood", params);
     return response.data;
   }
 }

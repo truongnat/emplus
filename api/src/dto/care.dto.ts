@@ -20,3 +20,18 @@ export function validateSaveCycleInput(input: unknown): SaveCycleDto {
     message: "Dữ liệu chu kỳ không hợp lệ.",
   });
 }
+
+const saveMoodSchema = z.object({
+  value: z.coerce.number().refine(
+    (v) => Number.isInteger(v) && v >= 0 && v <= 100,
+    "value phải là số nguyên từ 0 đến 100.",
+  ),
+});
+
+export type SaveMoodDto = z.infer<typeof saveMoodSchema>;
+
+export function validateSaveMoodInput(input: unknown): SaveMoodDto {
+  return parseWithSchema(saveMoodSchema, input, {
+    message: "Dữ liệu tâm trạng không hợp lệ.",
+  });
+}

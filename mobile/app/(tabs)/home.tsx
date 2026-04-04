@@ -94,7 +94,7 @@ export default function HomeScreen() {
           pointerEvents="none"
           accessible
           accessibilityRole="text"
-          accessibilityLabel="Em Plus"
+          accessibilityLabel="Em+"
         >
           <LoginBrandGradientTitle />
         </View>

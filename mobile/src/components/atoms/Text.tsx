@@ -8,6 +8,7 @@ import {
   TextStyle,
   StyleSheet,
   type AccessibilityProps,
+  type TextProps as RNTextProps,
 } from "react-native";
 import { useTheme } from "@/src/theme";
 import { palette } from "@/src/theme/tokens";
@@ -33,7 +34,14 @@ type TextAccessibilityProps = Pick<
   | "accessibilityElementsHidden"
 >;
 
-export interface TextProps extends Partial<TextAccessibilityProps> {
+type TextAndroidProps = Pick<
+  RNTextProps,
+  "android_hyphenationFrequency" | "textBreakStrategy"
+>;
+
+export interface TextProps
+  extends Partial<TextAccessibilityProps>,
+    Partial<TextAndroidProps> {
   children: ReactNode;
   variant?: TextVariant;
   color?: TextColor;
@@ -55,6 +63,8 @@ export function Text({
   accessibilityHint,
   importantForAccessibility,
   accessibilityElementsHidden,
+  android_hyphenationFrequency,
+  textBreakStrategy,
 }: TextProps) {
   const theme = useTheme();
 
@@ -76,6 +86,8 @@ export function Text({
       style={[styles[variant], dynamicStyles.text, style]}
       numberOfLines={numberOfLines}
       onPress={onPress}
+      android_hyphenationFrequency={android_hyphenationFrequency}
+      textBreakStrategy={textBreakStrategy}
       accessible={accessible}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={accessibilityLabel}

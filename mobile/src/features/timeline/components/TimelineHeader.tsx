@@ -1,8 +1,10 @@
 import React from "react";
-import { View, ScrollView, Alert, StyleSheet } from "react-native";
-import { AppText, PressableScale, pickImage } from "@/src/ui-kit";
+import { View, ScrollView, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
+import { AppText, PressableScale } from "@/src/ui-kit";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeColors } from "@/src/theme";
+import { typographyRoles } from "@/src/theme/typography-roles";
 
 export interface FilterChip {
   id: string;
@@ -28,25 +30,26 @@ export function TimelineHeader({
   filters = DEFAULT_FILTERS,
 }: TimelineHeaderProps) {
   const colors = useThemeColors();
+  const router = useRouter();
 
-  const handleAddMemory = async () => {
-    try {
-      const asset = await pickImage();
-      if (asset) {
-        Alert.alert(
-          "Thành công",
-          `Đã chọn ảnh: ${asset.fileName || "ảnh mới"}`,
-        );
-      }
-    } catch (error: any) {
-      Alert.alert("Lỗi", error.message);
-    }
+  const handleAddMemory = () => {
+    router.push("/add-memory");
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.topRow}>
-        <AppText style={[styles.title, { color: colors.text.primary }]}>
+        <AppText
+          accessibilityRole="header"
+          style={[
+            typographyRoles.title,
+            styles.title,
+            {
+              color: colors.text.primary,
+              fontFamily: typographyRoles.display.fontFamily,
+            },
+          ]}
+        >
           Dòng thời gian
         </AppText>
         <PressableScale
@@ -116,11 +119,12 @@ export function TimelineHeader({
 }
 
 const styles = StyleSheet.create({
+  /** Safe area top do màn tab bọc ngoài; giữ sát với Thông báo. */
   container: {
-    paddingTop: 24,
-    paddingBottom: 4,
-    paddingHorizontal: 20,
-    gap: 20,
+    paddingTop: 4,
+    paddingBottom: 12,
+    paddingHorizontal: 22,
+    gap: 16,
   },
   topRow: {
     flexDirection: "row",
@@ -128,9 +132,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   title: {
-    fontSize: 28,
-    fontWeight: "900",
-    letterSpacing: -1,
+    letterSpacing: -0.5,
   },
   plusButton: {
     width: 44,
@@ -146,7 +148,7 @@ const styles = StyleSheet.create({
   },
   filterList: {
     gap: 12,
-    paddingRight: 20,
+    paddingRight: 22,
     paddingVertical: 4,
   },
   filterChip: {

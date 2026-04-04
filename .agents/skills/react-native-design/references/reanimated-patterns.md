@@ -773,3 +773,4 @@ function AnimatedComponent() {
   return <Animated.View style={animatedStyle} />;
 }
 ```
+

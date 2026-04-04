@@ -4,7 +4,7 @@ import MaskedView from "@react-native-masked-view/masked-view";
 import { LinearGradient } from "expo-linear-gradient";
 
 /**
- * Wordmark "Em Plus" với fill gradient (góc trên trái).
+ * Wordmark "Em+" với fill gradient (góc trên trái).
  */
 export function LoginBrandGradientTitle() {
   return (
@@ -12,7 +12,7 @@ export function LoginBrandGradientTitle() {
       style={styles.maskRoot}
       maskElement={
         <View style={styles.maskBox}>
-          <Text style={styles.maskText}>Em Plus</Text>
+          <Text style={styles.maskText}>Em+</Text>
         </View>
       }
     >
@@ -39,9 +39,9 @@ const styles = StyleSheet.create({
   },
   maskText: {
     fontFamily: "BeVietnamPro_800ExtraBold",
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "normal",
-    letterSpacing: -0.7,
+    letterSpacing: -0.5,
     color: "#000000",
     backgroundColor: "transparent",
     ...Platform.select({
@@ -51,6 +51,6 @@ const styles = StyleSheet.create({
   },
   gradient: {
     flex: 1,
-    minWidth: 200,
+    minWidth: 120,
   },
 });

@@ -1,4 +1,4 @@
-# Em Plus - Ứng dụng chăm sóc tình yêu (Mobile First)
+# Em+ — Ứng dụng chăm sóc tình yêu (Mobile First)
 
 Dự án Monorepo cung cấp nền tảng hỗ trợ các cặp đôi ghi lại kỷ niệm, theo dõi số ngày yêu và chăm sóc mối quan hệ.
 

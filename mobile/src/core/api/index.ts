@@ -39,9 +39,15 @@ export class ApiClient {
     const method = init?.method ?? "GET";
     const timeout = options?.timeoutMs ?? appConfig.api.timeoutMs;
 
-    // Tự động đính kèm Token nếu không skipAuth
+    const body = init?.body;
+    const isMultipart =
+      body != null &&
+      typeof body === "object" &&
+      typeof (body as FormData).append === "function";
+
+    // Tự động đính kèm Token nếu không skipAuth (multipart: không set Content-Type để RN gắn boundary)
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
+      ...(isMultipart ? {} : { "Content-Type": "application/json" }),
       ...(options?.headers ?? {}),
       ...((init?.headers as Record<string, string>) ?? {}),
     };
@@ -150,10 +156,31 @@ export class ApiClient {
     return this.request<T>(path, { method: "GET" }, options);
   }
 
-  post<T>(path: string, body?: any, options?: ApiRequestOptions) {
+  post<T>(path: string, body?: unknown, options?: ApiRequestOptions) {
+    if (body != null && typeof body === "object" && typeof (body as FormData).append === "function") {
+      return this.request<T>(
+        path,
+        { method: "POST", body: body as BodyInit },
+        options,
+      );
+    }
     return this.request<T>(
       path,
-      { method: "POST", body: body ? JSON.stringify(body) : undefined },
+      {
+        method: "POST",
+        body: body !== undefined && body !== null ? JSON.stringify(body) : undefined,
+      },
+      options,
+    );
+  }
+
+  put<T>(path: string, body?: unknown, options?: ApiRequestOptions) {
+    return this.request<T>(
+      path,
+      {
+        method: "PUT",
+        body: body !== undefined && body !== null ? JSON.stringify(body) : undefined,
+      },
       options,
     );
   }
@@ -164,6 +191,10 @@ export class ApiClient {
       { method: "PATCH", body: body !== undefined ? JSON.stringify(body) : undefined },
       options,
     );
+  }
+
+  delete<T>(path: string, options?: ApiRequestOptions) {
+    return this.request<T>(path, { method: "DELETE" }, options);
   }
 }
 

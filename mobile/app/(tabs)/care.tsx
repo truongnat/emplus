@@ -1,23 +1,32 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Pressable,
-  View,
-  ScrollView,
-  StyleSheet,
-  Animated,
-} from "react-native";
+import { Pressable, View, ScrollView, StyleSheet, Animated } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { StatusBar } from "expo-status-bar";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { Text } from "@/src/components/atoms/Text";
+import {
+  TOAST_DEFAULT_DURATION_MS,
+  TOAST_TAB_BAR_OFFSET,
+} from "@/src/components/atoms/Toast";
 import { Card } from "@/src/components/molecules/Card";
 import { MoodVibeCheck } from "@/src/features/mood";
-import { getMaleSuggestions, toDisplayError } from "@/src/api";
+import {
+  getCoupleMood,
+  getMaleSuggestions,
+  toDisplayError,
+} from "@/src/api";
+import { MOOD_BAND_LABEL_VI, moodBandFromValue } from "@/src/features/mood";
 import { useSession } from "@/src/session-context";
 import { palette } from "@/src/theme/tokens";
-import { useThemeColors } from "@/src/theme";
+import { useThemeColors, useThemeMode } from "@/src/theme";
+import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
+import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
+import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
+import { homeScreenStyles } from "@/src/features/home/homeScreen.styles";
 import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
 import { lottieInventory } from "@/src/lottie/inventory";
 import type { SemanticColors } from "@/src/theme/tokens/semantic";
@@ -89,9 +98,14 @@ const orbStyles = StyleSheet.create({
   },
 });
 
+interface CareSuggestion {
+  text: string;
+  callToAction?: { label: string };
+}
+
 interface ExtendedMaleSuggestions {
   emotionalStatusContext?: string;
-  suggestions?: any[];
+  suggestions?: CareSuggestion[];
   badge?: string;
 }
 
@@ -99,8 +113,6 @@ function createCareStyles(c: SemanticColors) {
   return StyleSheet.create({
     scrollContent: {
       paddingHorizontal: 24,
-      paddingTop: 24,
-      paddingBottom: 120,
     },
     header: {
       flexDirection: "row",
@@ -284,12 +296,45 @@ function createCareStyles(c: SemanticColors) {
       marginTop: 12,
       fontWeight: "600",
     },
+    partnerMoodCard: {
+      backgroundColor: c.surface.default,
+      borderRadius: 24,
+      borderWidth: 1,
+      borderColor: c.border.subtle,
+      padding: 18,
+      shadowColor: c.text.primary,
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.04,
+      shadowRadius: 14,
+      elevation: 3,
+    },
+    partnerMoodLabel: {
+      fontSize: 10,
+      fontWeight: "800",
+      color: c.text.tertiary,
+      letterSpacing: 1.2,
+      marginBottom: 6,
+    },
+    partnerMoodTitle: {
+      fontSize: 17,
+      fontWeight: "800",
+      color: c.text.primary,
+    },
+    partnerMoodSub: {
+      fontSize: 13,
+      color: c.text.secondary,
+      marginTop: 4,
+      fontWeight: "500",
+    },
     femaleContent: {
       alignItems: "center",
     },
+    screenRoot: {
+      flex: 1,
+      zIndex: 1,
+    },
     noticeContainer: {
       position: "absolute",
-      bottom: 110,
       left: 24,
       right: 24,
       zIndex: 2000,
@@ -315,10 +360,9 @@ function createCareStyles(c: SemanticColors) {
     },
     errorContainer: {
       position: "absolute",
-      bottom: 110,
       left: 24,
       right: 24,
-      zIndex: 2000,
+      zIndex: 2001,
       flexDirection: "row",
       alignItems: "center",
       gap: 12,
@@ -339,6 +383,7 @@ function createCareStyles(c: SemanticColors) {
       alignItems: "center",
       justifyContent: "center",
       padding: 24,
+      zIndex: 1,
     },
     centerText: {
       fontSize: 16,
@@ -352,9 +397,18 @@ function createCareStyles(c: SemanticColors) {
 export default function CareScreen() {
   const { session } = useSession();
   const colors = useThemeColors();
+  const { isDark } = useThemeMode();
+  const insets = useSafeAreaInsets();
+  useAuthGridChrome(isDark, colors.background.default, true);
   const styles = useMemo(() => createCareStyles(colors), [colors]);
   const [notice, setNotice] = useState<string | null>(null);
   const isAuthenticated = !!session;
+
+  useEffect(() => {
+    if (!notice) return;
+    const id = setTimeout(() => setNotice(null), TOAST_DEFAULT_DURATION_MS);
+    return () => clearTimeout(id);
+  }, [notice]);
 
   const user = session?.user;
   const isMale = user?.gender === "NAM";
@@ -367,6 +421,14 @@ export default function CareScreen() {
     },
     enabled: isMale,
     retry: false,
+  });
+
+  const { data: coupleMood } = useQuery({
+    queryKey: ["coupleMood"],
+    queryFn: getCoupleMood,
+    enabled: isAuthenticated && isMale,
+    staleTime: 15_000,
+    refetchInterval: 20_000,
   });
 
   const emotionalContext = data?.emotionalStatusContext ?? "";
@@ -390,29 +452,55 @@ export default function CareScreen() {
     return colors.brand.strong;
   }, [emotionalContext, colors]);
 
+  const toastBottom = insets.bottom + TOAST_TAB_BAR_OFFSET;
+  const scrollPadTop = insets.top + 10;
+  const scrollPadBottom = Math.max(128, insets.bottom + 100);
+
+  const appShell = (body: React.ReactNode) => (
+    <AppScreen
+      applyTopSafeAreaPadding={false}
+      wrapWithKeyboardDismiss={false}
+      style={{
+        ...loginScreenStyles.appScreenBase,
+        backgroundColor: "transparent",
+      }}
+      contentContainerStyle={loginScreenStyles.appContent}
+      animatedEntrance={false}
+    >
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <View style={homeScreenStyles.layerRoot}>
+        <LoginGridAnimatedBackground isDark={isDark} />
+        {body}
+      </View>
+    </AppScreen>
+  );
+
   if (!isAuthenticated) {
-    return (
-      <AppScreen>
-        <View style={styles.centerContainer}>
-          <EmplusLottie
-            source={lottieInventory.careHeart}
-            style={{ width: 160, height: 160 }}
-            loop
-            speed={0.85}
-          />
-          <Text style={styles.centerText}>
-            Đăng nhập để xem màn Cảm xúc
-          </Text>
-        </View>
-      </AppScreen>
+    return appShell(
+      <View style={[styles.centerContainer, { paddingTop: insets.top }]}>
+        <EmplusLottie
+          source={lottieInventory.careHeart}
+          style={{ width: 160, height: 160 }}
+          loop
+          speed={0.85}
+        />
+        <Text style={styles.centerText}>
+          Đăng nhập để xem màn Cảm xúc
+        </Text>
+      </View>,
     );
   }
 
-  return (
-    <AppScreen>
+  return appShell(
+    <View style={styles.screenRoot}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        style={{ flex: 1 }}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: scrollPadTop, paddingBottom: scrollPadBottom },
+        ]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         {/* Header */}
         <View style={styles.header}>
@@ -471,19 +559,36 @@ export default function CareScreen() {
           </View>
         </View>
 
-        <View style={{ alignItems: "center", marginBottom: 20 }}>
-          <EmplusLottie
-            source={lottieInventory.careHeart}
-            style={{ width: 128, height: 128 }}
-            loop
-            speed={0.8}
-          />
-        </View>
-
         {isMale ? (
           /* Male View - Suggestions */
           <View style={styles.maleContent}>
             <MoodOrb color={statusColor} />
+            {coupleMood?.partner ? (
+              <Card style={styles.partnerMoodCard}>
+                <Text style={styles.partnerMoodLabel}>TÂM TRẠNG CÔ ẤY</Text>
+                {typeof coupleMood.partner.value === "number" ? (
+                  <>
+                    <Text style={styles.partnerMoodTitle}>
+                      {MOOD_BAND_LABEL_VI[moodBandFromValue(coupleMood.partner.value)]}
+                    </Text>
+                    <Text style={styles.partnerMoodSub}>
+                      Điểm {coupleMood.partner.value}/100 — để bạn thấu hiểu hơn hôm nay.
+                    </Text>
+                  </>
+                ) : (
+                  <Text style={styles.partnerMoodSub}>
+                    {coupleMood.partner.fullName} chưa kéo thanh tâm trạng hôm nay.
+                  </Text>
+                )}
+              </Card>
+            ) : (
+              <Card style={styles.partnerMoodCard}>
+                <Text style={styles.partnerMoodLabel}>TÂM TRẠNG CÔ ẤY</Text>
+                <Text style={styles.partnerMoodSub}>
+                  Ghép đôi trong app để xem tâm trạng khi cô ấy chia sẻ.
+                </Text>
+              </Card>
+            )}
             {/* Status Card */}
             <Card style={styles.statusCard}>
               <View style={styles.statusCardContent}>
@@ -525,7 +630,7 @@ export default function CareScreen() {
               </View>
 
               {suggestions.length > 0 ? (
-                suggestions.map((s: any, idx: number) => (
+                suggestions.map((s, idx) => (
                   <Card
                     key={idx}
                     style={StyleSheet.flatten([
@@ -597,40 +702,41 @@ export default function CareScreen() {
           /* Female View - Mood Tracking */
           <View style={styles.femaleContent}>
             <MoodVibeCheck
-              partnerName="người ấy"
-              onMoodChange={(val) => {
-                setNotice("Đã cập nhật tâm trạng của bạn!");
+              onMoodChange={() => {
+                setNotice("Đã đồng bộ tâm trạng — người ấy có thể thấy.");
               }}
             />
           </View>
         )}
-
-        {/* Notice Toast */}
-        {notice && (
-          <View style={styles.noticeContainer}>
-            <View style={styles.noticeContent}>
-              <Ionicons
-                name="checkmark-circle"
-                size={20}
-                color={colors.status.success.icon}
-              />
-              <Text style={styles.noticeText}>{notice}</Text>
-            </View>
-          </View>
-        )}
-
-        {/* Error Banner */}
-        {error && isMale && (
-          <View style={styles.errorContainer}>
-            <Ionicons
-              name="alert-circle"
-              size={20}
-              color={colors.status.error.icon}
-            />
-            <Text style={styles.errorText}>{toDisplayError(error)}</Text>
-          </View>
-        )}
       </ScrollView>
-    </AppScreen>
+
+      {isMale && error ? (
+        <View style={[styles.errorContainer, { bottom: toastBottom }]}>
+          <Ionicons
+            name="alert-circle"
+            size={20}
+            color={colors.status.error.icon}
+          />
+          <Text style={styles.errorText}>{toDisplayError(error)}</Text>
+        </View>
+      ) : notice ? (
+        <Pressable
+          style={[styles.noticeContainer, { bottom: toastBottom }]}
+          onPress={() => setNotice(null)}
+          accessibilityRole="alert"
+          accessibilityLabel={notice}
+          accessibilityHint="Nhấn để đóng"
+        >
+          <View style={styles.noticeContent}>
+            <Ionicons
+              name="checkmark-circle"
+              size={20}
+              color={colors.status.success.icon}
+            />
+            <Text style={styles.noticeText}>{notice}</Text>
+          </View>
+        </Pressable>
+      ) : null}
+    </View>,
   );
 }

@@ -42,7 +42,7 @@ function FontLoadingScreen() {
         speed={1.1}
       />
       <Text style={[fontLoadingStyles.text, { color: colors.text.tertiary }]}>
-        Đang tải Em Plus...
+        Đang tải Em+...
       </Text>
     </View>
   );
@@ -140,6 +140,8 @@ function RootLayoutInner() {
               />
               <Stack.Screen name="policy" />
               <Stack.Screen name="add-expense" />
+              <Stack.Screen name="add-memory" />
+              <Stack.Screen name="memory/[id]" />
               <Stack.Screen name="profile-details/personal-info" />
               <Stack.Screen name="profile-details/notifications" />
               <Stack.Screen name="profile-details/appearance" />

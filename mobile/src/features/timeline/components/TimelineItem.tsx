@@ -1,5 +1,7 @@
-import React, { useMemo, useCallback } from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useMemo, useCallback, useRef } from "react";
+import { View, StyleSheet, type ViewStyle } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Swipeable } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { type MemoryItem } from "@/src/api";
@@ -13,29 +15,33 @@ import { useThemeColors } from "@/src/theme";
 
 interface TimelineItemProps {
   item: MemoryItem;
+  /** Nhãn tháng/năm trên trục — thường bật cho phần tử đầu mỗi nhóm ngày */
   showAxis?: boolean;
-  /** Lưới 2 cột: ẩn trục, thẻ co giãn theo cột */
-  grid?: boolean;
-  /** Ảnh thấp hơn một chút để tạo nhịp masonry */
-  staggerShort?: boolean;
+  /** Ẩn cột trục — dùng khi thẻ nằm trong layout xen kẽ trái/phải */
+  omitAxis?: boolean;
   onImagePress?: (images: string[], index: number) => void;
+  /** Chạm tiêu đề → màn chi tiết */
+  onTitlePress?: () => void;
+  /** Vuốt trái hiện nút Xoá; gọi khi user chạm Xoá (parent hiện xác nhận). */
+  onDeleteActionPress?: () => void;
 }
 
 export const TimelineItem = React.memo(function TimelineItem({
   item,
   showAxis = false,
-  grid = false,
-  staggerShort = false,
+  omitAxis = false,
   onImagePress,
+  onTitlePress,
+  onDeleteActionPress,
 }: TimelineItemProps) {
   const colors = useThemeColors();
+  const swipeRef = useRef<Swipeable>(null);
   const mediaUrls = useMemo(
     () => parseMediaUrls(item.mediaUrls),
     [item.mediaUrls],
   );
   const isPayment = useMemo(() => item.tags?.includes("chi-phi"), [item.tags]);
   const isTask = useMemo(() => item.tags?.includes("nhiem-vu"), [item.tags]);
-  const hasMultipleImages = mediaUrls.length > 1;
   const hasImages = mediaUrls.length > 0;
 
   const handleImagePress = useCallback(
@@ -44,6 +50,135 @@ export const TimelineItem = React.memo(function TimelineItem({
     },
     [onImagePress, mediaUrls],
   );
+
+  const renderImageCell = useCallback(
+    (
+      uri: string,
+      index: number,
+      cellStyle: ViewStyle,
+      showMoreOverlay?: number,
+    ) => (
+      <View key={`${index}-${uri.slice(0, 32)}`} style={cellStyle}>
+        <Image
+          source={uri}
+          style={styles.mainImage}
+          contentFit="cover"
+          transition={200}
+          pointerEvents="none"
+        />
+        {showMoreOverlay != null && showMoreOverlay > 0 ? (
+          <View style={styles.gridMoreOverlay} pointerEvents="none">
+            <AppText style={styles.gridMoreText}>+{showMoreOverlay}</AppText>
+          </View>
+        ) : null}
+        <PressableScale
+          onPress={() => handleImagePress(index)}
+          style={StyleSheet.absoluteFill}
+          accessibilityRole="button"
+          accessibilityLabel={
+            showMoreOverlay != null && showMoreOverlay > 0
+              ? `Xem ảnh, còn ${showMoreOverlay} ảnh khác`
+              : `Xem ảnh ${index + 1}`
+          }
+        >
+          <View style={{ flex: 1 }} />
+        </PressableScale>
+      </View>
+    ),
+    [handleImagePress],
+  );
+
+  const renderMediaLayout = () => {
+    const n = mediaUrls.length;
+    if (n === 0) return null;
+
+    if (n === 1) {
+      return (
+        <>
+          <Image
+            source={mediaUrls[0]}
+            style={styles.mainImage}
+            contentFit="cover"
+            transition={200}
+            pointerEvents="none"
+          />
+          <PressableScale
+            onPress={() => handleImagePress(0)}
+            style={StyleSheet.absoluteFill}
+            accessibilityRole="button"
+            accessibilityLabel="Xem ảnh"
+          >
+            <View style={{ flex: 1 }} />
+          </PressableScale>
+        </>
+      );
+    }
+
+    if (n === 2) {
+      return (
+        <View style={styles.gridRow}>
+          {renderImageCell(mediaUrls[0], 0, styles.gridHalf)}
+          {renderImageCell(mediaUrls[1], 1, styles.gridHalf)}
+        </View>
+      );
+    }
+
+    if (n === 3) {
+      return (
+        <View style={styles.gridRow}>
+          <View style={styles.gridHalf}>
+            {renderImageCell(mediaUrls[0], 0, styles.gridFill)}
+          </View>
+          <View style={styles.gridHalfCol}>
+            {renderImageCell(mediaUrls[1], 1, styles.gridStackCell)}
+            {renderImageCell(mediaUrls[2], 2, styles.gridStackCell)}
+          </View>
+        </View>
+      );
+    }
+
+    const moreCount = n - 4;
+    return (
+      <View style={styles.gridQuad}>
+        <View style={styles.gridRowHalf}>
+          {renderImageCell(mediaUrls[0], 0, styles.gridCellQuad)}
+          {renderImageCell(mediaUrls[1], 1, styles.gridCellQuad)}
+        </View>
+        <View style={styles.gridRowHalf}>
+          {renderImageCell(mediaUrls[2], 2, styles.gridCellQuad)}
+          {renderImageCell(
+            mediaUrls[3],
+            3,
+            styles.gridCellQuad,
+            moreCount > 0 ? moreCount : undefined,
+          )}
+        </View>
+      </View>
+    );
+  };
+
+  const renderRightActions = useCallback(() => {
+    if (!onDeleteActionPress) return null;
+    return (
+      <View style={styles.deleteTray}>
+        <TouchableOpacity
+          style={[styles.deleteBtn, { backgroundColor: colors.status.error.bg }]}
+          onPress={() => {
+            swipeRef.current?.close();
+            onDeleteActionPress();
+          }}
+          accessibilityRole="button"
+          accessibilityLabel="Xoá mục"
+        >
+          <AppText
+            style={[styles.deleteBtnText, { color: colors.status.error.text }]}
+          >
+            Xoá
+          </AppText>
+        </TouchableOpacity>
+      </View>
+    );
+  }, [colors.status.error.bg, colors.status.error.text, onDeleteActionPress]);
 
   const renderIcon = () => {
     if (isPayment) {
@@ -94,79 +229,94 @@ export const TimelineItem = React.memo(function TimelineItem({
     );
   };
 
-  const imageSectionStyle = [
-    styles.imageSection,
-    grid && staggerShort && styles.imageSectionShort,
-  ];
-
   return (
-    <View style={[styles.outerContainer, grid && styles.outerContainerGrid]}>
-      {!grid && (
+    <View
+      style={[styles.outerContainer, omitAxis && styles.outerContainerOmitAxis]}
+    >
+      {!omitAxis ? (
         <View style={styles.axisContainer}>
           <View
             style={[styles.axisLine, { backgroundColor: colors.border.subtle }]}
           />
-          {showAxis && (
+          {showAxis ? (
             <View
               style={[
                 styles.axisLabelContainer,
                 { backgroundColor: colors.border.subtle },
               ]}
             >
-              <AppText style={[styles.axisText, { color: colors.text.tertiary }]}>
+              <AppText
+                style={[styles.axisText, { color: colors.text.tertiary }]}
+              >
                 {getAxisMonthYear(item)}
               </AppText>
             </View>
-          )}
+          ) : null}
         </View>
-      )}
+      ) : null}
 
-      <View
-        style={[
-          styles.card,
-          grid && styles.cardGrid,
-          {
-            backgroundColor: colors.surface.default,
-            borderColor: colors.border.subtle,
-            shadowColor: colors.text.primary,
-          },
-        ]}
+      <Swipeable
+        ref={swipeRef}
+        renderRightActions={onDeleteActionPress ? renderRightActions : undefined}
+        overshootRight={false}
+        enabled={!!onDeleteActionPress}
+        dragOffsetFromRightEdge={28}
+        dragOffsetFromLeftEdge={28}
+        failOffsetY={[-12, 12]}
+        containerStyle={
+          omitAxis ? styles.swipeableRootOmitAxis : styles.swipeableRootWithAxis
+        }
+        childrenContainerStyle={
+          omitAxis
+            ? styles.swipeableChildrenOmitAxis
+            : styles.swipeableChildrenWithAxis
+        }
       >
+        <View
+          style={[
+            styles.card,
+            omitAxis && styles.cardOmitAxis,
+            {
+              backgroundColor: colors.surface.default,
+              borderColor: colors.border.subtle,
+              shadowColor: colors.text.primary,
+            },
+          ]}
+        >
         {hasImages ? (
-          <View style={imageSectionStyle}>
-            <Image
-              source={mediaUrls[0]}
-              style={styles.mainImage}
-              contentFit="cover"
-              transition={200}
-            />
-            <PressableScale
-              onPress={() => handleImagePress(0)}
-              style={StyleSheet.absoluteFill}
-            >
-              <View style={{ flex: 1 }} />
-            </PressableScale>
-            {hasMultipleImages && (
-              <View style={styles.imageCountBadge}>
-                <Ionicons name="images" size={14} color="#fff" />
-                <AppText style={styles.imageCountText}>
-                  {mediaUrls.length}
-                </AppText>
-              </View>
-            )}
-          </View>
+          <View style={styles.imageSection}>{renderMediaLayout()}</View>
         ) : null}
 
         <View style={styles.contentSection}>
           <View style={styles.headerRow}>
             {renderIcon()}
             <View style={styles.titleContainer}>
-              <AppText
-                numberOfLines={2}
-                style={[styles.title, { color: colors.text.primary }]}
-              >
-                {item.title}
-              </AppText>
+              {onTitlePress ? (
+                <PressableScale
+                  onPress={onTitlePress}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Chi tiết: ${item.title}`}
+                  style={styles.titlePressable}
+                >
+                  <AppText
+                    numberOfLines={4}
+                    android_hyphenationFrequency="none"
+                    textBreakStrategy="simple"
+                    style={[styles.title, { color: colors.text.primary }]}
+                  >
+                    {item.title}
+                  </AppText>
+                </PressableScale>
+              ) : (
+                <AppText
+                  numberOfLines={4}
+                  android_hyphenationFrequency="none"
+                  textBreakStrategy="simple"
+                  style={[styles.title, { color: colors.text.primary }]}
+                >
+                  {item.title}
+                </AppText>
+              )}
               <AppText style={[styles.timeLabel, { color: colors.text.tertiary }]}>
                 {getMemoryTime(item.createdAt)} •{" "}
                 {isPayment ? "Thanh toán" : isTask ? "Nhiệm vụ" : "Kỷ niệm"}
@@ -174,7 +324,7 @@ export const TimelineItem = React.memo(function TimelineItem({
             </View>
           </View>
 
-          {!!item.description && (
+          {!!item.description ? (
             <View
               style={[
                 styles.descriptionContainer,
@@ -188,15 +338,16 @@ export const TimelineItem = React.memo(function TimelineItem({
               ]}
             >
               <AppText
-                numberOfLines={3}
+                numberOfLines={5}
                 style={[styles.description, { color: colors.text.primary }]}
               >
                 {item.description}
               </AppText>
             </View>
-          )}
+          ) : null}
         </View>
-      </View>
+        </View>
+      </Swipeable>
     </View>
   );
 });
@@ -204,14 +355,35 @@ export const TimelineItem = React.memo(function TimelineItem({
 const styles = StyleSheet.create({
   outerContainer: {
     flexDirection: "row",
-    paddingHorizontal: 24,
-    marginBottom: 20,
+    alignItems: "flex-start",
+    paddingHorizontal: 22,
+    marginBottom: 18,
+    width: "100%",
   },
-  outerContainerGrid: {
-    flex: 1,
+  outerContainerOmitAxis: {
+    flexDirection: "column",
     paddingHorizontal: 0,
     marginBottom: 0,
+  },
+  /**
+   * Swipeable bọc PanGestureHandler + Animated.View — mặc định không flex.
+   * Trong hàng [trục | Swipeable], phải ép giãn ngang nếu không thẻ co ~intrinsic width.
+   */
+  swipeableRootWithAxis: {
+    flex: 1,
     minWidth: 0,
+    alignSelf: "stretch",
+  },
+  swipeableChildrenWithAxis: {
+    flex: 1,
+    alignSelf: "stretch",
+  },
+  swipeableRootOmitAxis: {
+    width: "100%",
+    alignSelf: "stretch",
+  },
+  swipeableChildrenOmitAxis: {
+    width: "100%",
   },
   axisContainer: {
     width: 32,
@@ -220,7 +392,7 @@ const styles = StyleSheet.create({
   axisLine: {
     position: "absolute",
     top: -24,
-    bottom: -20,
+    bottom: -18,
     width: 2,
   },
   axisLabelContainer: {
@@ -237,54 +409,96 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    borderRadius: 32,
+    minWidth: 0,
+    borderRadius: 28,
     overflow: "hidden",
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    elevation: 6,
     borderWidth: 1,
   },
-  cardGrid: {
-    borderRadius: 24,
-    elevation: 4,
+  cardOmitAxis: {
+    flex: 0,
+    flexGrow: 0,
+    width: "100%",
+    alignSelf: "stretch",
   },
   imageSection: {
-    height: 200,
+    height: 220,
     width: "100%",
     position: "relative",
-  },
-  imageSectionShort: {
-    height: 148,
   },
   mainImage: {
     width: "100%",
     height: "100%",
   },
-  imageCountBadge: {
-    position: "absolute",
-    top: 16,
-    right: 16,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
+  gridRow: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
+    width: "100%",
+    height: 220,
+    gap: 2,
   },
-  imageCountText: {
+  gridHalf: {
+    flex: 1,
+    height: "100%",
+    position: "relative",
+    overflow: "hidden",
+  },
+  gridHalfCol: {
+    flex: 1,
+    height: "100%",
+    flexDirection: "column",
+    gap: 2,
+  },
+  gridStackCell: {
+    flex: 1,
+    position: "relative",
+    overflow: "hidden",
+  },
+  gridFill: {
+    flex: 1,
+    width: "100%",
+    minHeight: 0,
+    overflow: "hidden",
+    position: "relative",
+  },
+  gridQuad: {
+    width: "100%",
+    height: 220,
+    flexDirection: "column",
+    gap: 2,
+  },
+  gridRowHalf: {
+    flex: 1,
+    flexDirection: "row",
+    gap: 2,
+    minHeight: 0,
+  },
+  gridCellQuad: {
+    flex: 1,
+    position: "relative",
+    overflow: "hidden",
+    minWidth: 0,
+  },
+  gridMoreOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  gridMoreText: {
     color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "800",
+    fontSize: 26,
+    fontWeight: "900",
   },
   contentSection: {
-    padding: 20,
+    padding: 18,
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
+    gap: 14,
   },
   iconContainer: {
     width: 48,
@@ -295,28 +509,51 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flex: 1,
+    minWidth: 0,
+  },
+  /** TouchableOpacity mặc định co theo nội dung — cần giãn full cột để title xuống dòng đúng chỗ từ. */
+  titlePressable: {
+    flex: 1,
+    minWidth: 0,
+    alignSelf: "stretch",
   },
   title: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "800",
-    lineHeight: 22,
+    lineHeight: 24,
+    width: "100%",
   },
   timeLabel: {
     fontSize: 12,
     fontWeight: "600",
-    marginTop: 2,
+    marginTop: 4,
   },
   descriptionContainer: {
-    marginTop: 16,
+    marginTop: 14,
   },
   paymentDescription: {
-    padding: 16,
-    borderRadius: 20,
+    padding: 14,
+    borderRadius: 18,
     borderWidth: 1,
   },
   description: {
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 21,
     fontWeight: "500",
+  },
+  deleteTray: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    marginLeft: 8,
+  },
+  deleteBtn: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 72,
+    borderRadius: 20,
+  },
+  deleteBtnText: {
+    fontSize: 14,
+    fontWeight: "800",
   },
 });

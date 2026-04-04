@@ -4,6 +4,7 @@ import type {
   BudgetItem,
   Couple,
   EmotionalCycle,
+  UserMoodState,
   InAppNotification,
   Invite,
   MemoryItem,
@@ -37,6 +38,9 @@ export interface DataStore {
     tag?: string;
   }): Promise<{ items: MemoryItem[]; total: number }>;
   saveMemory(memory: MemoryItem): Promise<void>;
+  updateMemory(memory: MemoryItem): Promise<void>;
+  getMemoryByCouple(coupleId: string, memoryId: string): Promise<MemoryItem | undefined>;
+  deleteMemory(coupleId: string, memoryId: string): Promise<boolean>;
   listBudgetItemsByCouple(coupleId: string): Promise<BudgetItem[]>;
   getBudgetItem(id: string): Promise<BudgetItem | undefined>;
   saveBudgetItem(item: BudgetItem): Promise<void>;
@@ -45,6 +49,8 @@ export interface DataStore {
   getUserById(userId: string): Promise<User | undefined>;
   getCycleByUserId(userId: string): Promise<EmotionalCycle | undefined>;
   saveCycle(cycle: EmotionalCycle): Promise<void>;
+  getMoodByUserId(userId: string): Promise<UserMoodState | undefined>;
+  upsertUserMood(userId: string, value: number): Promise<UserMoodState>;
   updateCouple(couple: Couple): Promise<void>;
   saveCouple(couple: Couple): Promise<void>;
   getHomeCache(coupleId: string): Promise<unknown | undefined>;
@@ -75,7 +81,7 @@ export interface DataStore {
   ): Promise<{ items: InAppNotification[]; total: number }>;
   getNotificationForUser(userId: string, notificationId: string): Promise<InAppNotification | undefined>;
   createInAppNotification(
-    input: Omit<InAppNotification, "id" | "createdAt"> & { id?: string },
+    input: Omit<InAppNotification, "id" | "createdAt"> & { id?: string; createdAt?: string },
   ): Promise<InAppNotification>;
   markNotificationRead(userId: string, notificationId: string): Promise<InAppNotification | undefined>;
   markAllNotificationsRead(userId: string): Promise<number>;

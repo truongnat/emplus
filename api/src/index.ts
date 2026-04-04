@@ -9,4 +9,4 @@ Bun.serve({
   websocket,
 });
 
-console.log(`Em Plus API đang chạy tại http://localhost:${port}`);
+console.log(`Em+ API đang chạy tại http://localhost:${port}`);

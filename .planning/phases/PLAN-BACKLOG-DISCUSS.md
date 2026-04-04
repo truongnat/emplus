@@ -28,6 +28,8 @@ flowchart TD
 
 ## Phase 1 — Khôi phục mật khẩu trên mobile (API đã sẵn)
 
+**Kế hoạch thực thi (UAT + đóng phase):** [phase-1-password-reset/PLAN.md](./phase-1-password-reset/PLAN.md)
+
 **Mục tiêu:** Người dùng quên mật khẩu có luồng hoàn chỉnh: gửi OTP → nhập OTP + mật khẩu mới → đăng nhập lại.
 
 **Contract API hiện có (đã implement server):**

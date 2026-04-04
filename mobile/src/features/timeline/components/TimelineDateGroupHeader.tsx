@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text, Animated, StyleSheet } from "react-native";
+import { View, Animated, StyleSheet } from "react-native";
 import { formatGroupDate } from "@/src/utils/timeline-helpers";
 import { useThemeColors } from "@/src/theme";
+import { AppText } from "@/src/ui-kit";
 
 export interface TimelineDateGroupHeaderProps {
   dateString: string;
@@ -46,7 +47,7 @@ function PulsingRing({ brandColor }: { brandColor: string }) {
   );
 }
 
-export function TimelineDateGroupHeader({
+export const TimelineDateGroupHeader = React.memo(function TimelineDateGroupHeader({
   dateString,
 }: TimelineDateGroupHeaderProps) {
   const colors = useThemeColors();
@@ -80,26 +81,35 @@ export function TimelineDateGroupHeader({
           />
         </View>
       </View>
-      <Text
-        style={[
-          styles.dateText,
-          { color: colors.text.tertiary },
-          isToday && { color: colors.text.primary },
-        ]}
-      >
-        {formatGroupDate(dateString)}
-      </Text>
+      <View style={styles.titleBlock}>
+        <AppText
+          accessibilityRole="header"
+          numberOfLines={1}
+          style={[
+            styles.dateText,
+            { color: isToday ? colors.text.primary : colors.text.tertiary },
+          ]}
+        >
+          {formatGroupDate(dateString)}
+        </AppText>
+      </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 32,
-    marginBottom: 16,
-    marginHorizontal: 24,
+    width: "100%",
+    marginTop: 28,
+    marginBottom: 12,
+    paddingHorizontal: 22,
+  },
+  titleBlock: {
+    flex: 1,
+    minWidth: 0,
+    justifyContent: "center",
   },
   markerContainer: {
     width: 32,
@@ -138,10 +148,10 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   dateText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "900",
     textTransform: "uppercase",
-    letterSpacing: 2,
+    letterSpacing: 1.5,
     marginLeft: 8,
   },
 });

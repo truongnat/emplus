@@ -1,7 +1,7 @@
-# Em Plus — Design Proposal
+# Em+ — Design Proposal
 
 **Ngày:** 2026-03-15
-**App:** Em Plus — Ứng dụng đôi lứa cho người Việt
+**App:** Em+ — Ứng dụng đôi lứa cho người Việt
 **Phạm vi:** Thiết kế lại toàn bộ giao diện, nâng tầm visual + UX
 
 ---
@@ -526,7 +526,7 @@ Couple avatar pair:
 │                                     │
 │          ╭─────────────╮            │
 │          │      ❤️      │            │  ← Logo, gradient bg
-│          │   Em Plus   │            │    rose-500, radius-2xl
+│          │    Em+      │            │    rose-500, radius-2xl
 │          ╰─────────────╯            │
 │                                     │
 │   Chào mừng trở lại 👋             │

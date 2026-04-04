@@ -81,7 +81,7 @@ export async function createUser(
   return {
     id: crypto.randomUUID(),
     email,
-    fullName: fullName || email.split("@")[0] || "Người dùng Em Plus",
+    fullName: fullName || email.split("@")[0] || "Người dùng Em+",
     gender: chuanHoaGioiTinhDauVao(gender),
     authProvider: "LOCAL",
     authId: email,

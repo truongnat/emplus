@@ -6,7 +6,7 @@ import { RingingBell } from "./HomeDecorations";
 import { useThemeColors } from "@/src/theme";
 
 /**
- * Nút thông báo góc phải — cùng baseline với wordmark "Em Plus" (home chrome).
+ * Nút thông báo góc phải — cùng baseline với wordmark "Em+" (home chrome).
  */
 export function HomeChromeNotificationButton() {
   const colors = useThemeColors();

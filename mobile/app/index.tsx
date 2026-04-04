@@ -42,7 +42,7 @@ export default function Index() {
                 color: colors.text.primary,
               }}
             >
-              Em Plus
+              Em+
             </AppText>
             <ActivityIndicator
               color={colors.brand.default}

@@ -1,7 +1,9 @@
 import { Hono } from "hono";
 import type { AppEnv } from "../app-env.ts";
+import { env } from "../config/env.ts";
 import { parseListNotificationsQuery } from "../dto/notifications.dto.ts";
 import { requireAuth } from "../middleware/auth.ts";
+import { ensureDemoInAppNotifications } from "./demo-in-app-notifications.ts";
 import { store } from "../store.ts";
 import { AppError, paginated, success } from "../utils/http.ts";
 
@@ -16,6 +18,10 @@ notificationRoutes.get("/", async (context) => {
     limit: context.req.query("limit"),
     unread_only: context.req.query("unread_only"),
   });
+
+  if (env.fakeInAppNotifications) {
+    await ensureDemoInAppNotifications(store, user);
+  }
 
   const result = await store.listNotificationsForUser(user.id, {
     page: query.page,

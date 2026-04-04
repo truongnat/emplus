@@ -9,7 +9,11 @@ import React, {
   useCallback,
   ReactNode,
 } from "react";
-import { ToastContainer, toast as toastImpl } from "./components/atoms/Toast";
+import {
+  ToastContainer,
+  toast as toastImpl,
+  TOAST_DEFAULT_DURATION_MS,
+} from "./components/atoms/Toast";
 
 type ToastVariant = "success" | "error" | "warning" | "info";
 
@@ -28,18 +32,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     (
       message: string,
       variant: ToastVariant = "info",
-      duration: number = 3000,
+      duration: number = TOAST_DEFAULT_DURATION_MS,
     ) => {
-      console.log("🍞 Toast SHOW:", {
-        message: message || "(empty message)",
-        variant,
-        duration,
-        messageLength: message?.length,
-        messageType: typeof message,
-      });
-
       if (!message || message.trim() === "") {
-        console.error("❌ Toast error: Empty message!");
         return;
       }
 
@@ -47,7 +42,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         message,
         variant,
         duration,
-        position: "top",
+        position: "bottom",
       });
     },
     [],

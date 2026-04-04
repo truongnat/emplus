@@ -48,12 +48,9 @@ export function useLogin(options: UseLoginOptions = {}) {
       onSuccess?.(data);
     },
     onError: (error) => {
-      console.log("🔴 Login error:", error);
       const errorMessage = toDisplayError(error);
-      console.log("📝 Error message:", errorMessage);
 
       if (showToast) {
-        console.log("🍞 Calling toast with:", errorMessage);
         toast(errorMessage, "error");
       }
       onError?.(error);

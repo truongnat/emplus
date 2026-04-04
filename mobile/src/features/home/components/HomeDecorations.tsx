@@ -9,7 +9,6 @@ import Animated, {
   withDelay,
   Easing,
   useAnimatedReaction,
-  runOnJS,
   cancelAnimation,
 } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";

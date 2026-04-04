@@ -43,7 +43,7 @@ export const appConfig = {
 
   // Other constants
   brand: {
-    name: "Em Plus",
+    name: "Em+",
   },
 } as const;
 

@@ -52,6 +52,8 @@ export interface EnvConfig {
   minioSecretKey?: string;
   minioBucket: string;
   minioUseSsl: boolean;
+  /** URL gốc mà app mobile truy cập được (vd. http://192.168.1.5:9000). Mặc định lấy origin của MINIO_ENDPOINT. */
+  minioPublicBaseUrl?: string;
   swaggerEnabled: boolean;
   swaggerPath: string;
   allowMockOAuth: boolean;
@@ -60,6 +62,10 @@ export interface EnvConfig {
   appleIssuer?: string;
   defaultBudgetAmount: number;
   fallbackQuotes: string[];
+  /** Khi true: user chưa có thông báo nào thì GET /v1/notifications seed vài bản ghi demo (chỉ dev mặc định). */
+  fakeInAppNotifications: boolean;
+  /** Khi true: couple chưa có memory nào thì GET /v1/timeline/memories seed 10 demo (dev mặc định). */
+  fakeTimelineMemories: boolean;
 }
 
 const googleClientIds = listFromEnv(process.env.GOOGLE_CLIENT_IDS);
@@ -72,8 +78,10 @@ if (process.env.APPLE_AUDIENCE?.trim()) {
   appleAudiences.push(process.env.APPLE_AUDIENCE.trim());
 }
 
+const nodeEnv = process.env.NODE_ENV ?? "development";
+
 export const env: EnvConfig = {
-  nodeEnv: process.env.NODE_ENV ?? "development",
+  nodeEnv,
   storeMode: process.env.DATA_STORE === "memory" ? "memory" : "postgres",
   corsAllowedOrigins: listFromEnv(process.env.CORS_ALLOWED_ORIGINS),
   databaseUrl: process.env.DATABASE_URL,
@@ -90,6 +98,7 @@ export const env: EnvConfig = {
   minioSecretKey: process.env.MINIO_SECRET_KEY,
   minioBucket: process.env.MINIO_BUCKET ?? "emplus",
   minioUseSsl: boolFromEnv(process.env.MINIO_USE_SSL, false),
+  minioPublicBaseUrl: process.env.MINIO_PUBLIC_BASE_URL?.trim() || undefined,
   swaggerEnabled: boolFromEnv(process.env.SWAGGER_ENABLED, true),
   swaggerPath: process.env.SWAGGER_PATH ?? "/v1/docs",
   allowMockOAuth: isTestEnvironment() && boolFromEnv(process.env.ALLOW_MOCK_OAUTH, false),
@@ -105,4 +114,12 @@ export const env: EnvConfig = {
         "Hạnh phúc là khi hai trái tim cùng nhịp đập.",
         "Tình yêu đích thực không phải là một ngọn lửa cháy, mà là một ngọn nến cháy trong gió.",
       ],
+  fakeInAppNotifications: boolFromEnv(
+    process.env.FAKE_IN_APP_NOTIFICATIONS,
+    nodeEnv === "development",
+  ),
+  fakeTimelineMemories: boolFromEnv(
+    process.env.FAKE_TIMELINE_MEMORIES,
+    nodeEnv === "development",
+  ),
 };

@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Em Plus API",
+    "title": "Em+ API",
     "version": "1.0.0",
     "description": "API xác thực, ghép đôi cặp đôi, chăm sóc cảm xúc, timeline và bảng điều khiển."
   },
@@ -25,6 +25,9 @@
     },
     {
       "name": "Kỷ niệm"
+    },
+    {
+      "name": "Media"
     },
     {
       "name": "Chăm sóc"
@@ -1461,6 +1464,161 @@
         }
       }
     },
+    "/v1/timeline/memories/{id}": {
+      "get": {
+        "tags": [
+          "Kỷ niệm"
+        ],
+        "summary": "Chi tiết một mục timeline",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Memory",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Memory"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Kỷ niệm"
+        ],
+        "summary": "Xoá mục timeline",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Đã xoá",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "ok"
+                  ],
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy"
+          }
+        }
+      }
+    },
+    "/v1/media/upload": {
+      "post": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Upload một ảnh lên MinIO (timeline)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "URL công khai của ảnh",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "data"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "url"
+                      ],
+                      "properties": {
+                        "url": {
+                          "type": "string",
+                          "format": "uri"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "File không hợp lệ"
+          },
+          "503": {
+            "description": "MinIO chưa cấu hình"
+          }
+        }
+      }
+    },
     "/v1/care/female-cycle": {
       "post": {
         "tags": [
@@ -1597,6 +1755,147 @@
           },
           "403": {
             "description": "Chỉ tài khoản nam mới được gọi API này"
+          }
+        }
+      }
+    },
+    "/v1/care/mood": {
+      "get": {
+        "tags": [
+          "Chăm sóc"
+        ],
+        "summary": "Tâm trạng cặp đôi (bản thân + đối phương)",
+        "description": "Trả về mood đã lưu của user hiện tại và của partner (nếu đã ghép đôi). Partner null khi chưa có couple.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "self và partner (nullable)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "self",
+                    "partner"
+                  ],
+                  "properties": {
+                    "self": {
+                      "nullable": true,
+                      "type": "object",
+                      "required": [
+                        "value",
+                        "updatedAt"
+                      ],
+                      "properties": {
+                        "value": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 100
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    },
+                    "partner": {
+                      "nullable": true,
+                      "type": "object",
+                      "required": [
+                        "userId",
+                        "fullName",
+                        "value",
+                        "updatedAt"
+                      ],
+                      "properties": {
+                        "userId": {
+                          "type": "string"
+                        },
+                        "fullName": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "nullable": true
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "nullable": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Chăm sóc"
+        ],
+        "summary": "Cập nhật tâm trạng của bản thân",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "value"
+                ],
+                "properties": {
+                  "value": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Đã lưu",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "value",
+                    "updatedAt"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Giá trị không hợp lệ"
           }
         }
       }

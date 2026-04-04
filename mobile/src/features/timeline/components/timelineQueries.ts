@@ -22,6 +22,10 @@ export function useTimelineMemoriesQuery(
       );
     },
     initialPageParam: 1,
+    /** Timeline cần dữ liệu mới sau khi API đồng bộ demo; tránh cache 5p + persist giữ bản cũ. */
+    staleTime: 0,
+    gcTime: 1000 * 60 * 30,
+    refetchOnMount: "always",
     getNextPageParam: (lastPage) =>
       lastPage.pagination.page < lastPage.pagination.totalPages
         ? lastPage.pagination.page + 1

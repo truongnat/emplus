@@ -13,6 +13,7 @@ import {
   dashboardRoutes,
   debugRoutes,
   liveRoutes,
+  mediaRoutes,
   notificationRoutes,
   systemRoutes,
   timelineRoutes,
@@ -71,6 +72,7 @@ app.route("/v1/users", userRoutes);
 app.route("/v1/couples", couplesRoutes);
 app.route("/v1/dashboard", dashboardRoutes);
 app.route("/v1/timeline", timelineRoutes);
+app.route("/v1/media", mediaRoutes);
 app.route("/v1/care", careRoutes);
 app.route("/v1/system", systemRoutes);
 app.route("/v1/budget", budgetRoutes);

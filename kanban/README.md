@@ -33,3 +33,25 @@ Thư mục theo dõi ticket nhẹ, đồng bộ với [`workflows/dev/w-ticket.m
 | [ticket-27](./ticket-27/TICKET.md) | Bottom tab bar — glass, elevation, radii per Visual Design Guide | done   |
 | [ticket-28](./ticket-28/TICKET.md) | Care heart navbar — bounce on press (Reanimated, reduce motion) | done   |
 | [ticket-29](./ticket-29/TICKET.md) | Home screen — review pass, scroll inset, dead code | done   |
+| [ticket-30](./ticket-30/TICKET.md) | Notifications — Home grid shell, scroll insets, heading semantics | done   |
+| [ticket-31](./ticket-31/TICKET.md) | Notifications empty — cat Lottie, remove Em Plus, title top | done   |
+| [ticket-32](./ticket-32/TICKET.md) | Timeline — grid shell, safe area, AppText + typography        | done   |
+| [ticket-33](./ticket-33/TICKET.md) | Timeline empty Love Lottie + API 10 demo memories (all filters) | done   |
+| [ticket-34](./ticket-34/TICKET.md) | Timeline grid — thẻ full width ô masonry (fix co hẹp)          | done   |
+| [ticket-35](./ticket-35/TICKET.md) | Timeline — một cột full ngang, bỏ masonry 2 cột               | done   |
+| [ticket-36](./ticket-36/TICKET.md) | Timeline — thẻ nhiều ảnh (carousel) + preview đa ảnh         | done   |
+| [ticket-37](./ticket-37/TICKET.md) | Timeline — feature API + UI hoàn chỉnh (tổng hợp)           | done   |
+| [ticket-38](./ticket-38/TICKET.md) | Thêm kỷ niệm — shell grid, multi ảnh MinIO, date picker, ghi chú | done   |
+| [ticket-39](./ticket-39/TICKET.md) | Toast — full width + message/description không giới hạn dòng | done   |
+| [ticket-40](./ticket-40/TICKET.md) | Timeline — **kế hoạch** xoá & chỉnh sửa memory (API + UX) | backlog |
+| [ticket-41](./ticket-41/TICKET.md) | Timeline — thẻ full ngang (bỏ zigzag 86%) | done |
+| [ticket-42](./ticket-42/TICKET.md) | Timeline — Swipeable flex, thẻ không còn hẹp ~40% | done |
+| [ticket-43](./ticket-43/TICKET.md) | Chi tiết memory — bento grid toàn bộ ảnh | done |
+| [ticket-44](./ticket-44/TICKET.md) | Wordmark & tên hiển thị Em Plus → Em+ | done |
+| [ticket-45](./ticket-45/TICKET.md) | Timeline — perf + tách file / lazy viewer | done |
+| [ticket-46](./ticket-46/TICKET.md) | Tab Thẻ thay ngân sách; pill 4 ô; pad ngang 24 | done |
+| [ticket-47](./ticket-47/TICKET.md) | Care screen — toast overlay, hero gọn, keyboard dismiss | done |
+| [ticket-48](./ticket-48/TICKET.md) | Care screen — nền lưới animation (auth grid) | done |
+| [ticket-49](./ticket-49/TICKET.md) | Mood center blob — màu theo slider | done |
+| [ticket-50](./ticket-50/TICKET.md) | Toast toàn app — đồng bộ kiểu Care (bottom + semantic) | done |
+| [ticket-51](./ticket-51/TICKET.md) | Mood — API đồng bộ cặp đôi + UI Care (nam/nữ) | done |

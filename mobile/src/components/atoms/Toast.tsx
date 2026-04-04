@@ -8,11 +8,13 @@ import React, {
 } from "react";
 import {
   AccessibilityInfo,
+  ActivityIndicator,
+  Pressable,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import Animated, {
   Easing,
   Layout,
@@ -23,11 +25,17 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-  runOnJS,
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Theme, useTheme } from "@/src/theme/engine";
+import { useThemeColors } from "@/src/theme";
+import type { SemanticColors } from "@/src/theme/tokens/semantic";
+
+/** Đồng bộ với màn Care — lề ngang + khoảng phía trên custom tab bar */
+export const TOAST_HORIZONTAL_PAD = 24;
+export const TOAST_TAB_BAR_OFFSET = 92;
+export const TOAST_DEFAULT_DURATION_MS = 3200;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -89,8 +97,8 @@ class ToastStore {
       message: config.message,
       description: config.description,
       variant: config.variant ?? "info",
-      duration: config.duration ?? 3500,
-      position: config.position ?? "top",
+      duration: config.duration ?? TOAST_DEFAULT_DURATION_MS,
+      position: config.position ?? "bottom",
       action: config.action,
       icon: config.icon,
       onDismiss: config.onDismiss,
@@ -168,7 +176,11 @@ export const toast = {
           typeof messages.success === "function"
             ? messages.success(data)
             : messages.success;
-        store.update(id, { message: msg, variant: "success", duration: 3000 });
+        store.update(id, {
+          message: msg,
+          variant: "success",
+          duration: TOAST_DEFAULT_DURATION_MS,
+        });
         return data;
       },
       (err) => {
@@ -190,12 +202,12 @@ const SWIPE_DISMISS_THRESHOLD = 80;
 function ToastItemView({
   item,
   position,
-  theme,
 }: {
   item: ToastItem;
   position: ToastPosition;
-  theme: Theme;
 }) {
+  const colors = useThemeColors();
+  const look = useMemo(() => getVariantLook(item.variant, colors), [item.variant, colors]);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const opacity = useSharedValue(1);
@@ -246,7 +258,7 @@ function ToastItemView({
 
   const panGesture = Gesture.Pan()
     .onStart(() => {
-      runOnJS(pauseTimer)();
+      scheduleOnRN(pauseTimer);
     })
     .onUpdate((e) => {
       translateX.value = e.translationX;
@@ -260,7 +272,7 @@ function ToastItemView({
         const dir = e.translationX > 0 ? 1 : -1;
         translateX.value = withTiming(dir * 500, { duration: 200 });
         opacity.value = withTiming(0, { duration: 180 }, () => {
-          runOnJS(toast.dismiss)(item.id);
+          scheduleOnRN(toast.dismiss, item.id);
         });
       } else {
         translateX.value = withTiming(0, {
@@ -268,7 +280,7 @@ function ToastItemView({
           easing: Easing.out(Easing.back(2)),
         });
         translateY.value = withTiming(0, { duration: 300 });
-        runOnJS(resumeTimer)();
+        scheduleOnRN(resumeTimer);
       }
     });
 
@@ -289,8 +301,6 @@ function ToastItemView({
   const exiting =
     position === "top" ? SlideOutUp.duration(280) : SlideOutDown.duration(280);
 
-  const variantStyle = getVariantStyle(item.variant, theme);
-
   return (
     <Animated.View
       entering={entering}
@@ -301,74 +311,119 @@ function ToastItemView({
         <Animated.View
           style={[
             styles.toastContainer,
-            { backgroundColor: variantStyle.bg },
+            {
+              backgroundColor: look.backgroundColor,
+              borderWidth: look.borderWidth,
+              borderColor: look.borderColor,
+              shadowColor: colors.text.primary,
+            },
             animatedStyle,
           ]}
           accessibilityRole="alert"
         >
-          <View style={styles.toastContent}>
-            <View style={[styles.iconContainer]}>
-              {item.icon ?? (
-                <Text
-                  style={[styles.iconText, { color: variantStyle.textColor }]}
-                >
-                  {variantStyle.iconChar}
-                </Text>
-              )}
-            </View>
+          <Pressable
+            onPress={() => store.remove(item.id)}
+            accessibilityRole="button"
+            accessibilityLabel="Đóng thông báo"
+            style={styles.toastPressable}
+          >
+            <View style={styles.toastContent}>
+              <View style={styles.iconContainer}>
+                {item.icon ??
+                  (item.variant === "loading" ? (
+                    <ActivityIndicator color={look.iconColor} size="small" />
+                  ) : look.iconName ? (
+                    <Ionicons
+                      name={look.iconName}
+                      size={22}
+                      color={look.iconColor}
+                    />
+                  ) : null)}
+              </View>
 
-            <View style={styles.textContainer}>
-              <Text
-                style={[styles.messageText, { color: variantStyle.textColor }]}
-                numberOfLines={3}
-              >
-                {item.message}
-              </Text>
-              {item.description && (
-                <Text
-                  style={[
-                    styles.descriptionText,
-                    { color: variantStyle.textColor + "BB" },
-                  ]}
-                  numberOfLines={2}
-                >
-                  {item.description}
+              <View style={styles.textContainer}>
+                <Text style={[styles.messageText, { color: look.textColor }]}>
+                  {item.message}
                 </Text>
-              )}
+                {item.description ? (
+                  <Text
+                    style={[
+                      styles.descriptionText,
+                      {
+                        color: look.textColor,
+                        opacity: 0.88,
+                      },
+                    ]}
+                  >
+                    {item.description}
+                  </Text>
+                ) : null}
+              </View>
             </View>
-          </View>
+          </Pressable>
         </Animated.View>
       </GestureDetector>
     </Animated.View>
   );
 }
 
-function getVariantStyle(variant: ToastVariant, theme: Theme) {
+function getVariantLook(
+  variant: ToastVariant,
+  c: SemanticColors,
+): {
+  backgroundColor: string;
+  borderWidth: number;
+  borderColor: string;
+  textColor: string;
+  iconColor: string;
+  iconName: keyof typeof Ionicons.glyphMap | null;
+} {
   switch (variant) {
     case "success":
       return {
-        bg: "#30D158",
-        textColor: "#FFFFFF",
-        iconChar: "✓",
+        backgroundColor: c.background.inverse,
+        borderWidth: 0,
+        borderColor: "transparent",
+        textColor: c.text.inverse,
+        iconColor: c.status.success.icon,
+        iconName: "checkmark-circle",
       };
     case "error":
       return {
-        bg: "#FF3B30",
-        textColor: "#FFFFFF",
-        iconChar: "✕",
+        backgroundColor: c.status.error.bg,
+        borderWidth: 1,
+        borderColor: c.status.error.border,
+        textColor: c.status.error.text,
+        iconColor: c.status.error.icon,
+        iconName: "alert-circle",
       };
     case "warning":
       return {
-        bg: "#FF9500",
-        textColor: "#FFFFFF",
-        iconChar: "⚠",
+        backgroundColor: c.status.warning.bg,
+        borderWidth: 1,
+        borderColor: c.status.warning.border,
+        textColor: c.status.warning.text,
+        iconColor: c.status.warning.icon,
+        iconName: "warning",
+      };
+    case "loading":
+      return {
+        backgroundColor: c.background.inverse,
+        borderWidth: 0,
+        borderColor: "transparent",
+        textColor: c.text.inverse,
+        iconColor: c.text.inverse,
+        iconName: null,
       };
     case "info":
     default:
       return {
-        bg: "#0A84FF",
-        textColor: "#FFFFFF",
-        iconChar: "ℹ",
+        backgroundColor: c.background.inverse,
+        borderWidth: 0,
+        borderColor: "transparent",
+        textColor: c.text.inverse,
+        iconColor: c.status.info.icon,
+        iconName: "information-circle",
       };
   }
 }
@@ -378,7 +433,6 @@ function getVariantStyle(variant: ToastVariant, theme: Theme) {
 export function ToastContainer({ maxVisible = 3 }: { maxVisible?: number }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const insets = useSafeAreaInsets();
-  const theme = useTheme();
 
   useEffect(() => {
     const unsub = store.subscribe(setToasts);
@@ -388,27 +442,45 @@ export function ToastContainer({ maxVisible = 3 }: { maxVisible?: number }) {
   }, []);
 
   const topToasts = toasts
-    .filter((t) => t.position !== "bottom")
+    .filter((t) => t.position === "top")
+    .slice(-maxVisible);
+
+  const bottomToasts = toasts
+    .filter((t) => t.position === "bottom")
     .slice(-maxVisible);
 
   return (
     <>
       <View
         style={[
-          styles.region,
-          styles.topRightRegion,
-          { paddingTop: insets.top + 8 },
+          styles.regionTop,
+          {
+            paddingTop: insets.top + 8,
+            paddingLeft: TOAST_HORIZONTAL_PAD + insets.left,
+            paddingRight: TOAST_HORIZONTAL_PAD + insets.right,
+          },
         ]}
         pointerEvents="box-none"
         collapsable={false}
       >
         {topToasts.map((item) => (
-          <ToastItemView
-            key={item.id}
-            item={item}
-            position="top"
-            theme={theme}
-          />
+          <ToastItemView key={item.id} item={item} position="top" />
+        ))}
+      </View>
+      <View
+        style={[
+          styles.regionBottom,
+          {
+            paddingBottom: insets.bottom + TOAST_TAB_BAR_OFFSET,
+            paddingLeft: TOAST_HORIZONTAL_PAD + insets.left,
+            paddingRight: TOAST_HORIZONTAL_PAD + insets.right,
+          },
+        ]}
+        pointerEvents="box-none"
+        collapsable={false}
+      >
+        {bottomToasts.map((item) => (
+          <ToastItemView key={item.id} item={item} position="bottom" />
         ))}
       </View>
     </>
@@ -416,43 +488,50 @@ export function ToastContainer({ maxVisible = 3 }: { maxVisible?: number }) {
 }
 
 const styles = StyleSheet.create({
-  region: {
+  regionTop: {
     position: "absolute",
-    right: 16,
+    top: 0,
+    left: 0,
+    right: 0,
     zIndex: 10000,
     elevation: 100,
-    gap: 8,
-    maxWidth: "90%",
+    gap: 10,
   },
-  topRightRegion: { top: 0 },
+  regionBottom: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10000,
+    elevation: 100,
+    flexDirection: "column-reverse",
+    gap: 10,
+  },
   toastContainer: {
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
+    alignSelf: "stretch",
+    width: "100%",
+    borderRadius: 20,
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.2,
-    shadowRadius: 12,
+    shadowRadius: 20,
     elevation: 10,
-    minWidth: 200,
-    maxWidth: 400,
+  },
+  toastPressable: {
+    width: "100%",
   },
   toastContent: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 14,
-    gap: 10,
-    minWidth: 200,
+    padding: 16,
+    gap: 12,
   },
   iconContainer: {
     width: 28,
     height: 28,
-    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
   },
-  iconText: { fontSize: 14, fontWeight: "600" },
-  textContainer: { flex: 1, gap: 2 },
-  messageText: { fontSize: 14, fontWeight: "600", lineHeight: 20 },
-  descriptionText: { fontSize: 12, lineHeight: 16 },
+  textContainer: { flex: 1, minWidth: 0, gap: 4 },
+  messageText: { fontSize: 14, fontWeight: "700", lineHeight: 20 },
+  descriptionText: { fontSize: 12, lineHeight: 18, fontWeight: "600" },
 });

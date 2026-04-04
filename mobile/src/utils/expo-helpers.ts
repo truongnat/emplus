@@ -9,6 +9,33 @@ import { Platform } from "react-native";
 /**
  * Image & Media Helpers
  */
+/** Chọn nhiều ảnh từ thư viện (timeline / kỷ niệm). */
+export async function pickMemoryImages(
+  maxCount: number,
+  options: ImagePicker.ImagePickerOptions = {},
+): Promise<ImagePicker.ImagePickerAsset[]> {
+  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (status !== "granted") {
+    throw new Error("Permission to access media library was denied");
+  }
+
+  const safeMax = Math.min(24, Math.max(1, maxCount));
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ["images"],
+    allowsMultipleSelection: true,
+    selectionLimit: safeMax,
+    allowsEditing: false,
+    quality: 0.75,
+    exif: false,
+    preferredAssetRepresentationMode:
+      ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible,
+    ...options,
+  });
+
+  if (result.canceled) return [];
+  return result.assets ?? [];
+}
+
 export async function pickImage(options: ImagePicker.ImagePickerOptions = {}) {
   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (status !== "granted") {

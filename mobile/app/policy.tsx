@@ -127,7 +127,7 @@ export default function PolicyScreen() {
         title: "Thu thập dữ liệu",
         color: colors.brand.default,
         content:
-          "Chúng tôi chỉ thu thập những thông tin cần thiết để cung cấp dịch vụ Em Plus, bao gồm: email, mật khẩu (mã hóa), giới tính, và ID người dùng. Không thu thập dữ liệu cá nhân nhạy cảm khác.",
+          "Chúng tôi chỉ thu thập những thông tin cần thiết để cung cấp dịch vụ Em+, bao gồm: email, mật khẩu (mã hóa), giới tính, và ID người dùng. Không thu thập dữ liệu cá nhân nhạy cảm khác.",
       },
       {
         key: "use",
@@ -186,7 +186,7 @@ export default function PolicyScreen() {
               size={24}
               color={colors.brand.default}
             />
-            <AppText style={styles.headerText}>Chính sách Em Plus</AppText>
+            <AppText style={styles.headerText}>Chính sách Em+</AppText>
           </View>
         </Reveal>
 
@@ -200,7 +200,7 @@ export default function PolicyScreen() {
               marginBottom: 16,
             }}
           >
-            Em Plus cam kết bảo vệ quyền riêng tư của bạn. Ứng dụng được thiết
+            Em+ cam kết bảo vệ quyền riêng tư của bạn. Ứng dụng được thiết
             kế với nguyên tắc "quyền riêng tư từ đầu" (privacy by design), chỉ
             thu thập dữ liệu tối thiểu cần thiết.
           </AppText>

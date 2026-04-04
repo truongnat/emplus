@@ -1,3 +1,8 @@
+import {
+  apiClient,
+  type ApiRequestOptions,
+  type ApiResponse,
+} from "./core/api";
 import { dependencies } from "./framework/di/dependencies";
 
 /**
@@ -27,6 +32,9 @@ export const listMemories = (token: any, data: any) =>
   dependencies.timeline.getMemories.execute(data);
 export const getMaleSuggestions = () =>
   dependencies.care.getMaleSuggestions.execute();
+export const getCoupleMood = () => dependencies.care.getCoupleMood.execute();
+export const putCoupleMood = (value: number) =>
+  dependencies.care.putCoupleMood.execute({ value });
 export const getBudgetSummary = () => dependencies.budget.getSummary.execute();
 export const listBudgetExpenses = (token: any, data: any) =>
   dependencies.budget.getExpenses.execute(data);
@@ -34,6 +42,23 @@ export const createBudgetExpense = (token: any, data: any) =>
   dependencies.budget.createExpense.execute(data);
 export const createMemory = (token: any, data: any) =>
   dependencies.timeline.createMemory.execute(data);
+export const getMemoryById = (_token: any, id: string) =>
+  dependencies.timeline.getMemory.execute(id);
+export const deleteMemoryById = (_token: any, id: string) =>
+  dependencies.timeline.deleteMemory.execute(id);
+
+/** Upload một ảnh lên MinIO qua POST /v1/media/upload (multipart field `file`). */
+export async function uploadTimelineMemoryPhoto(
+  formData: FormData,
+  options?: ApiRequestOptions,
+): Promise<string> {
+  const res = await apiClient.post<ApiResponse<{ url: string }>>(
+    "/media/upload",
+    formData,
+    { ...options, timeoutMs: options?.timeoutMs ?? 120_000 },
+  );
+  return res.data.url;
+}
 
 export { toDisplayError } from "./core/api/to-display-error";
 export type {

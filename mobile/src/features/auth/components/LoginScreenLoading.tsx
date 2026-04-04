@@ -21,7 +21,7 @@ export function LoginScreenLoading() {
           loop
         />
         <Text style={[styles.loadingText, { color: colors.text.tertiary }]}>
-          Đang tải Em Plus...
+          Đang tải Em+...
         </Text>
       </View>
     </AppScreen>

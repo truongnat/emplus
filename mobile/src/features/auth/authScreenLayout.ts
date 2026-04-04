@@ -15,7 +15,7 @@ export const AUTH_GRID_SCROLL_PADDING_EXTRA =
   AUTH_GRID_TOP_BAR_HEIGHT +
   AUTH_GRID_SCROLL_GAP_BELOW_TOP_BAR;
 
-/** Login: “Em Plus” wordmark — offset below safe area (no back chip row). */
+/** Login: “Em+” wordmark — offset below safe area (no back chip row). */
 export const AUTH_LOGIN_BRAND_TOP_OFFSET = 8;
 
 /**

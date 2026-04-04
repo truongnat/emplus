@@ -1,22 +1,31 @@
 import React, { useState, useMemo } from "react";
-import { View, ScrollView, Switch, StyleSheet, Dimensions } from "react-native";
+import { View, ScrollView, Switch, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { StatusBar } from "expo-status-bar";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
+import { TOAST_TAB_BAR_OFFSET } from "@/src/components/atoms/Toast";
 import { AppText, PressableScale } from "@/src/ui-kit";
+import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
+import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
+import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
+import { homeScreenStyles } from "@/src/features/home/homeScreen.styles";
 import { useSession } from "@/src/session-context";
-import { useThemeColors } from "@/src/theme";
+import { useThemeColors, useThemeMode } from "@/src/theme";
 import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
 import { lottieInventory } from "@/src/lottie/inventory";
 import type { SemanticColors } from "@/src/theme/tokens/semantic";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
 function createProfileStyles(c: SemanticColors) {
   return StyleSheet.create({
+    screenRoot: {
+      flex: 1,
+      zIndex: 1,
+    },
     scrollContent: {
-      paddingBottom: 120,
+      flexGrow: 1,
     },
     headerContainer: {
       height: 180,
@@ -34,7 +43,6 @@ function createProfileStyles(c: SemanticColors) {
       alignItems: "center",
       justifyContent: "space-between",
       paddingHorizontal: 24,
-      paddingTop: 32,
     },
     headerTitle: {
       fontSize: 24,
@@ -174,6 +182,7 @@ function createProfileStyles(c: SemanticColors) {
       alignItems: "center",
       justifyContent: "center",
       padding: 24,
+      zIndex: 1,
     },
     centerText: {
       fontSize: 16,
@@ -244,36 +253,63 @@ function SettingItem({
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { session, clearSession, isAuthenticated } = useSession();
   const colors = useThemeColors();
+  const { isDark } = useThemeMode();
+  useAuthGridChrome(isDark, colors.background.default, true);
   const styles = useMemo(() => createProfileStyles(colors), [colors]);
   const [syncEnabled, setSyncEnabled] = useState(true);
 
+  const scrollPadBottom = Math.max(insets.bottom + TOAST_TAB_BAR_OFFSET, 100);
+
+  const appShell = (body: React.ReactNode) => (
+    <AppScreen
+      applyTopSafeAreaPadding={false}
+      wrapWithKeyboardDismiss={false}
+      style={{
+        ...loginScreenStyles.appScreenBase,
+        backgroundColor: "transparent",
+      }}
+      contentContainerStyle={loginScreenStyles.appContent}
+      animatedEntrance={false}
+    >
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <View style={homeScreenStyles.layerRoot}>
+        <LoginGridAnimatedBackground isDark={isDark} />
+        {body}
+      </View>
+    </AppScreen>
+  );
+
   if (!isAuthenticated) {
-    return (
-      <AppScreen>
-        <View style={styles.centerContainer}>
-          <EmplusLottie
-            source={lottieInventory.empty}
-            style={{ width: 140, height: 140 }}
-            loop
-          />
-          <AppText style={[styles.centerText, { color: colors.text.tertiary }]}>
-            Đăng nhập để xem hồ sơ
-          </AppText>
-        </View>
-      </AppScreen>
+    return appShell(
+      <View style={[styles.centerContainer, { paddingTop: insets.top }]}>
+        <EmplusLottie
+          source={lottieInventory.empty}
+          style={{ width: 140, height: 140 }}
+          loop
+        />
+        <AppText style={[styles.centerText, { color: colors.text.tertiary }]}>
+          Đăng nhập để xem hồ sơ
+        </AppText>
+      </View>,
     );
   }
 
   const userInitial = session?.user?.email?.[0]?.toUpperCase() || "U";
   const userEmail = session?.user?.email || "User";
 
-  return (
-    <AppScreen>
+  return appShell(
+    <View style={styles.screenRoot}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        style={{ flex: 1, backgroundColor: "transparent" }}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: scrollPadBottom },
+        ]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         {/* Premium Header with Overlapping Avatar */}
         <View style={styles.headerContainer}>
@@ -283,7 +319,9 @@ export default function ProfileScreen() {
             end={{ x: 1, y: 1 }}
             style={styles.headerGradient}
           />
-          <View style={styles.headerTitleRow}>
+          <View
+            style={[styles.headerTitleRow, { paddingTop: insets.top + 12 }]}
+          >
             <AppText style={[styles.headerTitle, { color: colors.text.onBrand }]}>
               Tài khoản
             </AppText>
@@ -462,6 +500,6 @@ export default function ProfileScreen() {
           </View>
         </View>
       </ScrollView>
-    </AppScreen>
+    </View>,
   );
 }

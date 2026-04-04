@@ -14,22 +14,42 @@ export function formatGroupDate(dateString: string): string {
   if (dateString === today) return "HÔM NAY";
   if (dateString === yesterday) return "HÔM QUA";
 
-  // Format YYYY-MM-DD to more readable if needed, but the current app uses raw ISO string
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+    const [y, m, d] = dateString.split("-");
+    return `${d}/${m}/${y}`;
+  }
   return dateString;
 }
 
-export function parseMediaUrls(mediaUrlsInput: any): string[] {
-  if (Array.isArray(mediaUrlsInput)) {
-    return mediaUrlsInput;
+function coerceUrl(entry: unknown): string | null {
+  if (typeof entry === "string" && entry.trim().length > 0) {
+    return entry.trim();
   }
-  if (typeof mediaUrlsInput === "string") {
+  if (entry && typeof entry === "object" && "url" in entry) {
+    const u = (entry as { url?: unknown }).url;
+    if (typeof u === "string" && u.trim().length > 0) return u.trim();
+  }
+  return null;
+}
+
+export function parseMediaUrls(mediaUrlsInput: any): string[] {
+  let raw: unknown[] = [];
+  if (Array.isArray(mediaUrlsInput)) {
+    raw = mediaUrlsInput;
+  } else if (typeof mediaUrlsInput === "string") {
     try {
-      return JSON.parse(mediaUrlsInput);
+      const parsed = JSON.parse(mediaUrlsInput);
+      raw = Array.isArray(parsed) ? parsed : [];
     } catch {
-      return [];
+      raw = [];
     }
   }
-  return [];
+  const out: string[] = [];
+  for (const entry of raw) {
+    const u = coerceUrl(entry);
+    if (u) out.push(u);
+  }
+  return out;
 }
 
 export function getMemoryTime(createdAt?: string): string {

@@ -1,19 +1,100 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Animated, PanResponder, View, Dimensions, StyleSheet } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Animated as RNAnimated, View, Dimensions, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import Svg, { Defs, RadialGradient, Stop, Circle, G } from "react-native-svg";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Reanimated, {
+  clamp,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppText } from "@/src/components/atoms/Text";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { auraPalette } from "@/src/theme/aura-colors";
+import { getCoupleMood, putCoupleMood } from "@/src/api";
+import { tokenManager } from "@/src/core/api/token-manager";
+import { useSession } from "@/src/session-context";
 import { useThemeColors } from "@/src/theme";
+import { MOOD_BAND_LABEL_VI, moodBandFromValue } from "../mood-band";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-const AnimatedG = Animated.createAnimatedComponent(G);
+/** Blob tâm trạng phía trên — nhỏ hơn bản 280px để gọn màn Care */
+const MOOD_BLOB_SIZE = 200;
+const MOOD_VISUAL_HEIGHT = Math.round((260 * MOOD_BLOB_SIZE) / 280);
 
-const MOOD_STORAGE_KEY = "@emplus:mood-history";
+const THUMB_WIDTH = 56;
+const THUMB_HALF = 28;
+/** Tối đa ~10 lần/giây cập nhật blob + chữ từ UI thread (đủ mượt, ít setState). */
+const MOOD_LABEL_FLUSH_MS = 100;
+
+/** Cùng dải với `LinearGradient` của thanh slider */
+const TRACK_GREEN = "#10B981";
+const TRACK_YELLOW = "#FACC15";
+const TRACK_PINK = "#FB7185";
+
+function parseHex(hex: string): { r: number; g: number; b: number } {
+  const h = hex.replace("#", "");
+  return {
+    r: parseInt(h.slice(0, 2), 16),
+    g: parseInt(h.slice(2, 4), 16),
+    b: parseInt(h.slice(4, 6), 16),
+  };
+}
+
+function toHex(r: number, g: number, b: number): string {
+  const c = (n: number) =>
+    Math.round(Math.min(255, Math.max(0, n)))
+      .toString(16)
+      .padStart(2, "0");
+  return `#${c(r)}${c(g)}${c(b)}`;
+}
+
+function lerpHex(a: string, b: string, t: number): string {
+  const A = parseHex(a);
+  const B = parseHex(b);
+  const x = Math.min(1, Math.max(0, t));
+  return toHex(
+    A.r + (B.r - A.r) * x,
+    A.g + (B.g - A.g) * x,
+    A.b + (B.b - A.b) * x,
+  );
+}
+
+/** t ∈ [0,1] dọc theo slider: xanh → vàng → hồng */
+function interpolateTrackColor(t: number): string {
+  const x = Math.min(1, Math.max(0, t));
+  if (x <= 0.5) return lerpHex(TRACK_GREEN, TRACK_YELLOW, x * 2);
+  return lerpHex(TRACK_YELLOW, TRACK_PINK, (x - 0.5) * 2);
+}
+
+function mixWithWhite(hex: string, amount: number): string {
+  const { r, g, b } = parseHex(hex);
+  const a = Math.min(1, Math.max(0, amount));
+  return toHex(
+    r + (255 - r) * a,
+    g + (255 - g) * a,
+    b + (255 - b) * a,
+  );
+}
+
+function moodBlobStops(moodT: number) {
+  const core = interpolateTrackColor(moodT);
+  const coreB = interpolateTrackColor(Math.min(1, moodT + 0.12));
+  return {
+    g1a: core,
+    g1b: mixWithWhite(core, 0.38),
+    g1c: mixWithWhite(core, 0.55),
+    g2a: coreB,
+    g2b: mixWithWhite(coreB, 0.35),
+    g2c: mixWithWhite(coreB, 0.52),
+  };
+}
+
+const AnimatedCircle = RNAnimated.createAnimatedComponent(Circle);
+const AnimatedG = RNAnimated.createAnimatedComponent(G);
 
 interface MoodVibeCheckProps {
   initialValue?: number;
@@ -25,12 +106,15 @@ const VisualArea = React.memo(
   ({
     phase,
     floatAnim,
+    moodT,
   }: {
-    phase: Animated.Value;
-    floatAnim: Animated.Value;
+    phase: RNAnimated.Value;
+    floatAnim: RNAnimated.Value;
+    moodT: number;
   }) => {
-    const SVG_SIZE = 280;
+    const SVG_SIZE = MOOD_BLOB_SIZE;
     const CENTER = SVG_SIZE / 2;
+    const stops = useMemo(() => moodBlobStops(moodT), [moodT]);
 
     const b1_cx = phase.interpolate({
       inputRange: [0, 0.25, 0.5, 0.75, 1],
@@ -59,7 +143,7 @@ const VisualArea = React.memo(
     });
 
     return (
-      <Animated.View
+      <RNAnimated.View
         style={[
           styles.visualContainer,
           { transform: [{ translateY: floatAnim }] },
@@ -81,9 +165,9 @@ const VisualArea = React.memo(
               fx="50%"
               fy="50%"
             >
-              <Stop offset="0%" stopColor="#FB7185" stopOpacity="0.8" />
-              <Stop offset="70%" stopColor="#FDA4AF" stopOpacity="0.3" />
-              <Stop offset="100%" stopColor="#FDA4AF" stopOpacity="0" />
+              <Stop offset="0%" stopColor={stops.g1a} stopOpacity="0.82" />
+              <Stop offset="70%" stopColor={stops.g1b} stopOpacity="0.32" />
+              <Stop offset="100%" stopColor={stops.g1c} stopOpacity="0" />
             </RadialGradient>
             <RadialGradient
               id="vibeGrad2"
@@ -94,9 +178,9 @@ const VisualArea = React.memo(
               fx="50%"
               fy="50%"
             >
-              <Stop offset="0%" stopColor={auraPalette.rose300} stopOpacity="0.7" />
-              <Stop offset="70%" stopColor="#FBCFE8" stopOpacity="0.2" />
-              <Stop offset="100%" stopColor="#FBCFE8" stopOpacity="0" />
+              <Stop offset="0%" stopColor={stops.g2a} stopOpacity="0.72" />
+              <Stop offset="70%" stopColor={stops.g2b} stopOpacity="0.22" />
+              <Stop offset="100%" stopColor={stops.g2c} stopOpacity="0" />
             </RadialGradient>
           </Defs>
 
@@ -115,7 +199,7 @@ const VisualArea = React.memo(
             />
           </AnimatedG>
         </Svg>
-      </Animated.View>
+      </RNAnimated.View>
     );
   },
 );
@@ -126,59 +210,74 @@ export function MoodVibeCheck({
   partnerName = "người ấy",
 }: MoodVibeCheckProps) {
   const colors = useThemeColors();
+  const { isAuthenticated, hydrated } = useSession();
+  const queryClient = useQueryClient();
   const [value, setValue] = useState(initialValue);
-  const [isSliding, setIsSliding] = useState(false);
   const sliderWidth = useRef(SCREEN_WIDTH - 96);
-  const saveTimeout = useRef<NodeJS.Timeout | null>(null);
+  const latestDragValueRef = useRef(initialValue);
+  const lastLabelFlushRef = useRef(0);
+  /** Chỉ hydrate `self` từ API một lần — refetch sau PUT không ghi đè local bằng bản stale. */
+  const moodSelfHydratedRef = useRef(false);
+  /** Giá trị đã lưu trên server (sau hydrate / PUT thành công) — tránh PUT+toast trùng. */
+  const lastPersistedValueRef = useRef<number | null>(null);
 
-  const phase = useRef(new Animated.Value(0)).current;
-  const floatAnim = useRef(new Animated.Value(0)).current;
+  const progressSV = useSharedValue(initialValue);
+  const trackW = useSharedValue(Math.max(1, SCREEN_WIDTH - 96));
+  const panStartProgress = useSharedValue(initialValue);
 
-  // Load saved mood on mount
+  const phase = useRef(new RNAnimated.Value(0)).current;
+  const floatAnim = useRef(new RNAnimated.Value(0)).current;
+
+  const { data: moodPayload } = useQuery({
+    queryKey: ["coupleMood"],
+    queryFn: getCoupleMood,
+    staleTime: 15_000,
+    enabled: hydrated && isAuthenticated,
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: (v: number) => putCoupleMood(v),
+    onSuccess: (_saved, v) => {
+      lastPersistedValueRef.current = v;
+      onMoodChange?.(v);
+      void queryClient.invalidateQueries({ queryKey: ["coupleMood"] });
+    },
+  });
+
   useEffect(() => {
-    const loadSavedMood = async () => {
-      try {
-        const savedMood = await AsyncStorage.getItem(MOOD_STORAGE_KEY);
-        if (savedMood) {
-          const parsed = JSON.parse(savedMood);
-          const today = new Date().toDateString();
-          if (parsed.date === today) {
-            setValue(parsed.value);
-          }
-        }
-      } catch (error) {
-        console.error("Error loading mood:", error);
-      }
-    };
-    loadSavedMood();
-  }, []);
+    if (moodSelfHydratedRef.current || moodPayload === undefined) return;
+    moodSelfHydratedRef.current = true;
+    const v =
+      typeof moodPayload.self?.value === "number" ? moodPayload.self.value : initialValue;
+    lastPersistedValueRef.current = v;
+    progressSV.value = v;
+    latestDragValueRef.current = v;
+    setValue(v);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ gán progressSV.value, không cần deps shared value
+  }, [moodPayload, initialValue]);
 
-  const saveMood = async (moodValue: number) => {
+  const mutateMoodRef = useRef(saveMutation.mutateAsync);
+  mutateMoodRef.current = saveMutation.mutateAsync;
+
+  const saveMood = useCallback(async (moodValue: number) => {
+    const token = tokenManager.getAccessToken()?.trim();
+    if (!token) return;
+    if (
+      lastPersistedValueRef.current !== null &&
+      moodValue === lastPersistedValueRef.current
+    ) {
+      return;
+    }
     try {
-      const moodData = {
-        value: moodValue,
-        date: new Date().toDateString(),
-        timestamp: Date.now(),
-      };
-      await AsyncStorage.setItem(MOOD_STORAGE_KEY, JSON.stringify(moodData));
+      await mutateMoodRef.current(moodValue);
     } catch (error) {
       console.error("Error saving mood:", error);
     }
-  };
-
-  const debouncedSaveMood = (moodValue: number) => {
-    if (saveTimeout.current) {
-      clearTimeout(saveTimeout.current);
-    }
-    saveTimeout.current = setTimeout(() => {
-      saveMood(moodValue);
-      onMoodChange?.(moodValue);
-    }, 300) as any;
-  };
+  }, []);
 
   useEffect(() => {
-    const animation = Animated.loop(
-      Animated.timing(phase, {
+    const animation = RNAnimated.loop(
+      RNAnimated.timing(phase, {
         toValue: 1,
         duration: 20000,
         useNativeDriver: false,
@@ -186,14 +285,14 @@ export function MoodVibeCheck({
     );
     animation.start();
 
-    const floating = Animated.loop(
-      Animated.sequence([
-        Animated.timing(floatAnim, {
+    const floating = RNAnimated.loop(
+      RNAnimated.sequence([
+        RNAnimated.timing(floatAnim, {
           toValue: -15,
           duration: 4000,
           useNativeDriver: true,
         }),
-        Animated.timing(floatAnim, {
+        RNAnimated.timing(floatAnim, {
           toValue: 0,
           duration: 4000,
           useNativeDriver: true,
@@ -209,48 +308,89 @@ export function MoodVibeCheck({
   }, [floatAnim, phase]);
 
   const moodConfig = useMemo(() => {
-    if (value < 25)
-      return { text: "Yên tâm", color: colors.status.success.text };
-    if (value < 50)
-      return { text: "Ổn định", color: colors.status.warning.text };
-    if (value < 75)
-      return { text: "Lo lắng", color: colors.brand.default };
-    return { text: "Căng thẳng", color: colors.status.error.text };
+    const band = moodBandFromValue(value);
+    const text = MOOD_BAND_LABEL_VI[band];
+    const color =
+      band === "calm"
+        ? colors.status.success.text
+        : band === "steady"
+          ? colors.status.warning.text
+          : band === "worried"
+            ? colors.brand.default
+            : colors.status.error.text;
+    return { text, color };
   }, [value, colors]);
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        setIsSliding(true);
-      },
-      onPanResponderMove: (_, gestureState) => {
-        const currentWidth = sliderWidth.current;
-        const cardLeftOffset = (SCREEN_WIDTH - currentWidth) / 2;
-        const relativeX = gestureState.moveX - cardLeftOffset;
-        const newValue = Math.min(
-          100,
-          Math.max(0, (relativeX / currentWidth) * 100),
-        );
-        setValue(Math.round(newValue));
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        const currentWidth = sliderWidth.current;
-        const cardLeftOffset = (SCREEN_WIDTH - currentWidth) / 2;
-        const relativeX = gestureState.moveX - cardLeftOffset;
-        const finalValue = Math.min(
-          100,
-          Math.max(0, (relativeX / currentWidth) * 100),
-        );
-        const roundedValue = Math.round(finalValue);
-        debouncedSaveMood(roundedValue);
-        setIsSliding(false);
-      },
-      onPanResponderTerminate: () => {
-        setIsSliding(false);
-      },
-    }),
-  ).current;
+  const partnerDisplayName = moodPayload?.partner?.fullName ?? partnerName;
+  const partnerMoodValue = moodPayload?.partner?.value;
+  const partnerMoodLabel =
+    typeof partnerMoodValue === "number"
+      ? MOOD_BAND_LABEL_VI[moodBandFromValue(partnerMoodValue)]
+      : null;
+
+  /**
+   * Worklet chỉ được `scheduleOnRN(fn, ...args)` với hàm ổn định (useCallback).
+   * Không dùng `ref.current = fn` rồi `scheduleOnRN(ref.current)` — serialize ref → crash khi gán `.current` sau.
+   */
+  const flushLabelThrottled = useCallback((n: number) => {
+    const t = Date.now();
+    if (t - lastLabelFlushRef.current < MOOD_LABEL_FLUSH_MS) return;
+    lastLabelFlushRef.current = t;
+    latestDragValueRef.current = n;
+    setValue(n);
+  }, []);
+
+  const onPanFinalize = useCallback(
+    (rounded: number) => {
+      latestDragValueRef.current = rounded;
+      lastLabelFlushRef.current = Date.now();
+      setValue(rounded);
+      void saveMood(rounded);
+    },
+    [saveMood],
+  );
+
+  useAnimatedReaction(
+    () => Math.round(progressSV.value),
+    (current, previous) => {
+      if (previous === undefined) return;
+      if (current !== previous) {
+        scheduleOnRN(flushLabelThrottled, current);
+      }
+    },
+    [flushLabelThrottled],
+  );
+
+  const panGesture = useMemo(
+    () =>
+      Gesture.Pan()
+        .onBegin(() => {
+          panStartProgress.value = progressSV.value;
+        })
+        .onUpdate((e) => {
+          const w = trackW.value;
+          const span = Math.max(1, w - THUMB_WIDTH);
+          const next = panStartProgress.value + (e.translationX / span) * 100;
+          progressSV.value = clamp(next, 0, 100);
+        })
+        .onFinalize(() => {
+          const rounded = Math.round(progressSV.value);
+          progressSV.value = rounded;
+          scheduleOnRN(onPanFinalize, rounded);
+        }),
+    [onPanFinalize, panStartProgress, progressSV, trackW],
+  );
+
+  const thumbStyle = useAnimatedStyle(() => {
+    const w = trackW.value;
+    return {
+      transform: [
+        {
+          translateX: (progressSV.value / 100) * w - THUMB_HALF,
+        },
+      ],
+    };
+  }, [progressSV, trackW]);
 
   return (
     <View
@@ -259,7 +399,7 @@ export function MoodVibeCheck({
       accessibilityLabel="Mood slider"
       accessibilityValue={{ min: 0, max: 100, now: value }}
     >
-      <VisualArea phase={phase} floatAnim={floatAnim} />
+      <VisualArea phase={phase} floatAnim={floatAnim} moodT={value / 100} />
 
       <View style={styles.card}>
         <View style={styles.header}>
@@ -269,42 +409,39 @@ export function MoodVibeCheck({
               {moodConfig.text}
             </AppText>
           </AppText>
-          <AppText style={styles.subtitle}>
-            Kéo để điều chỉnh nhịp đập tâm trạng
-          </AppText>
         </View>
 
         <View
           style={styles.sliderArea}
           onLayout={(e) => {
-            sliderWidth.current = e.nativeEvent.layout.width;
+            const w = e.nativeEvent.layout.width;
+            sliderWidth.current = w;
+            trackW.value = w;
           }}
         >
-          <View style={styles.sliderLabels}>
-            <AppText style={styles.sliderEdgeText}>BÌNH THẢN</AppText>
-            <AppText style={styles.sliderEdgeText}>CĂNG THẲNG</AppText>
-          </View>
+          <GestureDetector gesture={panGesture}>
+            <View style={styles.sliderGestureInner} collapsable={false}>
+              <View style={styles.sliderLabels} pointerEvents="none">
+                <AppText style={styles.sliderEdgeText}>BÌNH THẢN</AppText>
+                <AppText style={styles.sliderEdgeText}>CĂNG THẲNG</AppText>
+              </View>
 
-          <View style={styles.track}>
-            <LinearGradient
-              colors={["#10B981", "#FACC15", "#FB7185"]}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={styles.trackGradient}
-            />
-          </View>
+              <View style={styles.track} pointerEvents="none">
+                <LinearGradient
+                  colors={["#10B981", "#FACC15", "#FB7185"]}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={styles.trackGradient}
+                />
+              </View>
 
-          <View
-            {...panResponder.panHandlers}
-            style={[
-              styles.thumbContainer,
-              { left: (value / 100) * sliderWidth.current - 28 },
-            ]}
-          >
-            <View style={styles.thumbOuter}>
-              <View style={[styles.thumbInner, { backgroundColor: moodConfig.color }]} />
+              <Reanimated.View style={[styles.thumbContainer, thumbStyle]}>
+                <View style={styles.thumbOuter}>
+                  <View style={[styles.thumbInner, { backgroundColor: moodConfig.color }]} />
+                </View>
+              </Reanimated.View>
             </View>
-          </View>
+          </GestureDetector>
         </View>
 
         <View style={styles.footerInfo}>
@@ -318,12 +455,30 @@ export function MoodVibeCheck({
           </View>
         </View>
 
+        {moodPayload?.partner ? (
+          <>
+            <View style={styles.divider} />
+            <View style={styles.partnerRow}>
+              <AppText style={styles.partnerRowTitle}>
+                {partnerDisplayName.toUpperCase()}
+              </AppText>
+              {partnerMoodLabel != null ? (
+                <AppText style={styles.partnerRowValue}>
+                  {partnerMoodLabel}
+                  <AppText style={styles.partnerRowScore}> · {partnerMoodValue}</AppText>
+                </AppText>
+              ) : (
+                <AppText style={styles.partnerRowPending}>
+                  Chưa cập nhật tâm trạng
+                </AppText>
+              )}
+            </View>
+          </>
+        ) : null}
+
         <View style={styles.divider} />
         <AppText style={styles.hintText}>
-          Buông tay để gửi nhịp bộ cảm xúc đến{" "}
-          <AppText style={[styles.partnerName, { color: colors.brand.default }]}>
-            {partnerName}
-          </AppText>
+          Buông tay để lưu — cả hai sẽ thấy trên tab Cảm xúc khi đã ghép đôi.
         </AppText>
       </View>
     </View>
@@ -336,11 +491,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   visualContainer: {
-    width: 280,
-    height: 260,
+    width: MOOD_BLOB_SIZE,
+    height: MOOD_VISUAL_HEIGHT,
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 10,
+    marginVertical: 6,
   },
   svgAbsolute: {
     position: "absolute",
@@ -371,17 +526,15 @@ const styles = StyleSheet.create({
   moodStatusValue: {
     fontWeight: "900",
   },
-  subtitle: {
-    fontSize: 13,
-    color: "#78716C",
-    marginTop: 6,
-    fontWeight: "600",
-    textAlign: "center",
-  },
   sliderArea: {
     height: 80,
     justifyContent: "center",
     marginTop: 4,
+  },
+  sliderGestureInner: {
+    height: "100%",
+    width: "100%",
+    justifyContent: "center",
   },
   sliderLabels: {
     flexDirection: "row",
@@ -463,7 +616,31 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 18,
   },
-  partnerName: {
+  partnerRow: {
+    marginBottom: 16,
+    alignItems: "center",
+    gap: 4,
+  },
+  partnerRowTitle: {
+    fontSize: 9,
     fontWeight: "800",
+    color: "#A8A29E",
+    letterSpacing: 1.2,
+  },
+  partnerRowValue: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#1C1917",
+    textAlign: "center",
+  },
+  partnerRowScore: {
+    fontWeight: "700",
+    color: "#78716C",
+  },
+  partnerRowPending: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#78716C",
+    textAlign: "center",
   },
 });

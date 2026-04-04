@@ -95,15 +95,19 @@ export const sanitizeMiddleware = createMiddleware<AppEnv>(async (c, next) => {
   }
   (c.req as any).sanitizedQuery = queryParams;
 
-  // Sanitize body for POST/PUT/PATCH
+  // Sanitize body for POST/PUT/PATCH (JSON only — multipart must stay unread for handlers)
   if (["POST", "PUT", "PATCH"].includes(c.req.method)) {
-    try {
-      const body = await c.req.json();
-      const sanitizedBody = sanitizeObject(body);
-      (c.req as any).sanitizedBody = sanitizedBody;
-    } catch {
-      // If JSON parsing fails, skip sanitization
+    const ct = c.req.header("content-type") ?? "";
+    if (ct.includes("multipart/form-data")) {
       (c.req as any).sanitizedBody = null;
+    } else {
+      try {
+        const body = await c.req.json();
+        const sanitizedBody = sanitizeObject(body);
+        (c.req as any).sanitizedBody = sanitizedBody;
+      } catch {
+        (c.req as any).sanitizedBody = null;
+      }
     }
   }
 

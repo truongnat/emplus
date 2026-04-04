@@ -186,7 +186,7 @@ import {
 
 <AuthHeader
   icon="heart-outline"
-  title="Em Plus"
+  title="Em+"
   subtitle="Welcome"
   showBack
   onBack={handleBack}

@@ -1,19 +1,54 @@
 import { Hono } from "hono";
 import type { AppEnv } from "../app-env.ts";
+import { env } from "../config/env.ts";
 import { parseTimelineQueryParams, validateCreateMemoryInput } from "../dto/timeline.dto.ts";
 import { requireAuth } from "../middleware/auth.ts";
+import {
+  ensureDemoTimelineMemories,
+  ensureDemoGridTestMemories,
+  syncDemoTimelineMediaUrls,
+} from "./demo-timeline-memories.ts";
 import { store } from "../store.ts";
 import type { MemoryItem } from "../types.ts";
 import { resolveActiveCoupleIdAsync } from "../utils/couple.ts";
-import { paginated, readJson, success } from "../utils/http.ts";
+import { AppError, paginated, readJson, success } from "../utils/http.ts";
 
 export const timelineRoutes = new Hono<AppEnv>();
 
 timelineRoutes.use("*", requireAuth);
 
+timelineRoutes.get("/memories/:id", async (context) => {
+  const user = context.get("user");
+  const coupleId = await resolveActiveCoupleIdAsync(user.id);
+  const id = context.req.param("id");
+  const memory = await store.getMemoryByCouple(coupleId, id);
+  if (!memory) {
+    throw new AppError(404, "NOT_FOUND", "Không tìm thấy mục.");
+  }
+  return success(context, memory);
+});
+
+timelineRoutes.delete("/memories/:id", async (context) => {
+  const user = context.get("user");
+  const coupleId = await resolveActiveCoupleIdAsync(user.id);
+  const id = context.req.param("id");
+  const deleted = await store.deleteMemory(coupleId, id);
+  if (!deleted) {
+    throw new AppError(404, "NOT_FOUND", "Không tìm thấy mục.");
+  }
+  await store.invalidateHomeCache(coupleId);
+  return success(context, { ok: true });
+});
+
 timelineRoutes.get("/memories", async (context) => {
   const user = context.get("user");
   const coupleId = await resolveActiveCoupleIdAsync(user.id);
+
+  if (env.fakeTimelineMemories) {
+    await ensureDemoTimelineMemories(store, coupleId, user.id);
+    await syncDemoTimelineMediaUrls(store, coupleId);
+    await ensureDemoGridTestMemories(store, coupleId, user.id);
+  }
 
   const query = parseTimelineQueryParams({
     page: context.req.query("page"),

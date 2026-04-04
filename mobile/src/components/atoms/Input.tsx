@@ -1,5 +1,5 @@
 /**
- * Input — form field (Em Plus design system, không RNUI).
+ * Input — form field (Em+ design system, không RNUI).
  */
 
 import React, {

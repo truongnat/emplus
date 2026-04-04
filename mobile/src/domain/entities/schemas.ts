@@ -941,6 +941,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/timeline/memories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Chi tiết một mục */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Memory"];
+                    };
+                };
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /** Xoá mục */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            ok: boolean;
+                        };
+                    };
+                };
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/care/female-cycle": {
         parameters: {
             query?: never;
@@ -1043,6 +1115,89 @@ export interface paths {
             };
         };
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/care/mood": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tâm trạng cặp đôi (bản thân + đối phương) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description self và partner (nullable) */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            self: {
+                                value: number;
+                                updatedAt: string;
+                            } | null;
+                            partner: {
+                                userId: string;
+                                fullName: string;
+                                value: number | null;
+                                updatedAt: string | null;
+                            } | null;
+                        };
+                    };
+                };
+            };
+        };
+        /** Cập nhật tâm trạng của bản thân */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        value: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description Đã lưu */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            value: number;
+                            updatedAt: string;
+                        };
+                    };
+                };
+                /** @description Giá trị không hợp lệ */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         post?: never;
         delete?: never;
         options?: never;
@@ -1564,6 +1719,9 @@ export namespace TimelineModule {
   
   export type CreateRequest = ApiRequest<"/v1/timeline/memories", "post">;
   export type CreateResponse = ApiResponse<"/v1/timeline/memories", "post">;
+
+  export type DetailResponse = ApiResponse<"/v1/timeline/memories/{id}", "get">;
+  export type DeleteResponse = ApiResponse<"/v1/timeline/memories/{id}", "delete">;
 }
 
 export namespace CareModule {
@@ -1571,6 +1729,10 @@ export namespace CareModule {
   export type FemaleCycleResponse = ApiResponse<"/v1/care/female-cycle", "post">;
   
   export type MaleSuggestionsResponse = ApiResponse<"/v1/care/male-suggestions", "get">;
+
+  export type CoupleMoodResponse = ApiResponse<"/v1/care/mood", "get">;
+  export type SaveMoodRequest = ApiRequest<"/v1/care/mood", "put">;
+  export type SaveMoodResponse = ApiResponse<"/v1/care/mood", "put">;
 }
 
 export namespace BudgetModule {

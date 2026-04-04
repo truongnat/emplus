@@ -1,4 +1,4 @@
-# Em Plus API
+# Em+ API
 
 API Bun + TypeScript theo tài liệu `docs/`:
 

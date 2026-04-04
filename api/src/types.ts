@@ -80,6 +80,13 @@ export interface EmotionalCycle {
   isTrackingActive: boolean;
 }
 
+/** Nhịp tâm trạng 0–100 do user cập nhật; đồng bộ cho cặp đôi. */
+export interface UserMoodState {
+  userId: string;
+  value: number;
+  updatedAt: string;
+}
+
 export interface MaleSuggestion {
   priority: number;
   text: string;

@@ -70,7 +70,7 @@ export default function LoginScreen() {
           pointerEvents="none"
           accessible
           accessibilityRole="text"
-          accessibilityLabel="Em Plus"
+          accessibilityLabel="Em+"
         >
           <LoginBrandGradientTitle />
         </View>

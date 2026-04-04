@@ -22,7 +22,6 @@ import {
 import Animated, {
   Extrapolation,
   interpolate,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -30,6 +29,7 @@ import Animated, {
   useAnimatedRef,
   SharedValue,
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/src/theme";
@@ -200,14 +200,14 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(
         const targetY = SCREEN_H - resolved[clampedIdx] - keyboardHeight.value;
         translateY.value = withSpring(targetY, SPRING_CONFIG);
         activeSnapIdx.value = clampedIdx;
-        onSnapChange && runOnJS(onSnapChange)(clampedIdx);
+        onSnapChange?.(clampedIdx);
       },
       [resolved, onSnapChange, theme.spring.smooth],
     );
 
     const dismissSheet = useCallback(() => {
       translateY.value = withSpring(SCREEN_H, CLOSE_SPRING, (finished) => {
-        if (finished && onClose) runOnJS(onClose)();
+        if (finished && onClose) scheduleOnRN(onClose);
       });
     }, [onClose, theme.spring.gentle]);
 
@@ -247,7 +247,7 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(
         const velocity = e.velocityY;
 
         if (velocity > dismissVelocityThreshold) {
-          runOnJS(dismissSheet)();
+          scheduleOnRN(dismissSheet);
           return;
         }
 
@@ -256,7 +256,7 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(
             activeSnapIdx.value + 1,
             resolved.length - 1,
           );
-          runOnJS(snapToIndex)(nextIdx);
+          scheduleOnRN(snapToIndex, nextIdx);
           return;
         }
 
@@ -272,14 +272,14 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(
         });
 
         if (currentHeight < resolved[0] * 0.5) {
-          runOnJS(dismissSheet)();
+          scheduleOnRN(dismissSheet);
         } else {
-          runOnJS(snapToIndex)(nearestIdx);
+          scheduleOnRN(snapToIndex, nearestIdx);
         }
       });
 
     const tapGesture = Gesture.Tap().onEnd(() => {
-      if (dismissOnBackdrop) runOnJS(dismissSheet)();
+      if (dismissOnBackdrop) scheduleOnRN(dismissSheet);
     });
 
     const sheetStyle = useAnimatedStyle(() => ({

@@ -19,7 +19,7 @@ export function LoginHeroSection() {
       style={styles.header}
       entering={enteringHero}
       accessibilityRole="header"
-      accessibilityLabel="Em Plus, đăng nhập"
+      accessibilityLabel="Em+, đăng nhập"
     >
       <View style={styles.logoMark}>
         <EmplusLottie

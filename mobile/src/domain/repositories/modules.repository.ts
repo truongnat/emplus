@@ -4,6 +4,7 @@ import type {
   DashboardModule,
   CareModule,
   BudgetModule,
+  Memory,
 } from "../entities/schemas";
 
 export interface TimelineRepository {
@@ -13,6 +14,8 @@ export interface TimelineRepository {
   createMemory(
     params: TimelineModule.CreateRequest,
   ): Promise<TimelineModule.CreateResponse>;
+  getMemory(id: string): Promise<Memory>;
+  deleteMemory(id: string): Promise<TimelineModule.DeleteResponse>;
 }
 
 export interface CoupleRepository {
@@ -31,6 +34,10 @@ export interface CareRepository {
     params: CareModule.FemaleCycleRequest,
   ): Promise<CareModule.FemaleCycleResponse>;
   getMaleSuggestions(): Promise<CareModule.MaleSuggestionsResponse>;
+  getCoupleMood(): Promise<CareModule.CoupleMoodResponse>;
+  putCoupleMood(
+    params: CareModule.SaveMoodRequest,
+  ): Promise<CareModule.SaveMoodResponse>;
 }
 
 export interface BudgetRepository {

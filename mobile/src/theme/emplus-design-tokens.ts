@@ -1,5 +1,5 @@
 /**
- * Em Plus — token sản phẩm (form, focus) bổ sung cho primitives trong tokens/index.
+ * Em+ — token sản phẩm (form, focus) bổ sung cho primitives trong tokens/index.
  * Màu focus tách khỏi brand coral để đủ contrast / a11y.
  */
 

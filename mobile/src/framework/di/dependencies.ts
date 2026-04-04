@@ -23,8 +23,12 @@ import {
   GetDashboardUseCase,
   GetMemoriesUseCase,
   CreateMemoryUseCase,
+  GetMemoryDetailUseCase,
+  DeleteMemoryUseCase,
   SaveFemaleCycleUseCase,
   GetMaleSuggestionsUseCase,
+  GetCoupleMoodUseCase,
+  PutCoupleMoodUseCase,
   GetBudgetSummaryUseCase,
   GetExpensesUseCase,
   CreateExpenseUseCase,
@@ -66,10 +70,14 @@ export const dependencies = {
   timeline: {
     getMemories: new GetMemoriesUseCase(timelineRepo),
     createMemory: new CreateMemoryUseCase(timelineRepo),
+    getMemory: new GetMemoryDetailUseCase(timelineRepo),
+    deleteMemory: new DeleteMemoryUseCase(timelineRepo),
   },
   care: {
     saveCycle: new SaveFemaleCycleUseCase(careRepo),
     getMaleSuggestions: new GetMaleSuggestionsUseCase(careRepo),
+    getCoupleMood: new GetCoupleMoodUseCase(careRepo),
+    putCoupleMood: new PutCoupleMoodUseCase(careRepo),
   },
   budget: {
     getSummary: new GetBudgetSummaryUseCase(budgetRepo),

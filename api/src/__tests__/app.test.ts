@@ -37,7 +37,7 @@ async function register(profile: {
   };
 }
 
-describe("Em Plus API MVP", () => {
+describe("Em+ API MVP", () => {
   beforeEach(async () => {
     if (store.reset) {
       await store.reset();
@@ -186,6 +186,44 @@ describe("Em Plus API MVP", () => {
     });
 
     expect(joinResponse.status).toBe(200);
+
+    const femaleMoodPut = await app.request("http://localhost/v1/care/mood", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${femaleToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ value: 62 }),
+    });
+    expect(femaleMoodPut.status).toBe(200);
+
+    const maleMoodGet = await app.request("http://localhost/v1/care/mood", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${maleToken}` },
+    });
+    expect(maleMoodGet.status).toBe(200);
+    const maleMoodPayload = await maleMoodGet.json();
+    expect(maleMoodPayload.data.partner?.fullName).toBe("Ngoc");
+    expect(maleMoodPayload.data.partner?.value).toBe(62);
+
+    const maleMoodPut = await app.request("http://localhost/v1/care/mood", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${maleToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ value: 81 }),
+    });
+    expect(maleMoodPut.status).toBe(200);
+
+    const femaleMoodGet = await app.request("http://localhost/v1/care/mood", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${femaleToken}` },
+    });
+    expect(femaleMoodGet.status).toBe(200);
+    const femaleMoodPayload = await femaleMoodGet.json();
+    expect(femaleMoodPayload.data.partner?.fullName).toBe("Minh");
+    expect(femaleMoodPayload.data.partner?.value).toBe(81);
 
     const saveCycleResponse = await app.request("http://localhost/v1/care/female-cycle", {
       method: "POST",

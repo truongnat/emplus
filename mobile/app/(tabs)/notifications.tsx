@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo } from "react";
 import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { StatusBar } from "expo-status-bar";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { AppText, PressableScale } from "@/src/ui-kit";
 import { useSession } from "@/src/session-context";
@@ -11,10 +13,16 @@ import {
 } from "@/src/presentation/hooks/notifications/useNotifications";
 import type { NotificationModule } from "@/src/domain/entities/schemas";
 import { syncExpoPushTokenToServer } from "@/src/lib/sync-expo-push-token";
-import { useThemeColors } from "@/src/theme";
+import { useThemeColors, useThemeMode } from "@/src/theme";
+import { typographyRoles } from "@/src/theme/typography-roles";
+import { fontSize } from "@/src/theme/tokens";
 import type { SemanticColors } from "@/src/theme/tokens/semantic";
 import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
 import { lottieInventory } from "@/src/lottie/inventory";
+import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
+import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
+import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
+import { homeScreenStyles } from "@/src/features/home/homeScreen.styles";
 
 function formatRelativeTime(iso: string): string {
   const t = new Date(iso).getTime();
@@ -38,9 +46,9 @@ function createNotificationStyles(c: SemanticColors) {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      paddingHorizontal: 24,
-      paddingTop: 16,
-      paddingBottom: 24,
+      paddingHorizontal: 22,
+      paddingTop: 4,
+      paddingBottom: 16,
     },
     headerLeft: {
       flex: 1,
@@ -62,18 +70,13 @@ function createNotificationStyles(c: SemanticColors) {
       color: c.brand.text,
     },
     title: {
-      fontSize: 28,
-      fontWeight: "900",
       color: c.text.primary,
-      letterSpacing: -1,
     },
     subtitle: {
-      fontSize: 12,
-      fontWeight: "800",
       color: c.text.tertiary,
       textTransform: "uppercase",
-      letterSpacing: 2,
-      marginTop: 2,
+      letterSpacing: 1.5,
+      marginTop: 4,
     },
     statusBadge: {
       flexDirection: "row",
@@ -131,8 +134,7 @@ function createNotificationStyles(c: SemanticColors) {
       marginTop: -2,
     },
     scrollContent: {
-      paddingHorizontal: 20,
-      paddingBottom: 160,
+      paddingHorizontal: 22,
     },
     section: {
       marginBottom: 32,
@@ -257,11 +259,25 @@ function createNotificationStyles(c: SemanticColors) {
       color: c.text.onBrand,
       fontWeight: "800",
     },
+    /** Fills scroll area so cat + copy sit vertically centered when list is empty */
+    emptyStateContainer: {
+      flexGrow: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      paddingVertical: 32,
+      paddingHorizontal: 24,
+    },
+    /** Cat playing animation — source 1070×456 */
+    emptyCatLottie: {
+      width: 300,
+      height: 128,
+    },
     emptyTitle: {
       marginTop: 12,
       fontSize: 18,
       fontWeight: "800",
       color: c.text.primary,
+      textAlign: "center",
     },
     emptySub: {
       marginTop: 8,
@@ -273,9 +289,17 @@ function createNotificationStyles(c: SemanticColors) {
 }
 
 export default function NotificationsScreen() {
+  const insets = useSafeAreaInsets();
   const { session, isAuthenticated } = useSession();
   const colors = useThemeColors();
+  const { isDark } = useThemeMode();
   const styles = useMemo(() => createNotificationStyles(colors), [colors]);
+  useAuthGridChrome(isDark, colors.background.default, true);
+
+  /** Title row directly under status bar (no Em+ wordmark on this tab). */
+  const topPad = insets.top + 10;
+  const scrollPadBottom = Math.max(128, insets.bottom + 100);
+
   const { data, isPending, isError, error, refetch } = useNotificationsList();
   const markRead = useMarkNotificationRead();
   const markAll = useMarkAllNotificationsRead();
@@ -296,12 +320,46 @@ export default function NotificationsScreen() {
   const previous = items.slice(2);
 
   return (
-    <AppScreen>
-      <View style={styles.container}>
+    <AppScreen
+      applyTopSafeAreaPadding={false}
+      wrapWithKeyboardDismiss={false}
+      style={{
+        ...loginScreenStyles.appScreenBase,
+        backgroundColor: "transparent",
+      }}
+      contentContainerStyle={loginScreenStyles.appContent}
+      animatedEntrance={false}
+    >
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <View style={homeScreenStyles.layerRoot}>
+        <LoginGridAnimatedBackground isDark={isDark} />
+
+        <View style={[styles.container, { paddingTop: topPad }]}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <AppText style={styles.title}>Thông báo</AppText>
-            <AppText style={styles.subtitle}>NHỊP ĐẬP HÔM NAY</AppText>
+            <AppText
+              accessibilityRole="header"
+              style={[
+                typographyRoles.title,
+                styles.title,
+                { fontFamily: typographyRoles.display.fontFamily },
+              ]}
+            >
+              Thông báo
+            </AppText>
+            <AppText
+              accessibilityRole="text"
+              style={[
+                typographyRoles.caption,
+                styles.subtitle,
+                {
+                  fontSize: fontSize["2xs"],
+                  fontFamily: typographyRoles.titleSm.fontFamily,
+                },
+              ]}
+            >
+              NHỊP ĐẬP HÔM NAY
+            </AppText>
           </View>
 
           <View style={styles.headerRight}>
@@ -339,7 +397,9 @@ export default function NotificationsScreen() {
         </View>
 
         {isPending && (
-          <View style={styles.centered}>
+          <View
+            style={[styles.centered, { paddingBottom: scrollPadBottom }]}
+          >
             <EmplusLottie
               source={lottieInventory.loader}
               style={{ width: 120, height: 120 }}
@@ -350,7 +410,9 @@ export default function NotificationsScreen() {
         )}
 
         {isError && (
-          <View style={styles.centered}>
+          <View
+            style={[styles.centered, { paddingBottom: scrollPadBottom }]}
+          >
             <EmplusLottie
               source={lottieInventory.error}
               style={{ width: 120, height: 120 }}
@@ -367,17 +429,31 @@ export default function NotificationsScreen() {
 
         {!isPending && !isError && (
           <ScrollView
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={[
+              styles.scrollContent,
+              {
+                paddingBottom: scrollPadBottom,
+                ...(items.length === 0 ? { flexGrow: 1 } : {}),
+              },
+            ]}
             showsVerticalScrollIndicator={false}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
           >
             {items.length === 0 ? (
-              <View style={styles.centered}>
+              <View style={styles.emptyStateContainer}>
                 <EmplusLottie
-                  source={lottieInventory.empty}
-                  style={{ width: 140, height: 140 }}
+                  source={lottieInventory.notificationsEmptyCat}
+                  style={styles.emptyCatLottie}
                   loop
+                  speed={0.95}
                 />
-                <AppText style={styles.emptyTitle}>Chưa có thông báo</AppText>
+                <AppText
+                  accessibilityRole="header"
+                  style={styles.emptyTitle}
+                >
+                  Chưa có thông báo
+                </AppText>
                 <AppText style={styles.emptySub}>
                   Khi có hoạt động mới, bạn sẽ thấy tại đây.
                 </AppText>
@@ -387,7 +463,12 @@ export default function NotificationsScreen() {
                 <View style={styles.section}>
                   <View style={styles.sectionHeader}>
                     <View style={styles.sectionDot} />
-                    <AppText style={styles.sectionTitle}>Mới nhất</AppText>
+                    <AppText
+                      accessibilityRole="header"
+                      style={styles.sectionTitle}
+                    >
+                      Mới nhất
+                    </AppText>
                   </View>
                   {latest.map((n) => (
                     <NotificationCard
@@ -408,6 +489,7 @@ export default function NotificationsScreen() {
                         style={[styles.sectionDot, styles.sectionDotMuted]}
                       />
                       <AppText
+                        accessibilityRole="header"
                         style={[styles.sectionTitle, styles.sectionTitleMuted]}
                       >
                         Trước đó
@@ -429,6 +511,7 @@ export default function NotificationsScreen() {
             )}
           </ScrollView>
         )}
+        </View>
       </View>
     </AppScreen>
   );

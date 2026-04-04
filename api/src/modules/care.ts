@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import type { AppEnv } from "../app-env.ts";
 import { buildMaleSuggestions, getEmotionalPhase } from "../engines/emotional.ts";
-import { validateSaveCycleInput } from "../dto/care.dto.ts";
+import { validateSaveCycleInput, validateSaveMoodInput } from "../dto/care.dto.ts";
 import { requireAuth } from "../middleware/auth.ts";
 import { store } from "../store.ts";
 import type { EmotionalCycle, User } from "../types.ts";
@@ -20,6 +20,21 @@ async function getPartner(current: User): Promise<{ partner: User; coupleId: str
     throw new AppError(404, "PARTNER_NOT_FOUND", "Không tìm thấy đối tác.");
   }
 
+  return { partner, coupleId: couple.id };
+}
+
+async function getPartnerOptional(
+  current: User,
+): Promise<{ partner: User; coupleId: string } | null> {
+  const couple = await store.getActiveCoupleForUser(current.id);
+  if (!couple?.partner2Id) {
+    return null;
+  }
+  const partnerId = couple.partner1Id === current.id ? couple.partner2Id : couple.partner1Id;
+  const partner = await store.getUserById(partnerId);
+  if (!partner) {
+    return null;
+  }
   return { partner, coupleId: couple.id };
 }
 
@@ -57,6 +72,37 @@ careRoutes.post("/female-cycle", async (context) => {
     message: "Đã lưu chu kỳ thành công.",
     cycle,
   });
+});
+
+careRoutes.get("/mood", async (context) => {
+  const user = context.get("user");
+  const link = await getPartnerOptional(user);
+  const selfRow = await store.getMoodByUserId(user.id);
+  const self = selfRow
+    ? { value: selfRow.value, updatedAt: selfRow.updatedAt }
+    : null;
+
+  if (!link) {
+    return success(context, { self, partner: null });
+  }
+
+  const partnerRow = await store.getMoodByUserId(link.partner.id);
+  const partner = {
+    userId: link.partner.id,
+    fullName: link.partner.fullName,
+    value: partnerRow?.value ?? null,
+    updatedAt: partnerRow?.updatedAt ?? null,
+  };
+
+  return success(context, { self, partner });
+});
+
+careRoutes.put("/mood", async (context) => {
+  const user = context.get("user");
+  const body = await readJson<Record<string, unknown>>(context);
+  const input = validateSaveMoodInput(body);
+  const saved = await store.upsertUserMood(user.id, input.value);
+  return success(context, { value: saved.value, updatedAt: saved.updatedAt });
 });
 
 careRoutes.get("/male-suggestions", async (context) => {

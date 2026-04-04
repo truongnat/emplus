@@ -11,6 +11,7 @@ import type {
   Invite,
   MemoryItem,
   User,
+  UserMoodState,
 } from "../types.ts";
 import type { DataStore } from "./contracts.ts";
 
@@ -96,6 +97,12 @@ type CycleRow = {
   isTrackingActive: boolean;
 };
 
+type MoodRow = {
+  userId: string;
+  value: number;
+  updatedAt: string | Date;
+};
+
 type BudgetRow = {
   id: string;
   coupleId: string;
@@ -161,6 +168,24 @@ function fromCoupleRow(row: CoupleRow): Couple {
   };
 }
 
+function normalizeMediaUrls(raw: unknown): string[] {
+  if (Array.isArray(raw)) {
+    return raw
+      .map((x) => (typeof x === "string" ? x.trim() : null))
+      .filter((x): x is string => Boolean(x && x.length > 0));
+  }
+  if (typeof raw === "string") {
+    try {
+      const p = JSON.parse(raw) as unknown;
+      return normalizeMediaUrls(p);
+    } catch {
+      const t = raw.trim();
+      return t ? [t] : [];
+    }
+  }
+  return [];
+}
+
 function fromMemoryRow(row: MemoryRow): MemoryItem {
   return {
     id: row.id,
@@ -169,7 +194,7 @@ function fromMemoryRow(row: MemoryRow): MemoryItem {
     title: row.title,
     description: row.description ?? undefined,
     memoryDate: asDate(row.memoryDate) ?? new Date().toISOString().slice(0, 10),
-    mediaUrls: row.mediaUrls ?? [],
+    mediaUrls: normalizeMediaUrls(row.mediaUrls as unknown),
     tags: row.tags ?? [],
     createdAt: asIso(row.createdAt) ?? new Date().toISOString(),
   };
@@ -184,6 +209,14 @@ function fromCycleRow(row: CycleRow): EmotionalCycle {
     periodDuration: row.periodDuration,
     symptomNotes: row.symptomNotes ?? [],
     isTrackingActive: row.isTrackingActive,
+  };
+}
+
+function fromMoodRow(row: MoodRow): UserMoodState {
+  return {
+    userId: row.userId,
+    value: row.value,
+    updatedAt: asIso(row.updatedAt) ?? new Date().toISOString(),
   };
 }
 
@@ -857,6 +890,46 @@ export class PostgresStore implements DataStore {
     `;
   }
 
+  async updateMemory(memory: MemoryItem): Promise<void> {
+    await this.sql`
+      UPDATE memories
+      SET title = ${memory.title},
+          description = ${memory.description ?? null},
+          memory_date = ${memory.memoryDate},
+          media_urls = ${JSON.stringify(memory.mediaUrls)}::jsonb,
+          tags = ${memory.tags}
+      WHERE id = ${memory.id} AND couple_id = ${memory.coupleId}
+    `;
+  }
+
+  async getMemoryByCouple(coupleId: string, memoryId: string): Promise<MemoryItem | undefined> {
+    const rows = await this.sql<MemoryRow[]>`
+      SELECT id,
+             couple_id AS "coupleId",
+             created_by_id AS "createdById",
+             title,
+             description,
+             memory_date AS "memoryDate",
+             media_urls AS "mediaUrls",
+             tags,
+             created_at AS "createdAt"
+      FROM memories
+      WHERE id = ${memoryId} AND couple_id = ${coupleId}
+      LIMIT 1
+    `;
+    const row = rows[0];
+    return row ? fromMemoryRow(row) : undefined;
+  }
+
+  async deleteMemory(coupleId: string, memoryId: string): Promise<boolean> {
+    const rows = await this.sql<{ id: string }[]>`
+      DELETE FROM memories
+      WHERE id = ${memoryId} AND couple_id = ${coupleId}
+      RETURNING id
+    `;
+    return rows.length > 0;
+  }
+
   async listBudgetItemsByCouple(coupleId: string): Promise<BudgetItem[]> {
     const rows = await this.sql<BudgetRow[]>`
       SELECT id,
@@ -1102,6 +1175,35 @@ export class PostgresStore implements DataStore {
         is_tracking_active = EXCLUDED.is_tracking_active,
         updated_at = NOW()
     `;
+  }
+
+  async getMoodByUserId(userId: string): Promise<UserMoodState | undefined> {
+    const rows = await this.sql<MoodRow[]>`
+      SELECT user_id AS "userId",
+             value,
+             updated_at AS "updatedAt"
+      FROM user_mood
+      WHERE user_id = ${userId}
+      LIMIT 1
+    `;
+    return rows[0] ? fromMoodRow(rows[0]) : undefined;
+  }
+
+  async upsertUserMood(userId: string, value: number): Promise<UserMoodState> {
+    const rows = await this.sql<MoodRow[]>`
+      INSERT INTO user_mood (user_id, value, updated_at)
+      VALUES (${userId}, ${value}, NOW())
+      ON CONFLICT (user_id)
+      DO UPDATE SET
+        value = EXCLUDED.value,
+        updated_at = NOW()
+      RETURNING user_id AS "userId", value, updated_at AS "updatedAt"
+    `;
+    const row = rows[0];
+    if (!row) {
+      throw new Error("Không thể lưu tâm trạng.");
+    }
+    return fromMoodRow(row);
   }
 
   async updateCouple(couple: Couple): Promise<void> {
@@ -1351,7 +1453,7 @@ export class PostgresStore implements DataStore {
   }
 
   async createInAppNotification(
-    input: Omit<InAppNotification, "id" | "createdAt"> & { id?: string },
+    input: Omit<InAppNotification, "id" | "createdAt"> & { id?: string; createdAt?: string },
   ): Promise<InAppNotification> {
     const id = input.id ?? crypto.randomUUID();
     const metadata = input.metadata ?? {};
@@ -1368,7 +1470,8 @@ export class PostgresStore implements DataStore {
         icon_bg,
         action_label,
         metadata,
-        read_at
+        read_at,
+        created_at
       ) VALUES (
         ${id},
         ${input.userId},
@@ -1381,7 +1484,8 @@ export class PostgresStore implements DataStore {
         ${input.iconBg ?? null},
         ${input.actionLabel ?? null},
         ${JSON.stringify(metadata)}::jsonb,
-        ${input.readAt ?? null}
+        ${input.readAt ?? null},
+        ${input.createdAt ? input.createdAt : this.sql`now()`}
       )
     `;
     const created = await this.getNotificationForUser(input.userId, id);

@@ -5,6 +5,7 @@ import type {
   DashboardModule,
   CareModule,
   BudgetModule,
+  Memory,
 } from "../../entities/schemas";
 import type {
   TimelineRepository,
@@ -38,6 +39,27 @@ export class CreateMemoryUseCase extends UseCase<
   }
   execute(params: TimelineModule.CreateRequest) {
     return this.repo.createMemory(params);
+  }
+}
+
+export class GetMemoryDetailUseCase extends UseCase<string, Memory> {
+  constructor(private repo: TimelineRepository) {
+    super();
+  }
+  execute(id: string) {
+    return this.repo.getMemory(id);
+  }
+}
+
+export class DeleteMemoryUseCase extends UseCase<
+  string,
+  TimelineModule.DeleteResponse
+> {
+  constructor(private repo: TimelineRepository) {
+    super();
+  }
+  execute(id: string) {
+    return this.repo.deleteMemory(id);
   }
 }
 
@@ -101,6 +123,30 @@ export class GetMaleSuggestionsUseCase extends UseCase<
   }
   execute() {
     return this.repo.getMaleSuggestions();
+  }
+}
+
+export class GetCoupleMoodUseCase extends UseCase<
+  void,
+  CareModule.CoupleMoodResponse
+> {
+  constructor(private repo: CareRepository) {
+    super();
+  }
+  execute() {
+    return this.repo.getCoupleMood();
+  }
+}
+
+export class PutCoupleMoodUseCase extends UseCase<
+  CareModule.SaveMoodRequest,
+  CareModule.SaveMoodResponse
+> {
+  constructor(private repo: CareRepository) {
+    super();
+  }
+  execute(params: CareModule.SaveMoodRequest) {
+    return this.repo.putCoupleMood(params);
   }
 }
 
