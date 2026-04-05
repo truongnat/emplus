@@ -3,17 +3,16 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { Text, View, StyleSheet } from "react-native";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { ThemeProvider, useThemeColors } from "@/src/theme";
+import { ThemeProvider } from "@/src/theme";
 import { ThemeModeProvider } from "@/src/theme/theme-mode-context";
 import { SessionProvider } from "@/src/session-context";
 import { ToastProvider } from "@/src/toast-context";
 import { AlertDialogProvider } from "@/src/alert-dialog-context";
 import { ApiProvider } from "@/src/framework/ctx/api-context";
 import { NotificationBootstrap } from "@/src/components/NotificationBootstrap";
-import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
-import { lottieInventory } from "@/src/lottie/inventory";
+import { AnimatedSplashScreen } from "@/src/components/AnimatedSplashScreen";
 import {
   BeVietnamPro_400Regular,
   BeVietnamPro_500Medium,
@@ -79,37 +78,6 @@ const errorStyles = StyleSheet.create({
   },
 });
 
-function FontLoadingScreen() {
-  const colors = useThemeColors();
-  return (
-    <View
-      style={[fontLoadingStyles.container, { backgroundColor: colors.background.default }]}
-    >
-      <EmplusLottie
-        source={lottieInventory.loader}
-        style={{ width: 120, height: 120 }}
-        loop
-        speed={1.1}
-      />
-      <Text style={[fontLoadingStyles.text, { color: colors.text.tertiary }]}>
-        Đang tải Em+...
-      </Text>
-    </View>
-  );
-}
-
-const fontLoadingStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 16,
-  },
-  text: {
-    fontSize: 15,
-  },
-});
-
 const styles = StyleSheet.create({
   root: {
     flex: 1,
@@ -126,6 +94,7 @@ function RootLayoutInner() {
     RobotoMono_400Regular,
     RobotoMono_700Bold,
   });
+  const [splashDone, setSplashDone] = useState(false);
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -133,8 +102,17 @@ function RootLayoutInner() {
     }
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) {
-    return <FontLoadingScreen />;
+  const handleSplashFinish = useCallback(() => {
+    setSplashDone(true);
+  }, []);
+
+  if (!splashDone) {
+    return (
+      <AnimatedSplashScreen
+        isReady={fontsLoaded}
+        onFinish={handleSplashFinish}
+      />
+    );
   }
 
   return (

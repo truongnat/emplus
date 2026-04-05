@@ -1,8 +1,6 @@
 import { Redirect } from "expo-router";
-import { View, ActivityIndicator, StyleSheet } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { View, Image, ActivityIndicator, StyleSheet } from "react-native";
 import { useSession } from "@/src/session-context";
-import { AppText } from "@/src/ui-kit";
 import { useThemeColors } from "@/src/theme";
 
 export default function Index() {
@@ -17,37 +15,16 @@ export default function Index() {
           { backgroundColor: colors.background.default },
         ]}
       >
-        <View style={{ alignItems: "center" }}>
-          <View
-            style={[
-              styles.iconContainer,
-              {
-                backgroundColor: colors.brand.muted,
-                borderColor: colors.border.subtle,
-              },
-            ]}
-          >
-            <MaterialCommunityIcons
-              name="heart-outline"
-              size={44}
-              color={colors.brand.default}
-            />
-          </View>
-          <AppText
-            style={{
-              fontSize: 24,
-              fontWeight: "bold",
-              marginBottom: 12,
-              color: colors.text.primary,
-            }}
-          >
-            Em+
-          </AppText>
-          <ActivityIndicator
-            color={colors.brand.default}
-            style={{ marginTop: 20 }}
-          />
-        </View>
+        <Image
+          source={require("../assets/icon.png")}
+          style={styles.icon}
+          resizeMode="contain"
+        />
+        <ActivityIndicator
+          color={colors.brand.default}
+          style={styles.loader}
+          size="small"
+        />
       </View>
     );
   }
@@ -69,13 +46,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  iconContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 24,
-    borderWidth: 1,
+  icon: {
+    width: 100,
+    height: 100,
+    borderRadius: 24,
+  },
+  loader: {
+    marginTop: 24,
   },
 });

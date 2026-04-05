@@ -1154,8 +1154,15 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
           summary: "Lấy danh sách khoản chi",
           security: [{ bearerAuth: [] }],
           parameters: [
-            { in: "query", name: "category", schema: { type: "string" } },
+            {
+              in: "query",
+              name: "status",
+              description:
+                "Lọc theo trạng thái (PAID, PENDING, OVER_BUDGET, DRAFT hoặc nhãn tiếng Việt tương ứng). Bỏ qua để lấy tất cả.",
+              schema: { type: "string" },
+            },
             { in: "query", name: "page", schema: { type: "integer", default: 1 } },
+            { in: "query", name: "limit", schema: { type: "integer" } },
           ],
           responses: {
             200: {

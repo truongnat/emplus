@@ -2053,7 +2053,8 @@
         "parameters": [
           {
             "in": "query",
-            "name": "category",
+            "name": "status",
+            "description": "Lọc theo trạng thái (PAID, PENDING, OVER_BUDGET, DRAFT hoặc nhãn tiếng Việt tương ứng). Bỏ qua để lấy tất cả.",
             "schema": {
               "type": "string"
             }
@@ -2064,6 +2065,13 @@
             "schema": {
               "type": "integer",
               "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
             }
           }
         ],

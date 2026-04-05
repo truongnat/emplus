@@ -1370,8 +1370,9 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    category?: string;
+                    status?: string;
                     page?: number;
+                    limit?: number;
                 };
                 header?: never;
                 path?: never;
