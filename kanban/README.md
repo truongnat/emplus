@@ -64,3 +64,4 @@ Thư mục theo dõi ticket nhẹ, đồng bộ với [`workflows/dev/w-ticket.m
 | [ticket-60](./ticket-60/TICKET.md) | Tab bar — liquid glass + gradient nền đáy | done |
 | [ticket-61](./ticket-61/TICKET.md) | Timeline + memory detail/add — dark Aura trên lưới | done |
 | [ticket-62](./ticket-62/TICKET.md) | Care tab + MoodVibeCheck — dark Aura trên lưới | done |
+| [ticket-63](./ticket-63/TICKET.md) | Audit quick wins — admin envelope, mail OTP, mobile polish | done |

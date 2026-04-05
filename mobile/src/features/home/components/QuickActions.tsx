@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { PressableScale, Reveal, AppText } from "@/src/ui-kit";
+import { PressableScale, AppText } from "@/src/ui-kit";
 import { useThemeColors, useThemeMode } from "@/src/theme";
 import { elevation } from "@/src/theme/elevation";
 import { typographyRoles } from "@/src/theme/typography-roles";
@@ -43,7 +43,6 @@ export const QuickActions = React.memo(function QuickActions({
   const iconBgTimeline = isDark ? "rgba(129, 140, 248, 0.16)" : "rgba(99, 102, 241, 0.1)";
 
   return (
-    <Reveal delay={350}>
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <AppText
@@ -204,7 +203,6 @@ export const QuickActions = React.memo(function QuickActions({
           </PressableScale>
         </View>
       </View>
-    </Reveal>
   );
 });
 

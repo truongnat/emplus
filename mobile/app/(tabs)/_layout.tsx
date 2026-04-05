@@ -1,4 +1,5 @@
 import { Redirect, Tabs } from "expo-router";
+import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import {
   StyleSheet,
@@ -60,7 +61,7 @@ function labelForRoute(route: string): string {
   return labels[route] || route;
 }
 
-function CustomTabBar({ state, descriptors, navigation }: any) {
+function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const { width: windowWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const colors = useThemeColors();
@@ -329,7 +330,7 @@ export default function TabsLayout() {
   const { hydrated, isAuthenticated, session } = sessionValue;
 
   if (!hydrated) return null;
-  if (!isAuthenticated || !!!session?.user.coupleId)
+  if (!isAuthenticated || !session?.user.coupleId)
     return <Redirect href="/login" />;
 
   return (

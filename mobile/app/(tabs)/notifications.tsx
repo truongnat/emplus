@@ -23,6 +23,7 @@ import { LoginGridAnimatedBackground } from "@/src/features/auth/components/Logi
 import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
 import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
 import { homeScreenStyles } from "@/src/features/home/homeScreen.styles";
+import { scrollPadBottomWithTabBar } from "@/src/core/common/core";
 
 function formatRelativeTime(iso: string): string {
   const t = new Date(iso).getTime();
@@ -247,7 +248,7 @@ export default function NotificationsScreen() {
 
   /** Title row directly under status bar (no Em+ wordmark on this tab). */
   const topPad = insets.top + 10;
-  const scrollPadBottom = Math.max(128, insets.bottom + 100);
+  const scrollPadBottom = scrollPadBottomWithTabBar(insets.bottom);
 
   const { data, isPending, isError, error, refetch } = useNotificationsList();
   const markRead = useMarkNotificationRead();

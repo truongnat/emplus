@@ -2,28 +2,26 @@ import { Hono } from "hono";
 import type { AppEnv } from "../app-env.ts";
 import { requireAuth, requireAdmin } from "../middleware/auth.ts";
 import { store } from "../store.ts";
+import { success } from "../utils/http.ts";
+import type { Couple, User } from "../types.ts";
 
 export const adminRoutes = new Hono<AppEnv>();
 
 // Get admin stats
 adminRoutes.get("/stats", requireAuth, requireAdmin, async (c) => {
-  // Get all users
-  const users = await (store as any).listAllUsers?.() || [];
-
-  // Get all couples
-  const couples = await (store as any).listAllCouples?.() || [];
+  const users = (await store.listAllUsers?.()) ?? [];
+  const couples = (await store.listAllCouples?.()) ?? [];
 
   const activeStatuses = new Set(["DANG_YEU", "DA_CUOI"]);
 
   const stats = {
     totalUsers: users.length,
     totalCouples: couples.length,
-    activeCouples: couples.filter((c: any) => activeStatuses.has(c.status)).length,
-    totalMemories: await (store as any).countMemories?.() || 0,
+    activeCouples: couples.filter((cp) => activeStatuses.has(cp.status)).length,
+    totalMemories: (await store.countMemories?.()) ?? 0,
   };
 
-  // Transform users for response
-  const transformedUsers = users.map((u: any) => ({
+  const transformedUsers = users.map((u: User) => ({
     id: u.id,
     email: u.email,
     fullName: u.fullName,
@@ -34,11 +32,14 @@ adminRoutes.get("/stats", requireAuth, requireAdmin, async (c) => {
     createdAt: u.createdAt,
   }));
 
-  // Transform couples for response
   const transformedCouples = await Promise.all(
-    couples.map(async (couple: any) => {
-      const partner1 = couple.partner1Id ? await store.getUserById(couple.partner1Id) : null;
-      const partner2 = couple.partner2Id ? await store.getUserById(couple.partner2Id) : null;
+    couples.map(async (couple: Couple) => {
+      const partner1 = couple.partner1Id
+        ? await store.getUserById(couple.partner1Id)
+        : null;
+      const partner2 = couple.partner2Id
+        ? await store.getUserById(couple.partner2Id)
+        : null;
 
       return {
         id: couple.id,
@@ -48,10 +49,10 @@ adminRoutes.get("/stats", requireAuth, requireAdmin, async (c) => {
         loveStartDate: couple.loveStartDate,
         createdAt: couple.createdAt,
       };
-    })
+    }),
   );
 
-  return c.json({
+  return success(c, {
     stats,
     users: transformedUsers,
     couples: transformedCouples,

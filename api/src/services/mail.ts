@@ -15,7 +15,7 @@ export async function sendOtpMail(email: string, otp: string) {
     const mailOptions = {
         from: `"Em+" <${env.smtpFrom}>`,
         to: email,
-        subject: `Mã xác thực OTP của bạn: ${otp}`,
+        subject: "Mã xác thực Em+",
         html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; borderRadius: 10px;">
         <h2 style="color: #FF4D67; text-align: center;">Xác thực tài khoản Em+</h2>
@@ -36,7 +36,8 @@ export async function sendOtpMail(email: string, otp: string) {
         console.log(`[Mail] Đã gửi OTP đến ${email}`);
     } catch (error) {
         console.error(`[Mail] Lỗi gửi OTP đến ${email}:`, error);
-        // Trong môi trường dev, chúng ta vẫn log OTP ra console để test nếu mail server lỗi
-        console.log(`[DEV] OTP cho ${email} là: ${otp}`);
+        if (env.nodeEnv !== "production") {
+          console.log(`[DEV] OTP cho ${email} là: ${otp}`);
+        }
     }
 }

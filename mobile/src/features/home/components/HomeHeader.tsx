@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Reveal, AppText } from "@/src/ui-kit";
+import { AppText } from "@/src/ui-kit";
 import { useThemeColors, useThemeMode } from "@/src/theme";
 import { auraPalette } from "@/src/theme/aura-colors";
 import { fontSize } from "@/src/theme/tokens";
@@ -28,7 +28,6 @@ export const HomeHeader = React.memo(function HomeHeader({
   const avatarMeBg = isDark ? "rgba(255, 107, 107, 0.22)" : auraPalette.coral100;
 
   return (
-    <Reveal>
       <View style={styles.container}>
         <View style={styles.leftContainer}>
           <View style={styles.avatarContainer}>
@@ -104,7 +103,6 @@ export const HomeHeader = React.memo(function HomeHeader({
           </View>
         </View>
       </View>
-    </Reveal>
   );
 });
 

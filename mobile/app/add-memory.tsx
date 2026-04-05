@@ -33,6 +33,7 @@ import { typographyRoles } from "@/src/theme/typography-roles";
 import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
 import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
 import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
+import { scrollPadBottomWithTabBar } from "@/src/core/common/core";
 import { homeScreenStyles } from "@/src/features/home/homeScreen.styles";
 import { pickMemoryImages } from "@/src/utils/expo-helpers";
 import { AppText, PressableScale } from "@/src/ui-kit";
@@ -177,7 +178,7 @@ export default function AddMemoryScreen() {
     [],
   );
 
-  const scrollPadBottom = Math.max(128, insets.bottom + 100);
+  const scrollPadBottom = scrollPadBottomWithTabBar(insets.bottom);
 
   return (
     <AppScreen

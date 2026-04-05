@@ -5,6 +5,7 @@ import {
   Switch,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -670,8 +671,21 @@ export default function ProfileScreen() {
                 />
               }
               onPress={() => {
-                clearSession();
-                router.replace("/login");
+                Alert.alert(
+                  "Đăng xuất",
+                  "Bạn có chắc muốn đăng xuất?",
+                  [
+                    { text: "Hủy", style: "cancel" },
+                    {
+                      text: "Đăng xuất",
+                      style: "destructive",
+                      onPress: () => {
+                        clearSession();
+                        router.replace("/login");
+                      },
+                    },
+                  ],
+                );
               }}
               isLast
             />

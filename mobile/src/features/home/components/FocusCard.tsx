@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { AppButton, Reveal, AppText } from "@/src/ui-kit";
+import { AppButton, AppText } from "@/src/ui-kit";
 import { useToast } from "@/src/toast-context";
 import { useThemeColors, useThemeMode } from "@/src/theme";
 import { elevation } from "@/src/theme/elevation";
@@ -45,7 +45,6 @@ export const FocusCard = React.memo(function FocusCard({
   const badgeBg = isDark ? "rgba(255, 107, 107, 0.18)" : "rgba(255, 107, 107, 0.12)";
 
   return (
-    <Reveal delay={520}>
       <View style={[styles.outer, elevation.floated]}>
         <View
           style={[
@@ -187,7 +186,6 @@ export const FocusCard = React.memo(function FocusCard({
           </View>
         </View>
       </View>
-    </Reveal>
   );
 });
 

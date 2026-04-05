@@ -65,13 +65,6 @@ export type {
 // Aliases for backward compatibility
 export { Text as AppText } from "./components/atoms/Text";
 export const AppButton = Button;
-export const Reveal = ({
-  children,
-  delay,
-}: {
-  children: React.ReactNode;
-  delay?: number;
-}) => <>{children}</>;
 
 // Expo Helpers
 export * from "./utils/expo-helpers";

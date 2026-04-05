@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 
-import { AppScreen, AppText, GlassCard, Reveal } from "../src/ui-kit";
+import { AppScreen, AppText, GlassCard } from "../src/ui-kit";
 import { palette, useThemeColors } from "../src/theme";
 
 const styles = StyleSheet.create({
@@ -179,16 +179,14 @@ export default function PolicyScreen() {
         contentContainerStyle={{ padding: 20, paddingBottom: 60 }}
         showsVerticalScrollIndicator={false}
       >
-        <Reveal>
-          <View style={styles.headerRow}>
-            <Ionicons
-              name="document-text-outline"
-              size={24}
-              color={colors.brand.default}
-            />
-            <AppText style={styles.headerText}>Chính sách Em+</AppText>
-          </View>
-        </Reveal>
+        <View style={styles.headerRow}>
+          <Ionicons
+            name="document-text-outline"
+            size={24}
+            color={colors.brand.default}
+          />
+          <AppText style={styles.headerText}>Chính sách Em+</AppText>
+        </View>
 
 
         <GlassCard style={styles.card}>

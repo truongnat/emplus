@@ -30,6 +30,7 @@ import {
 } from "@/src/features/auth/authScreenLayout";
 import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
 import { homeScreenStyles as styles } from "@/src/features/home/homeScreen.styles";
+import { scrollPadBottomWithTabBar } from "@/src/core/common/core";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -64,7 +65,7 @@ export default function HomeScreen() {
   const scrollPaddingTop =
     authGridScrollPaddingTop(insets.top) + AUTH_LOGIN_SCROLL_EXTRA_TOP;
   /** Floating tab bar (~72px) + wrapper padding + home indicator — never clip last section. */
-  const scrollPaddingBottom = Math.max(128, insets.bottom + 100);
+  const scrollPaddingBottom = scrollPadBottomWithTabBar(insets.bottom);
 
   const authShell = (
     children: React.ReactNode,

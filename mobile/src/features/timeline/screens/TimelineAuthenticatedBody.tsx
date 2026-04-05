@@ -20,6 +20,7 @@ import {
   type TimelineSection,
 } from "../components/TimelineMemorySectionList";
 import { TimelineImageViewerLazy } from "../components/TimelineImageViewerLazy";
+import { scrollPadBottomWithTabBar } from "@/src/core/common/core";
 
 export function TimelineAuthenticatedBody() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export function TimelineAuthenticatedBody() {
   useAuthGridChrome(isDark, colors.background.default, true);
 
   const topPad = insets.top + 10;
-  const scrollPadBottom = Math.max(128, insets.bottom + 100);
+  const scrollPadBottom = scrollPadBottomWithTabBar(insets.bottom);
 
   const sections: TimelineSection[] = useMemo(
     () =>

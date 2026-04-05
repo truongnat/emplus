@@ -166,7 +166,7 @@ export function Button({
           color={
             variant === "secondary" || variant === "ghost"
               ? theme.colors.brand.default
-              : "#FFFFFF"
+              : theme.colors.text.onBrand
           }
           size="small"
         />

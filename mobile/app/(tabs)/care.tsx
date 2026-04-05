@@ -34,6 +34,7 @@ import {
   homeDarkGridCard,
   homeDarkGridInset,
 } from "@/src/theme/emplus-design-tokens";
+import { scrollPadBottomWithTabBar } from "@/src/core/common/core";
 
 function MoodOrb({ color }: { color: string }) {
   const colors = useThemeColors();
@@ -472,7 +473,7 @@ export default function CareScreen() {
 
   const toastBottom = insets.bottom + TOAST_TAB_BAR_OFFSET;
   const scrollPadTop = insets.top + 10;
-  const scrollPadBottom = Math.max(128, insets.bottom + 100);
+  const scrollPadBottom = scrollPadBottomWithTabBar(insets.bottom);
 
   const appShell = (body: React.ReactNode) => (
     <AppScreen

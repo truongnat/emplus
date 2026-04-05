@@ -2,7 +2,7 @@ import { Redirect } from "expo-router";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSession } from "@/src/session-context";
-import { AppText, Reveal } from "@/src/ui-kit";
+import { AppText } from "@/src/ui-kit";
 import { useThemeColors } from "@/src/theme";
 
 export default function Index() {
@@ -17,39 +17,37 @@ export default function Index() {
           { backgroundColor: colors.background.default },
         ]}
       >
-        <Reveal>
-          <View style={{ alignItems: "center" }}>
-            <View
-              style={[
-                styles.iconContainer,
-                {
-                  backgroundColor: colors.brand.muted,
-                  borderColor: colors.border.subtle,
-                },
-              ]}
-            >
-              <MaterialCommunityIcons
-                name="heart-outline"
-                size={44}
-                color={colors.brand.default}
-              />
-            </View>
-            <AppText
-              style={{
-                fontSize: 24,
-                fontWeight: "bold",
-                marginBottom: 12,
-                color: colors.text.primary,
-              }}
-            >
-              Em+
-            </AppText>
-            <ActivityIndicator
+        <View style={{ alignItems: "center" }}>
+          <View
+            style={[
+              styles.iconContainer,
+              {
+                backgroundColor: colors.brand.muted,
+                borderColor: colors.border.subtle,
+              },
+            ]}
+          >
+            <MaterialCommunityIcons
+              name="heart-outline"
+              size={44}
               color={colors.brand.default}
-              style={{ marginTop: 20 }}
             />
           </View>
-        </Reveal>
+          <AppText
+            style={{
+              fontSize: 24,
+              fontWeight: "bold",
+              marginBottom: 12,
+              color: colors.text.primary,
+            }}
+          >
+            Em+
+          </AppText>
+          <ActivityIndicator
+            color={colors.brand.default}
+            style={{ marginTop: 20 }}
+          />
+        </View>
       </View>
     );
   }

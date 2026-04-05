@@ -522,10 +522,3 @@ export class InMemoryStore implements DataStore {
     this.expoPushTokens.set(userId, token);
   }
 }
-
-export function generateTokens(): { accessToken: string; refreshToken: string } {
-  return {
-    accessToken: randomToken("at"),
-    refreshToken: randomToken("rt"),
-  };
-}

@@ -30,6 +30,7 @@ import {
   parseMediaUrls,
   getMemoryTime,
 } from "@/src/utils/timeline-helpers";
+import { scrollPadBottomWithTabBar } from "@/src/core/common/core";
 
 export default function MemoryDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -62,7 +63,7 @@ export default function MemoryDetailScreen() {
     setViewer({ urls: mediaUrls, index });
   }, [mediaUrls]);
 
-  const scrollPadBottom = Math.max(128, insets.bottom + 100);
+  const scrollPadBottom = scrollPadBottomWithTabBar(insets.bottom);
 
   if (!memoryId) {
     return null;

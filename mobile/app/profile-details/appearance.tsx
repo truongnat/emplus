@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
-import { Reveal, AppText } from "@/src/ui-kit";
+import { AppText } from "@/src/ui-kit";
 import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
 import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
 import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
@@ -167,7 +167,7 @@ export default function AppearanceScreen() {
             contentContainerStyle={{ padding: 20, paddingBottom: scrollPadBottom }}
             showsVerticalScrollIndicator={false}
           >
-            <Reveal delay={100}>
+            <>
               <AppText style={styles.sectionLabel}>Chế độ hiển thị</AppText>
               <View style={styles.themeRow}>
                 <TouchableOpacity
@@ -312,9 +312,9 @@ export default function AppearanceScreen() {
                   Tự động: sáng khoảng 6:00–19:00, tối các giờ còn lại (giờ máy).
                 </AppText>
               ) : null}
-            </Reveal>
+            </>
 
-            <Reveal delay={200}>
+            <>
               <AppText style={[styles.sectionLabel, { marginTop: 32 }]}>
                 Màu nhấn
               </AppText>
@@ -335,7 +335,7 @@ export default function AppearanceScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
-            </Reveal>
+            </>
           </ScrollView>
         </View>
       </View>

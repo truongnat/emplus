@@ -2,7 +2,7 @@ import React, { useMemo, useCallback } from "react";
 import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { PressableScale, Reveal, AppText } from "@/src/ui-kit";
+import { PressableScale, AppText } from "@/src/ui-kit";
 import { getEventIcon } from "@/src/utils/home-helpers";
 import { useThemeColors, useThemeMode } from "@/src/theme";
 import { elevation } from "@/src/theme/elevation";
@@ -115,7 +115,6 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
   );
 
   return (
-    <Reveal delay={680}>
       <View style={styles.section}>
         <View style={styles.header}>
           <AppText
@@ -217,7 +216,6 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
           )}
         </View>
       </View>
-    </Reveal>
   );
 });
 
