@@ -9,6 +9,7 @@ import { ThemeProvider, useThemeColors } from "@/src/theme";
 import { ThemeModeProvider } from "@/src/theme/theme-mode-context";
 import { SessionProvider } from "@/src/session-context";
 import { ToastProvider } from "@/src/toast-context";
+import { AlertDialogProvider } from "@/src/alert-dialog-context";
 import { ApiProvider } from "@/src/framework/ctx/api-context";
 import { NotificationBootstrap } from "@/src/components/NotificationBootstrap";
 import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
@@ -89,8 +90,9 @@ function RootLayoutInner() {
 
   return (
     <ToastProvider>
-      <SessionProvider>
-        <ApiProvider>
+      <AlertDialogProvider>
+        <SessionProvider>
+          <ApiProvider>
           <>
             <NotificationBootstrap />
             <StatusBar style="auto" />
@@ -164,8 +166,9 @@ function RootLayoutInner() {
               />
             </Stack>
           </>
-        </ApiProvider>
-      </SessionProvider>
+          </ApiProvider>
+        </SessionProvider>
+      </AlertDialogProvider>
     </ToastProvider>
   );
 }

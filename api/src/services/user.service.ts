@@ -15,7 +15,11 @@ export interface UserProfile {
   profileBackgroundUrl?: string;
   gender: Gender;
   dob?: string;
+  birthTime?: string;
   timezone: string;
+  emailNotificationsEnabled: boolean;
+  profilePrivate: boolean;
+  showOnlineStatus: boolean;
   isActive: boolean;
   isAdmin: boolean;
   createdAt: string;
@@ -44,7 +48,11 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     profileBackgroundUrl: user.profileBackgroundUrl,
     gender: user.gender,
     dob: user.dob,
+    birthTime: user.birthTime,
     timezone: user.timezone,
+    emailNotificationsEnabled: user.emailNotificationsEnabled,
+    profilePrivate: user.profilePrivate,
+    showOnlineStatus: user.showOnlineStatus,
     isActive: user.isActive,
     isAdmin: user.isAdmin || false,
     createdAt: user.createdAt,
@@ -65,7 +73,11 @@ export async function updateUserProfile(
     profileBackgroundUrl?: string;
     gender?: string;
     dob?: string;
+    birthTime?: string;
     timezone?: string;
+    emailNotificationsEnabled?: boolean;
+    profilePrivate?: boolean;
+    showOnlineStatus?: boolean;
   },
 ): Promise<UserProfile> {
   const user = await store.getUserById(userId);
@@ -94,7 +106,16 @@ export async function updateUserProfile(
           : data.profileBackgroundUrl.trim(),
     gender: data.gender ? chuanHoaGioiTinhDauVao(data.gender) : user.gender,
     dob: data.dob ?? user.dob,
+    birthTime: data.birthTime !== undefined ? (data.birthTime?.trim() || undefined) : user.birthTime,
     timezone: data.timezone ?? user.timezone,
+    emailNotificationsEnabled:
+      data.emailNotificationsEnabled !== undefined
+        ? data.emailNotificationsEnabled
+        : user.emailNotificationsEnabled,
+    profilePrivate:
+      data.profilePrivate !== undefined ? data.profilePrivate : user.profilePrivate,
+    showOnlineStatus:
+      data.showOnlineStatus !== undefined ? data.showOnlineStatus : user.showOnlineStatus,
     updatedAt: new Date().toISOString(),
   };
 
@@ -112,7 +133,11 @@ export async function updateUserProfile(
     profileBackgroundUrl: updatedUser.profileBackgroundUrl,
     gender: updatedUser.gender,
     dob: updatedUser.dob,
+    birthTime: updatedUser.birthTime,
     timezone: updatedUser.timezone,
+    emailNotificationsEnabled: updatedUser.emailNotificationsEnabled,
+    profilePrivate: updatedUser.profilePrivate,
+    showOnlineStatus: updatedUser.showOnlineStatus,
     isActive: updatedUser.isActive,
     isAdmin: updatedUser.isAdmin || false,
     createdAt: updatedUser.createdAt,

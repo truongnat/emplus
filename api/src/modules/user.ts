@@ -39,7 +39,11 @@ userRoutes.put("/me", async (context) => {
     profileBackgroundUrl: input.profileBackgroundUrl,
     gender: input.gender,
     dob: input.dob,
+    birthTime: input.birthTime,
     timezone: input.timezone,
+    emailNotificationsEnabled: input.emailNotificationsEnabled,
+    profilePrivate: input.profilePrivate,
+    showOnlineStatus: input.showOnlineStatus,
   });
 
   return success(context, profile);

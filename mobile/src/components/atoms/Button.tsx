@@ -14,7 +14,14 @@ import {
 } from "react-native";
 import { useTheme } from "@/src/theme";
 
-type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger";
+type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "ghost"
+  | "danger"
+  /** Secondary action: neutral border/text (e.g. dialog cancel) */
+  | "neutralOutline";
 type ButtonSize = "sm" | "md" | "lg";
 
 export interface ButtonProps extends TouchableOpacityProps {
@@ -117,10 +124,20 @@ export function Button({
           paddingHorizontal: 12,
         },
         danger: {
-          backgroundColor: theme.colors.status.error.bg,
+          backgroundColor: theme.colors.status.error.icon,
           borderRadius: theme.radius.md,
+          borderWidth: 0,
+          shadowColor: theme.colors.status.error.icon,
+          shadowOffset: { width: 0, height: 3 },
+          shadowOpacity: 0.35,
+          shadowRadius: 10,
+          elevation: 5,
+        },
+        neutralOutline: {
+          backgroundColor: "transparent",
           borderWidth: 1.5,
-          borderColor: theme.colors.status.error.border,
+          borderColor: theme.colors.border.default,
+          borderRadius: theme.radius.md,
         },
         primaryLabel: {
           color: theme.colors.text.onBrand,
@@ -135,7 +152,10 @@ export function Button({
           color: theme.colors.brand.default,
         },
         dangerLabel: {
-          color: theme.colors.status.error.text,
+          color: theme.colors.text.onBrand,
+        },
+        neutralOutlineLabel: {
+          color: theme.colors.text.secondary,
         },
       }),
     [theme.colors],
@@ -166,7 +186,9 @@ export function Button({
           color={
             variant === "secondary" || variant === "ghost"
               ? theme.colors.brand.default
-              : theme.colors.text.onBrand
+              : variant === "neutralOutline"
+                ? theme.colors.text.secondary
+                : theme.colors.text.onBrand
           }
           size="small"
         />

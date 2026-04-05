@@ -1,12 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
-import {
-  View,
-  ScrollView,
-  Switch,
-  StyleSheet,
-  ActivityIndicator,
-  Alert,
-} from "react-native";
+import { View, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -29,6 +22,7 @@ import type { SemanticColors } from "@/src/theme/tokens/semantic";
 import { pickImage, pickBannerImage } from "@/src/utils/expo-helpers";
 import { uploadTimelineMemoryPhoto, toDisplayError } from "@/src/api";
 import { useToast } from "@/src/toast-context";
+import { useAlertDialog } from "@/src/alert-dialog-context";
 import { dependencies } from "@/src/framework/di/dependencies";
 import type { UserModule } from "@/src/domain/entities/schemas";
 
@@ -297,11 +291,11 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { session, clearSession, isAuthenticated, setSession } = useSession();
   const { showToast } = useToast();
+  const { confirm } = useAlertDialog();
   const colors = useThemeColors();
   const { isDark } = useThemeMode();
   useAuthGridChrome(isDark, colors.background.default, true);
   const styles = useMemo(() => createProfileStyles(colors), [colors]);
-  const [syncEnabled, setSyncEnabled] = useState(true);
   const [bannerBusy, setBannerBusy] = useState(false);
   const [avatarBusy, setAvatarBusy] = useState(false);
 
@@ -394,6 +388,8 @@ export default function ProfileScreen() {
   }
 
   const u = session?.user;
+  /** Đồng bộ với Quyền riêng tư: tắt thì không hiển thị như đang online trên hồ sơ. */
+  const showOnlineToOthers = u?.showOnlineStatus !== false;
   const displayName =
     (u?.nickname?.trim() || u?.fullName || u?.email || "Bạn") ?? "Bạn";
   const userEmail = u?.email || "";
@@ -544,12 +540,36 @@ export default function ProfileScreen() {
           <View
             style={[
               styles.statusBadge,
-              { backgroundColor: colors.status.success.bg },
+              showOnlineToOthers
+                ? { backgroundColor: colors.status.success.bg }
+                : {
+                    backgroundColor: colors.surface.sunken,
+                    borderWidth: 1,
+                    borderColor: colors.border.subtle,
+                  },
             ]}
           >
-            <View style={styles.statusDot} />
-            <AppText style={[styles.statusText, { color: colors.status.success.text }]}>
-              Đang hoạt động
+            <View
+              style={[
+                styles.statusDot,
+                showOnlineToOthers
+                  ? null
+                  : { backgroundColor: colors.text.tertiary },
+              ]}
+            />
+            <AppText
+              style={[
+                styles.statusText,
+                {
+                  color: showOnlineToOthers
+                    ? colors.status.success.text
+                    : colors.text.secondary,
+                },
+              ]}
+            >
+              {showOnlineToOthers
+                ? "Đang hoạt động"
+                : "Không hiển thị trạng thái online"}
             </AppText>
           </View>
         </View>
@@ -597,60 +617,11 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <AppText style={styles.sectionTitle}>Đồng bộ</AppText>
-          <View
-            style={[
-              styles.card,
-              {
-                backgroundColor: colors.surface.default,
-                borderColor: colors.border.subtle,
-              },
-            ]}
-          >
-            <View style={styles.settingItem}>
-              <View style={styles.settingLeft}>
-                <View
-                  style={[
-                    styles.settingIcon,
-                    {
-                      backgroundColor: colors.surface.sunken,
-                      borderColor: colors.border.subtle,
-                    },
-                  ]}
-                >
-                  <Ionicons
-                    name="cloud-upload-outline"
-                    size={20}
-                    color={colors.text.primary}
-                  />
-                </View>
-                <View style={styles.settingTextContainer}>
-                  <AppText style={[styles.settingLabel, { color: colors.text.primary }]}>
-                    Sao lưu đám mây
-                  </AppText>
-                  <AppText
-                    style={[styles.settingSublabel, { color: colors.text.secondary }]}
-                  >
-                    Tự động sao lưu dữ liệu
-                  </AppText>
-                </View>
-              </View>
-              <Switch
-                value={syncEnabled}
-                onValueChange={setSyncEnabled}
-                trackColor={{
-                  false: colors.border.default,
-                  true: colors.brand.default,
-                }}
-                thumbColor={colors.text.inverse}
-              />
-            </View>
-          </View>
-        </View>
+        {/*
+          Phase sau (premium): mục Đồng bộ / sao lưu đám mây — cần backend + gói trả phí.
+        */}
 
         <View style={styles.section}>
-          <AppText style={styles.sectionTitle}>Nguy hiểm</AppText>
           <View
             style={[
               styles.card,
@@ -667,25 +638,20 @@ export default function ProfileScreen() {
                 <Ionicons
                   name="chevron-forward"
                   size={18}
-                  color={colors.status.error.icon}
+                  color={colors.text.tertiary}
                 />
               }
               onPress={() => {
-                Alert.alert(
-                  "Đăng xuất",
-                  "Bạn có chắc muốn đăng xuất?",
-                  [
-                    { text: "Hủy", style: "cancel" },
-                    {
-                      text: "Đăng xuất",
-                      style: "destructive",
-                      onPress: () => {
-                        clearSession();
-                        router.replace("/login");
-                      },
-                    },
-                  ],
-                );
+                void confirm({
+                  title: "Đăng xuất",
+                  message: "Bạn có chắc muốn đăng xuất?",
+                  confirmLabel: "Đăng xuất",
+                  destructive: true,
+                }).then((ok) => {
+                  if (!ok) return;
+                  clearSession();
+                  router.replace("/login");
+                });
               }}
               isLast
             />

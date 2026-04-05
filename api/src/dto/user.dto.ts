@@ -51,6 +51,14 @@ const updateProfileSchema = z.object({
     return trimmed === "" ? undefined : trimmed;
   }, isoDateString("dob phải theo định dạng YYYY-MM-DD.").optional()),
   timezone: optionalTrimmedString(),
+  birthTime: z.preprocess((value) => {
+    if (typeof value !== "string") return value;
+    const t = value.trim();
+    return t === "" ? undefined : t;
+  }, z.string().regex(/^\d{2}:\d{2}$/, "birthTime phải theo định dạng HH:mm (24h).").optional()),
+  emailNotificationsEnabled: z.boolean().optional(),
+  profilePrivate: z.boolean().optional(),
+  showOnlineStatus: z.boolean().optional(),
 });
 
 export type UpdateProfileDto = z.infer<typeof updateProfileSchema>;

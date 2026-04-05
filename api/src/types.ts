@@ -13,10 +13,18 @@ export interface User {
   profileBackgroundUrl?: string;
   gender: Gender;
   dob?: string;
+  /** Giờ sinh HH:mm (24h). */
+  birthTime?: string;
   authProvider: AuthProvider;
   authId: string;
   passwordHash?: string;
   timezone: string;
+  /** Nhận thông báo qua email (worker gửi mail cần kiểm tra). */
+  emailNotificationsEnabled: boolean;
+  /** Hồ sơ riêng tư — giới hạn hiển thị theo policy (áp dụng ở luồng xem hồ sơ người khác). */
+  profilePrivate: boolean;
+  /** Hiển thị trạng thái online cho người khác (presence/heartbeat sau này). */
+  showOnlineStatus: boolean;
   isActive: boolean;
   isAdmin?: boolean;
   createdAt: string;

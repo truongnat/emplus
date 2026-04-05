@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
   profile_background_url VARCHAR(500),
   gender VARCHAR(20) NOT NULL,
   dob DATE,
+  birth_time VARCHAR(5),
   auth_provider VARCHAR(20) NOT NULL,
   auth_id VARCHAR(255) NOT NULL,
   password_hash TEXT,
@@ -25,6 +26,15 @@ CREATE TABLE IF NOT EXISTS users (
   CONSTRAINT uq_users_auth UNIQUE (auth_provider, auth_id),
   CONSTRAINT uq_users_email UNIQUE (email)
 );
+
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS email_notifications_enabled BOOLEAN NOT NULL DEFAULT true;
+
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS profile_private BOOLEAN NOT NULL DEFAULT false;
+
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS show_online_status BOOLEAN NOT NULL DEFAULT true;
 
 ALTER TABLE users
   ADD COLUMN IF NOT EXISTS password_hash TEXT;

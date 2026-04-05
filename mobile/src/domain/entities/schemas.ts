@@ -1611,7 +1611,15 @@ export interface components {
             gender: components["schemas"]["Gender"];
             /** Format: date */
             dob?: string;
+            /** @description Giờ sinh HH:mm (24h) */
+            birthTime?: string;
             timezone?: string;
+            /** @description Nhận thông báo qua email từ ứng dụng */
+            emailNotificationsEnabled?: boolean;
+            /** @description Hồ sơ riêng tư — khi bật, chỉ người đã ghép đôi nên xem đủ hồ sơ (áp dụng ở luồng discovery). */
+            profilePrivate?: boolean;
+            /** @description Cho phép người khác thấy trạng thái online của bạn (presence). */
+            showOnlineStatus?: boolean;
             isActive: boolean;
             isAdmin?: boolean;
             /** Format: uuid */
@@ -1636,7 +1644,15 @@ export interface components {
             gender?: components["schemas"]["Gender"];
             /** Format: date */
             dob?: string;
+            /** @description Giờ sinh HH:mm (24h) */
+            birthTime?: string;
             timezone?: string;
+            /** @description Bật/tắt nhận thông báo qua email */
+            emailNotificationsEnabled?: boolean;
+            /** @description Bật/tắt chế độ hồ sơ riêng tư */
+            profilePrivate?: boolean;
+            /** @description Bật/tắt hiển thị trạng thái online */
+            showOnlineStatus?: boolean;
         };
         TokenPair: {
             accessToken: string;

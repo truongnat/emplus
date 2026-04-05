@@ -57,7 +57,21 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             profileBackgroundUrl: { type: "string", format: "uri" },
             gender: { $ref: "#/components/schemas/Gender" },
             dob: { type: "string", format: "date" },
+            birthTime: { type: "string", description: "Giờ sinh HH:mm (24h)", pattern: "^\\d{2}:\\d{2}$" },
             timezone: { type: "string" },
+            emailNotificationsEnabled: {
+              type: "boolean",
+              description: "Nhận thông báo qua email từ ứng dụng",
+            },
+            profilePrivate: {
+              type: "boolean",
+              description:
+                "Hồ sơ riêng tư — khi bật, chỉ người đã ghép đôi nên xem đủ hồ sơ (áp dụng ở luồng discovery).",
+            },
+            showOnlineStatus: {
+              type: "boolean",
+              description: "Cho phép người khác thấy trạng thái online của bạn (presence).",
+            },
             isActive: { type: "boolean" },
             isAdmin: { type: "boolean" },
             coupleId: { type: "string", format: "uuid" },
@@ -80,7 +94,20 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             },
             gender: { $ref: "#/components/schemas/Gender" },
             dob: { type: "string", format: "date" },
+            birthTime: { type: "string", description: "Giờ sinh HH:mm (24h)", pattern: "^\\d{2}:\\d{2}$" },
             timezone: { type: "string" },
+            emailNotificationsEnabled: {
+              type: "boolean",
+              description: "Bật/tắt nhận thông báo qua email",
+            },
+            profilePrivate: {
+              type: "boolean",
+              description: "Bật/tắt chế độ hồ sơ riêng tư",
+            },
+            showOnlineStatus: {
+              type: "boolean",
+              description: "Bật/tắt hiển thị trạng thái online",
+            },
           },
         },
         TokenPair: {

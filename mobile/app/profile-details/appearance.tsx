@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -50,23 +50,8 @@ function createStyles(c: SemanticColors) {
       height: 72,
       borderRadius: 16,
       borderWidth: 2,
-      borderColor: c.border.subtle,
-      backgroundColor: c.surface.sunken,
       padding: 12,
       marginBottom: 8,
-    },
-    themeLine1: {
-      width: "60%",
-      height: 6,
-      backgroundColor: c.border.subtle,
-      borderRadius: 3,
-      marginBottom: 6,
-    },
-    themeLine2: {
-      width: "40%",
-      height: 6,
-      backgroundColor: c.border.subtle,
-      borderRadius: 3,
     },
     themeLabel: {
       fontSize: 11,
@@ -75,6 +60,7 @@ function createStyles(c: SemanticColors) {
       letterSpacing: 1,
     },
     themeLabelDefault: { color: c.text.tertiary },
+    /* Tạm tắt màu nhấn — chưa nối theme engine; bật lại khi có persist + override brand.
     colorRow: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
     colorButton: {
       width: 56,
@@ -91,6 +77,7 @@ function createStyles(c: SemanticColors) {
       borderColor: c.surface.default,
     },
     colorDotSelected: { borderColor: c.text.primary },
+    */
   });
 }
 
@@ -107,7 +94,17 @@ export default function AppearanceScreen() {
   useAuthGridChrome(isDark, themeColors.background.default, true);
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
+  /* Tạm tắt — màu nhấn chỉ đổi state local, không ảnh hưởng app theme.
   const [accentColor, setAccentColor] = useState("#ec1334");
+  const accentSwatches = [
+    "#ec1334",
+    "#f43f5e",
+    "#8b5cf6",
+    "#3b82f6",
+    "#10b981",
+    "#f59e0b",
+  ];
+  */
 
   const lightSelected =
     themePreference === "light" ||
@@ -118,16 +115,12 @@ export default function AppearanceScreen() {
     ((themePreference === "system" || themePreference === "daylight") &&
       colorScheme === "dark");
 
-  const accentSwatches = [
-    "#ec1334",
-    "#f43f5e",
-    "#8b5cf6",
-    "#3b82f6",
-    "#10b981",
-    "#f59e0b",
-  ];
-
   const scrollPadBottom = Math.max(insets.bottom + 32, 48);
+
+  /** Preview “Sáng” trên nền dark: tránh trắng tinh chói; trên nền light giữ nền app sáng. */
+  const lightPreviewSurface = isDark ? palette.zinc100 : palette.white;
+  const lightPreviewBorder = isDark ? palette.zinc400 : palette.zinc200;
+  const lightPreviewSkeleton = isDark ? palette.zinc500 : palette.zinc300;
 
   return (
     <AppScreen
@@ -180,13 +173,39 @@ export default function AppearanceScreen() {
                   <View
                     style={[
                       styles.themePreview,
+                      {
+                        backgroundColor: lightPreviewSurface,
+                        borderColor: lightPreviewBorder,
+                      },
+                      isDark && {
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.35,
+                        shadowRadius: 3,
+                        elevation: 3,
+                      },
                       lightSelected && {
                         borderColor: themeColors.brand.default,
                       },
                     ]}
                   >
-                    <View style={styles.themeLine1} />
-                    <View style={styles.themeLine2} />
+                    <View
+                      style={{
+                        width: "60%",
+                        height: 6,
+                        backgroundColor: lightPreviewSkeleton,
+                        borderRadius: 3,
+                        marginBottom: 6,
+                      }}
+                    />
+                    <View
+                      style={{
+                        width: "40%",
+                        height: 6,
+                        backgroundColor: lightPreviewSkeleton,
+                        borderRadius: 3,
+                      }}
+                    />
                   </View>
                   <AppText
                     style={[
@@ -314,6 +333,7 @@ export default function AppearanceScreen() {
               ) : null}
             </>
 
+            {/* Tạm tắt màu nhấn — chưa nối theme engine (xem comment đầu file / createStyles).
             <>
               <AppText style={[styles.sectionLabel, { marginTop: 32 }]}>
                 Màu nhấn
@@ -336,6 +356,7 @@ export default function AppearanceScreen() {
                 ))}
               </View>
             </>
+            */}
           </ScrollView>
         </View>
       </View>

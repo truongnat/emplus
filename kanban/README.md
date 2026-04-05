@@ -65,3 +65,4 @@ Thư mục theo dõi ticket nhẹ, đồng bộ với [`workflows/dev/w-ticket.m
 | [ticket-61](./ticket-61/TICKET.md) | Timeline + memory detail/add — dark Aura trên lưới | done |
 | [ticket-62](./ticket-62/TICKET.md) | Care tab + MoodVibeCheck — dark Aura trên lưới | done |
 | [ticket-63](./ticket-63/TICKET.md) | Audit quick wins — admin envelope, mail OTP, mobile polish | done |
+| [ticket-64](./ticket-64/TICKET.md) | Hồ sơ — format D/M/YYYY + sheet date/time picker, âm lịch | done |

@@ -21,6 +21,8 @@ export const appConfig = {
     onboarding: "emplus.onboarding.v1", // AsyncStorage
     /** Email ghi nhớ trên màn login (không phải token). */
     loginRememberEmail: "emplus.login.rememberEmail.v1",
+    /** Người dùng bật đăng ký thông báo đẩy (`1` / `0`). Mặc định khi chưa lưu: coi như bật (hành vi cũ). */
+    pushNotificationsEnabled: "emplus.settings.pushNotifications.enabled.v1",
   },
 
   // Authentication & Session

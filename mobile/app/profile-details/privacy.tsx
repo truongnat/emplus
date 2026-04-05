@@ -1,9 +1,17 @@
-import { useMemo, useState } from "react";
-import { View, ScrollView, Switch, StyleSheet, TouchableOpacity } from "react-native";
+import { useCallback, useMemo, useRef, useState } from "react";
+import {
+  View,
+  ScrollView,
+  Switch,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useMutation } from "@tanstack/react-query";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { AppText } from "@/src/ui-kit";
 import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
@@ -12,6 +20,13 @@ import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
 import { homeScreenStyles } from "@/src/features/home/homeScreen.styles";
 import { useThemeColors, useThemeMode } from "@/src/theme";
 import type { SemanticColors } from "@/src/theme/tokens/semantic";
+import { useSession } from "@/src/session-context";
+import { useToast } from "@/src/toast-context";
+import { toDisplayError } from "@/src/api";
+import { dependencies } from "@/src/framework/di/dependencies";
+
+/** Khoảng cách tối thiểu giữa hai lần gọi mạng (sau khi lần trước đã xong) — tránh spam toggle. */
+const SETTINGS_TOGGLE_MIN_INTERVAL_MS = 450;
 
 function createStyles(c: SemanticColors) {
   return StyleSheet.create({
@@ -69,12 +84,114 @@ export default function PrivacyScreen() {
   const insets = useSafeAreaInsets();
   const colors = useThemeColors();
   const { isDark } = useThemeMode();
+  const { session, setSession } = useSession();
+  const { showToast } = useToast();
   useAuthGridChrome(isDark, colors.background.default, true);
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [profilePrivate, setProfilePrivate] = useState(false);
   const [showOnlineStatus, setShowOnlineStatus] = useState(true);
-  const [allowMessages, setAllowMessages] = useState(true);
+
+  const lastPrivateNetworkEndedAtRef = useRef(0);
+  const lastOnlineNetworkEndedAtRef = useRef(0);
+
+  const syncPrivacyFromUser = useCallback(
+    (user: { profilePrivate?: boolean; showOnlineStatus?: boolean }) => {
+      setProfilePrivate(user.profilePrivate === true);
+      setShowOnlineStatus(user.showOnlineStatus !== false);
+    },
+    [],
+  );
+
+  const privateProfileMutation = useMutation({
+    mutationFn: (next: boolean) =>
+      dependencies.auth.updateProfile.execute({ profilePrivate: next }),
+    onSuccess: (user) => {
+      setSession((prev) => (prev ? { ...prev, user } : null));
+      syncPrivacyFromUser(user);
+      showToast(
+        user.profilePrivate === true ? "Đã bật hồ sơ riêng tư" : "Đã tắt hồ sơ riêng tư",
+        "success",
+      );
+    },
+    onError: (err: unknown) => {
+      showToast(toDisplayError(err), "error");
+      const v = session?.user?.profilePrivate === true;
+      setProfilePrivate(v);
+    },
+  });
+
+  const showOnlineMutation = useMutation({
+    mutationFn: (next: boolean) =>
+      dependencies.auth.updateProfile.execute({ showOnlineStatus: next }),
+    onSuccess: (user) => {
+      setSession((prev) => (prev ? { ...prev, user } : null));
+      syncPrivacyFromUser(user);
+      showToast(
+        user.showOnlineStatus !== false
+          ? "Đã bật hiển thị trạng thái online"
+          : "Đã tắt hiển thị trạng thái online",
+        "success",
+      );
+    },
+    onError: (err: unknown) => {
+      showToast(toDisplayError(err), "error");
+      setShowOnlineStatus(session?.user?.showOnlineStatus !== false);
+    },
+  });
+
+  const refreshPrivacyFromSession = useCallback(() => {
+    setProfilePrivate(session?.user?.profilePrivate === true);
+    setShowOnlineStatus(session?.user?.showOnlineStatus !== false);
+  }, [session?.user?.profilePrivate, session?.user?.showOnlineStatus]);
+
+  useFocusEffect(
+    useCallback(() => {
+      refreshPrivacyFromSession();
+    }, [refreshPrivacyFromSession]),
+  );
+
+  const onPrivateToggle = useCallback(
+    (next: boolean) => {
+      if (privateProfileMutation.isPending) {
+        return;
+      }
+      const sinceLast = Date.now() - lastPrivateNetworkEndedAtRef.current;
+      if (
+        lastPrivateNetworkEndedAtRef.current > 0 &&
+        sinceLast < SETTINGS_TOGGLE_MIN_INTERVAL_MS
+      ) {
+        return;
+      }
+      privateProfileMutation.mutate(next, {
+        onSettled: () => {
+          lastPrivateNetworkEndedAtRef.current = Date.now();
+        },
+      });
+    },
+    [privateProfileMutation],
+  );
+
+  const onOnlineToggle = useCallback(
+    (next: boolean) => {
+      if (showOnlineMutation.isPending) {
+        return;
+      }
+      const sinceLast = Date.now() - lastOnlineNetworkEndedAtRef.current;
+      if (
+        lastOnlineNetworkEndedAtRef.current > 0 &&
+        sinceLast < SETTINGS_TOGGLE_MIN_INTERVAL_MS
+      ) {
+        return;
+      }
+      showOnlineMutation.mutate(next, {
+        onSettled: () => {
+          lastOnlineNetworkEndedAtRef.current = Date.now();
+        },
+      });
+    },
+    [showOnlineMutation],
+  );
 
   const scrollPadBottom = Math.max(insets.bottom + 32, 48);
 
@@ -135,15 +252,20 @@ export default function PrivacyScreen() {
                     </AppText>
                   </View>
                 </View>
-                <Switch
-                  value={profilePrivate}
-                  onValueChange={setProfilePrivate}
-                  trackColor={{
-                    false: colors.border.subtle,
-                    true: colors.brand.default,
-                  }}
-                  thumbColor={colors.text.inverse}
-                />
+                {privateProfileMutation.isPending ? (
+                  <ActivityIndicator color={colors.brand.default} />
+                ) : (
+                  <Switch
+                    value={profilePrivate}
+                    onValueChange={onPrivateToggle}
+                    disabled={privateProfileMutation.isPending}
+                    trackColor={{
+                      false: colors.border.subtle,
+                      true: colors.brand.default,
+                    }}
+                    thumbColor={colors.text.inverse}
+                  />
+                )}
               </View>
 
               <View style={styles.settingRow}>
@@ -158,41 +280,26 @@ export default function PrivacyScreen() {
                     </AppText>
                   </View>
                 </View>
-                <Switch
-                  value={showOnlineStatus}
-                  onValueChange={setShowOnlineStatus}
-                  trackColor={{
-                    false: colors.border.subtle,
-                    true: colors.brand.default,
-                  }}
-                  thumbColor={colors.text.inverse}
-                />
+                {showOnlineMutation.isPending ? (
+                  <ActivityIndicator color={colors.brand.default} />
+                ) : (
+                  <Switch
+                    value={showOnlineStatus}
+                    onValueChange={onOnlineToggle}
+                    disabled={showOnlineMutation.isPending}
+                    trackColor={{
+                      false: colors.border.subtle,
+                      true: colors.brand.default,
+                    }}
+                    thumbColor={colors.text.inverse}
+                  />
+                )}
               </View>
 
-              <View style={styles.settingRow}>
-                <View style={styles.settingLeft}>
-                  <Ionicons
-                    name="chatbubble-outline"
-                    size={20}
-                    color={colors.text.secondary}
-                  />
-                  <View>
-                    <AppText style={styles.settingText}>Cho phép nhắn tin</AppText>
-                    <AppText style={styles.settingSubtext}>
-                      Nhận tin nhắn từ người lạ
-                    </AppText>
-                  </View>
-                </View>
-                <Switch
-                  value={allowMessages}
-                  onValueChange={setAllowMessages}
-                  trackColor={{
-                    false: colors.border.subtle,
-                    true: colors.brand.default,
-                  }}
-                  thumbColor={colors.text.inverse}
-                />
-              </View>
+              {/*
+                Phase sau (chưa ship release này): "Cho phép nhắn tin" / tin từ người lạ.
+                Cần API + policy trước khi bật lại UI.
+              */}
             </View>
 
             <View style={styles.section}>

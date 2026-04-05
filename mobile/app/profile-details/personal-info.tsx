@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   ScrollView,
@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -27,6 +28,9 @@ import { dependencies } from "@/src/framework/di/dependencies";
 import { useToast } from "@/src/toast-context";
 import { toDisplayError } from "@/src/api";
 import type { UserModule } from "@/src/domain/entities/schemas";
+import { formatDobDisplayVn } from "@/src/utils/date-format-vn";
+import { BirthDatePickerSheet } from "@/src/features/profile/components/BirthDatePickerSheet";
+import { BirthTimePickerSheet } from "@/src/features/profile/components/BirthTimePickerSheet";
 
 function createStyles(c: SemanticColors) {
   return StyleSheet.create({
@@ -34,10 +38,15 @@ function createStyles(c: SemanticColors) {
     header: {
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
       paddingHorizontal: 16,
       paddingBottom: 12,
     },
+    headerCenter: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    headerSideSpacer: { width: 40, height: 40 },
     backButton: {
       width: 40,
       height: 40,
@@ -96,6 +105,14 @@ function createStyles(c: SemanticColors) {
       paddingHorizontal: 20,
       marginBottom: 8,
     },
+    dobValueRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: 4,
+    },
+    dobValueText: { fontSize: 15, color: c.text.primary, fontWeight: "600" },
+    dobPlaceholder: { color: c.text.tertiary, fontWeight: "500" },
   });
 }
 
@@ -112,7 +129,11 @@ export default function PersonalInfoScreen() {
   const [fullName, setFullName] = useState("");
   const [nickname, setNickname] = useState("");
   const [email, setEmail] = useState("");
-  const [dob, setDob] = useState("");
+  /** Ngày sinh gửi API: YYYY-MM-DD */
+  const [dobIso, setDobIso] = useState("");
+  const [birthTimeHm, setBirthTimeHm] = useState("");
+  const [dateSheetOpen, setDateSheetOpen] = useState(false);
+  const [timeSheetOpen, setTimeSheetOpen] = useState(false);
 
   useEffect(() => {
     const u = session?.user;
@@ -120,7 +141,8 @@ export default function PersonalInfoScreen() {
     setFullName(u.fullName ?? "");
     setNickname(u.nickname ?? "");
     setEmail(u.email ?? "");
-    setDob(u.dob ?? "");
+    setDobIso(u.dob ?? "");
+    setBirthTimeHm(u.birthTime ?? "");
   }, [session?.user, hydrated]);
 
   const scrollPadBottom = Math.max(insets.bottom + 32, 48);
@@ -130,18 +152,28 @@ export default function PersonalInfoScreen() {
       const body: UserModule.UpdateProfileRequest = {
         fullName: fullName.trim(),
         nickname: nickname.trim() || undefined,
-        dob: dob.trim() || undefined,
+        dob: dobIso.trim() || undefined,
+        birthTime: birthTimeHm.trim() || undefined,
       };
       return dependencies.auth.updateProfile.execute(body);
     },
     onSuccess: (user) => {
       setSession((prev) => (prev ? { ...prev, user } : null));
       showToast("Đã lưu hồ sơ", "success");
+      router.back();
     },
     onError: (err: unknown) => {
       showToast(toDisplayError(err), "error");
     },
   });
+
+  const onConfirmTime = useCallback((hm: string) => {
+    setBirthTimeHm(hm);
+  }, []);
+
+  const onConfirmDate = useCallback((iso: string) => {
+    setDobIso(iso);
+  }, []);
 
   return (
     <AppScreen
@@ -176,8 +208,10 @@ export default function PersonalInfoScreen() {
                 color={colors.text.primary}
               />
             </TouchableOpacity>
-            <AppText style={styles.headerTitle}>Thông tin tài khoản</AppText>
-            <View style={{ width: 40 }} />
+            <View style={styles.headerCenter}>
+              <AppText style={styles.headerTitle}>Chỉnh sửa hồ sơ</AppText>
+            </View>
+            <View style={styles.headerSideSpacer} />
           </View>
 
           <ScrollView
@@ -187,8 +221,8 @@ export default function PersonalInfoScreen() {
             keyboardShouldPersistTaps="handled"
           >
             <AppText style={styles.hint}>
-              Ngày sinh theo định dạng YYYY-MM-DD. Tên hiển thị là tên chính trên
-              tab Hồ sơ (có thể để trống để dùng họ tên).
+              Tên hiển thị là tên chính trên tab Hồ sơ (có thể để trống để dùng
+              họ tên). Ngày sinh hiển thị D/M/YYYY. Giờ sinh lưu HH:mm (24h).
             </AppText>
 
             <View style={styles.section}>
@@ -269,14 +303,64 @@ export default function PersonalInfoScreen() {
                   />
                 </View>
                 <View style={styles.fieldContainer2}>
-                  <AppText style={styles.fieldLabel}>Ngày sinh (YYYY-MM-DD)</AppText>
-                  <TextInput
-                    style={styles.fieldInput}
-                    value={dob}
-                    onChangeText={setDob}
-                    placeholder="1990-01-01"
-                    placeholderTextColor={colors.text.tertiary}
+                  <AppText style={styles.fieldLabel}>Ngày sinh</AppText>
+                  <Pressable
+                    onPress={() => setDateSheetOpen(true)}
+                    accessibilityRole="button"
+                    accessibilityLabel="Chọn ngày sinh"
+                    style={styles.dobValueRow}
+                  >
+                    <AppText
+                      style={[
+                        styles.dobValueText,
+                        ...(dobIso.trim() ? [] : [styles.dobPlaceholder]),
+                      ]}
+                    >
+                      {dobIso.trim()
+                        ? formatDobDisplayVn(dobIso)
+                        : "Chọn ngày sinh"}
+                    </AppText>
+                    <Ionicons
+                      name="calendar-outline"
+                      size={22}
+                      color={colors.text.secondary}
+                    />
+                  </Pressable>
+                </View>
+              </View>
+
+              <View style={styles.divider} />
+
+              <View style={styles.fieldRow}>
+                <View style={styles.fieldIcon}>
+                  <Ionicons
+                    name="time-outline"
+                    size={20}
+                    color={colors.text.secondary}
                   />
+                </View>
+                <View style={styles.fieldContainer2}>
+                  <AppText style={styles.fieldLabel}>Giờ sinh</AppText>
+                  <Pressable
+                    onPress={() => setTimeSheetOpen(true)}
+                    accessibilityRole="button"
+                    accessibilityLabel="Chọn giờ sinh"
+                    style={styles.dobValueRow}
+                  >
+                    <AppText
+                      style={[
+                        styles.dobValueText,
+                        ...(birthTimeHm.trim() ? [] : [styles.dobPlaceholder]),
+                      ]}
+                    >
+                      {birthTimeHm.trim() ? birthTimeHm : "Chọn giờ sinh"}
+                    </AppText>
+                    <Ionicons
+                      name="time-outline"
+                      size={22}
+                      color={colors.text.secondary}
+                    />
+                  </Pressable>
                 </View>
               </View>
             </View>
@@ -294,6 +378,19 @@ export default function PersonalInfoScreen() {
           </ScrollView>
         </KeyboardAvoidingView>
       </View>
+
+      <BirthDatePickerSheet
+        visible={dateSheetOpen}
+        onClose={() => setDateSheetOpen(false)}
+        initialIso={dobIso || null}
+        onConfirm={onConfirmDate}
+      />
+      <BirthTimePickerSheet
+        visible={timeSheetOpen}
+        onClose={() => setTimeSheetOpen(false)}
+        initialHm={birthTimeHm || null}
+        onConfirm={onConfirmTime}
+      />
     </AppScreen>
   );
 }
