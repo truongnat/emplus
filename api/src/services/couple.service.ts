@@ -8,6 +8,7 @@ import { INVITE_CODE_TTL_SECONDS } from "../constants/index.ts";
 import { generateInviteCode } from "../shared/code.ts";
 import { formatDate, todayUtc } from "../shared/date.ts";
 import { hienThiGioiTinh, hienThiTrangThaiCapDoi } from "../utils/presentation.ts";
+import { notify } from "./notification.service.ts";
 import { AppError } from "../utils/http.ts";
 
 export interface InviteResponse {
@@ -106,6 +107,19 @@ export async function joinCouple(user: User, inviteCode: string): Promise<JoinRe
     store.deleteInvite(rawInviteCode),
     store.invalidateHomeCache(couple.id),
   ]);
+
+  notify({
+    userId: inviter.id,
+    coupleId: couple.id,
+    type: "pairing",
+    title: "Lời mời ghép đôi đã được chấp nhận!",
+    body: `${user.fullName} đã tham gia cùng bạn trên Em+.`,
+    iconName: "people-outline",
+    iconColor: "#7c3aed",
+    iconBg: "#ede9fe",
+    actionLabel: "Xem trang chủ",
+    url: "/(tabs)/home",
+  }).catch((err) => console.error("[Notify] Pairing notify failed:", err));
 
   return {
     coupleId: couple.id,

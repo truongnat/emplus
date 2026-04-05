@@ -8,6 +8,7 @@ import { mapDisplayStatusToInternal } from "../dto/budget.dto.ts";
 import { resolveActiveCoupleIdAsync } from "../utils/couple.ts";
 import { env } from "../config/env.ts";
 import { AppError } from "../utils/http.ts";
+import { notifyPartner } from "./notification.service.ts";
 
 export interface BudgetSummaryResponse {
   totalBudget: number;
@@ -139,6 +140,18 @@ export async function createExpense(
   };
 
   await store.saveBudgetItem(item);
+
+  notifyPartner(userId, coupleId, {
+    type: "budget",
+    title: `Đã thêm chi tiêu "${item.title}"`,
+    body: `${new Intl.NumberFormat("vi-VN").format(item.amount)} ₫ · ${item.category}`,
+    iconName: "wallet-outline",
+    iconColor: "#c2410c",
+    iconBg: "#ffedd5",
+    actionLabel: "Xem ngân sách",
+    url: "/(tabs)/home",
+  }).catch((err) => console.error("[Notify] Budget notify failed:", err));
+
   return item;
 }
 

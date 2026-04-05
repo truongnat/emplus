@@ -86,4 +86,5 @@ export interface DataStore {
   markNotificationRead(userId: string, notificationId: string): Promise<InAppNotification | undefined>;
   markAllNotificationsRead(userId: string): Promise<number>;
   updateExpoPushToken(userId: string, token: string | null): Promise<void>;
+  getExpoPushToken(userId: string): Promise<string | null>;
 }

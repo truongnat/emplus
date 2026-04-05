@@ -8,8 +8,24 @@ import { AppError } from "../utils/http.ts";
 
 export const liveRoutes = new Hono<AppEnv>();
 
-// Store active connections by coupleId (Hono WSContext — MessageEvent.target is null by design)
 const connections = new Map<string, Set<WSContext>>();
+const userPresence = new Map<string, { userId: string; coupleId: string; lastSeen: number }>();
+
+export function isUserOnline(userId: string): boolean {
+  const entry = userPresence.get(userId);
+  if (!entry) return false;
+  return Date.now() - entry.lastSeen < 90_000;
+}
+
+export function getOnlineUsersForCouple(coupleId: string): string[] {
+  const online: string[] = [];
+  for (const [userId, entry] of userPresence) {
+    if (entry.coupleId === coupleId && Date.now() - entry.lastSeen < 90_000) {
+      online.push(userId);
+    }
+  }
+  return online;
+}
 
 function broadcastToCouple(coupleId: string, message: unknown): void {
   const coupleConnections = connections.get(coupleId);
@@ -86,12 +102,23 @@ liveRoutes.get(
             return;
           }
 
-          // Handle subscription to couple room
+          if (message.type === "heartbeat") {
+            userPresence.set(userId, { userId, coupleId, lastSeen: Date.now() });
+            const onlineUsers = getOnlineUsersForCouple(coupleId);
+            broadcastToCouple(coupleId, {
+              type: "presence",
+              online: onlineUsers,
+              timestamp: Date.now(),
+            });
+            return;
+          }
+
           if (message.type === "subscribe") {
             if (!connections.has(coupleId)) {
               connections.set(coupleId, new Set());
             }
             connections.get(coupleId)?.add(wsCtx);
+            userPresence.set(userId, { userId, coupleId, lastSeen: Date.now() });
             try {
               wsCtx.send(JSON.stringify({ type: "subscribed", coupleId }));
             } catch (sendErr) {
@@ -117,6 +144,7 @@ liveRoutes.get(
         if (!wsCtx) {
           return;
         }
+        userPresence.delete(userId);
         const conns = connections.get(coupleId);
         if (conns) {
           conns.delete(wsCtx);
@@ -124,6 +152,11 @@ liveRoutes.get(
             connections.delete(coupleId);
           }
         }
+        broadcastToCouple(coupleId, {
+          type: "presence",
+          online: getOnlineUsersForCouple(coupleId),
+          timestamp: Date.now(),
+        });
       },
       onError(error: unknown) {
         console.error("WebSocket error:", error);

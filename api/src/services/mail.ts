@@ -11,6 +11,39 @@ const transporter = nodemailer.createTransport({
     } : undefined,
 });
 
+export async function sendNotificationEmail(
+    email: string,
+    title: string,
+    body?: string,
+): Promise<void> {
+    const mailOptions = {
+        from: `"Em+" <${env.smtpFrom}>`,
+        to: email,
+        subject: `Em+: ${title}`,
+        html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+        <h2 style="color: #FF4D67; text-align: center;">Em+</h2>
+        <p style="font-size: 16px; font-weight: 600;">${title}</p>
+        ${body ? `<p style="color: #555;">${body}</p>` : ""}
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+        <p style="font-size: 12px; color: #888; text-align: center;">
+          Bạn nhận email này vì đã bật thông báo qua email trong Em+.
+          Để tắt, vào Cài đặt → Thông báo trong ứng dụng.
+        </p>
+      </div>
+    `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        if (env.nodeEnv !== "production") {
+            console.log(`[Mail] Đã gửi notification email đến ${email}: ${title}`);
+        }
+    } catch (error) {
+        console.error(`[Mail] Lỗi gửi notification email:`, error);
+    }
+}
+
 export async function sendOtpMail(email: string, otp: string) {
     const mailOptions = {
         from: `"Em+" <${env.smtpFrom}>`,

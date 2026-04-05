@@ -1642,6 +1642,13 @@ export class PostgresStore implements DataStore {
     `;
   }
 
+  async getExpoPushToken(userId: string): Promise<string | null> {
+    const rows = await this.sql<{ expo_push_token: string | null }[]>`
+      SELECT expo_push_token FROM users WHERE id = ${userId} LIMIT 1
+    `;
+    return rows[0]?.expo_push_token ?? null;
+  }
+
   async cleanupExpiredSessions(batchSize: number = 500): Promise<number> {
     const accessResult = await this.sql`
       DELETE FROM user_sessions

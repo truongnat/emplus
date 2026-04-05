@@ -521,4 +521,8 @@ export class InMemoryStore implements DataStore {
     }
     this.expoPushTokens.set(userId, token);
   }
+
+  async getExpoPushToken(userId: string): Promise<string | null> {
+    return this.expoPushTokens.get(userId) ?? null;
+  }
 }

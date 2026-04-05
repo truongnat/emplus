@@ -7,6 +7,7 @@ import { store } from "../store.ts";
 import type { EmotionalCycle, User } from "../types.ts";
 import { todayUtc } from "../utils/date.ts";
 import { AppError, readJson, success } from "../utils/http.ts";
+import { notifyPartner } from "../services/notification.service.ts";
 
 async function getPartner(current: User): Promise<{ partner: User; coupleId: string }> {
   const couple = await store.getActiveCoupleForUser(current.id);
@@ -102,6 +103,22 @@ careRoutes.put("/mood", async (context) => {
   const body = await readJson<Record<string, unknown>>(context);
   const input = validateSaveMoodInput(body);
   const saved = await store.upsertUserMood(user.id, input.value);
+
+  if (user.coupleId) {
+    const moodLabels: Record<number, string> = {
+      1: "rất buồn", 2: "buồn", 3: "bình thường", 4: "vui", 5: "rất vui",
+    };
+    const label = moodLabels[input.value] ?? `${input.value}/5`;
+    notifyPartner(user.id, user.coupleId, {
+      type: "care",
+      title: `${user.fullName} đang cảm thấy ${label}`,
+      iconName: "heart-outline",
+      iconColor: "#0f766e",
+      iconBg: "#ccfbf1",
+      url: "/(tabs)/care",
+    }).catch((err) => console.error("[Notify] Mood notify failed:", err));
+  }
+
   return success(context, { value: saved.value, updatedAt: saved.updatedAt });
 });
 
