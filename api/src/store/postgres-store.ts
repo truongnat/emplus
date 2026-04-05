@@ -967,6 +967,65 @@ export class PostgresStore implements DataStore {
     return rows.length > 0;
   }
 
+  async aggregateBudgetByCouple(coupleId: string): Promise<{ totalSpent: number; pendingAmount: number }> {
+    const rows = await this.sql<{ total_spent: string; pending_amount: string }[]>`
+      SELECT
+        COALESCE(SUM(amount) FILTER (WHERE status IN ('PAID', 'OVER_BUDGET')), 0) AS total_spent,
+        COALESCE(SUM(amount) FILTER (WHERE status = 'PENDING'), 0) AS pending_amount
+      FROM budget_items
+      WHERE couple_id = ${coupleId}
+    `;
+    const row = rows[0];
+    return {
+      totalSpent: Number(row?.total_spent ?? 0),
+      pendingAmount: Number(row?.pending_amount ?? 0),
+    };
+  }
+
+  async paginateBudgetByCouple(
+    coupleId: string,
+    page: number,
+    limit: number,
+    status?: string,
+  ): Promise<{ items: BudgetItem[]; totalItems: number }> {
+    const offset = (page - 1) * limit;
+    let rows: BudgetRow[];
+    let countRows: { cnt: string }[];
+
+    if (status) {
+      rows = await this.sql<BudgetRow[]>`
+        SELECT id, couple_id AS "coupleId", created_by_id AS "createdById",
+               title, amount, category, date, place, status, note, created_at AS "createdAt"
+        FROM budget_items
+        WHERE couple_id = ${coupleId} AND status = ${status}
+        ORDER BY date DESC, created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `;
+      countRows = await this.sql<{ cnt: string }[]>`
+        SELECT COUNT(*)::text AS cnt FROM budget_items
+        WHERE couple_id = ${coupleId} AND status = ${status}
+      `;
+    } else {
+      rows = await this.sql<BudgetRow[]>`
+        SELECT id, couple_id AS "coupleId", created_by_id AS "createdById",
+               title, amount, category, date, place, status, note, created_at AS "createdAt"
+        FROM budget_items
+        WHERE couple_id = ${coupleId}
+        ORDER BY date DESC, created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `;
+      countRows = await this.sql<{ cnt: string }[]>`
+        SELECT COUNT(*)::text AS cnt FROM budget_items
+        WHERE couple_id = ${coupleId}
+      `;
+    }
+
+    return {
+      items: rows.map(fromBudgetRow),
+      totalItems: Number(countRows[0]?.cnt ?? 0),
+    };
+  }
+
   async listBudgetItemsByCouple(coupleId: string): Promise<BudgetItem[]> {
     const rows = await this.sql<BudgetRow[]>`
       SELECT id,
@@ -1582,35 +1641,57 @@ export class PostgresStore implements DataStore {
       WHERE id = ${userId}
     `;
   }
+
+  async cleanupExpiredSessions(batchSize: number = 500): Promise<number> {
+    const accessResult = await this.sql`
+      DELETE FROM user_sessions
+      WHERE ctid IN (
+        SELECT ctid FROM user_sessions
+        WHERE expires_at < NOW()
+        LIMIT ${batchSize}
+      )
+    `;
+    const refreshResult = await this.sql`
+      DELETE FROM user_refresh_sessions
+      WHERE ctid IN (
+        SELECT ctid FROM user_refresh_sessions
+        WHERE expires_at < NOW()
+        LIMIT ${batchSize}
+      )
+    `;
+    return accessResult.count + refreshResult.count;
+  }
 }
 
 export function createPostgresStore(databaseUrl: string, redisUrl?: string, readDatabaseUrl?: string): PostgresStore {
+  const isDev = (process.env.NODE_ENV ?? "development") !== "production";
+
   const sql = postgres(databaseUrl, {
     max: 10,
-    transform: {
-      undefined: null,
-    },
-    debug: (connection, query, params, types) => {
-      console.log(`[SQL Query]`, query);
-      if (params && params.length > 0) {
-        console.log(`[SQL Params]`, params);
-      }
-    },
+    transform: { undefined: null },
+    ...(isDev
+      ? {
+          debug: (_connection: unknown, query: string, params: unknown[]) => {
+            console.log(`[SQL Query]`, query);
+            if (params?.length) console.log(`[SQL Params]`, params);
+          },
+        }
+      : {}),
   });
   const readSql =
     readDatabaseUrl && readDatabaseUrl !== databaseUrl
       ? postgres(readDatabaseUrl, {
-        max: 10,
-        transform: {
-          undefined: null,
-        },
-        debug: (connection, query, params, types) => {
-          console.log(`[READ SQL Query]`, query);
-          if (params && params.length > 0) {
-            console.log(`[READ SQL Params]`, params);
-          }
-        },
-      })
+          max: 10,
+          transform: { undefined: null },
+          ...(isDev
+            ? {
+                debug: (_connection: unknown, query: string, params: unknown[]) => {
+                  console.log(`[READ SQL]`, query);
+                  if (params?.length) console.log(`[READ SQL Params]`, params);
+                },
+              }
+            : {}),
+        })
       : sql;
 
   const redis = redisUrl

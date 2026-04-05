@@ -28,8 +28,7 @@ export function useBudgetExpensesQuery(activeFilter: string) {
       return withAccessToken((token) =>
         listBudgetExpenses(token, {
           page: pageParam as number,
-          limit: 20,
-          status: apiStatus !== "Tất cả" ? apiStatus : undefined,
+          category: apiStatus !== "Tất cả" ? apiStatus : undefined,
         }),
       );
     },

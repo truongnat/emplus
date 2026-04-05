@@ -5,6 +5,7 @@
 import { store } from "../store.ts";
 import type { User, Gender } from "../types.ts";
 import { chuanHoaGioiTinhDauVao } from "../utils/presentation.ts";
+import { AppError } from "../utils/http.ts";
 
 export interface UserProfile {
   id: string;
@@ -82,10 +83,7 @@ export async function updateUserProfile(
 ): Promise<UserProfile> {
   const user = await store.getUserById(userId);
   if (!user) {
-    const error = new Error("Không tìm thấy người dùng.") as Error & { status: number; code: string };
-    error.status = 404;
-    error.code = "USER_NOT_FOUND";
-    throw error;
+    throw new AppError(404, "USER_NOT_FOUND", "Không tìm thấy người dùng.");
   }
 
   const updatedUser: User = {

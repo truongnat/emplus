@@ -47,11 +47,11 @@ export function mapDashboardData(dashboard: DashboardPayload | null) {
     greetingInfo: cachedGreeting,
     loveDays,
     startDateLabel: formatLoveDate(dashboard.coupleContext?.loveStartDate),
-    cycleLabel: normalizeCycleLabel(dashboard.dailySuggestion?.actionType),
+    cycleLabel: normalizeCycleLabel(undefined),
     upcomingEvents,
     nextDateLabel,
-    focusTitle: dashboard.dailySuggestion?.actionHint || "Kết nối hôm nay",
+    focusTitle: dashboard.careAdvice?.greeting || "Kết nối hôm nay",
     focusSubtitle:
-      dashboard.dailySuggestion?.quote || "Một chạm nhỏ để hai bạn gần hơn.",
+      dashboard.careAdvice?.subGreeting || "Một chạm nhỏ để hai bạn gần hơn.",
   };
 }

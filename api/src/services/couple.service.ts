@@ -8,6 +8,7 @@ import { INVITE_CODE_TTL_SECONDS } from "../constants/index.ts";
 import { generateInviteCode } from "../shared/code.ts";
 import { formatDate, todayUtc } from "../shared/date.ts";
 import { hienThiGioiTinh, hienThiTrangThaiCapDoi } from "../utils/presentation.ts";
+import { AppError } from "../utils/http.ts";
 
 export interface InviteResponse {
   inviteCode: string;
@@ -30,10 +31,7 @@ export interface JoinResponse {
 export async function generateInvite(userId: string): Promise<InviteResponse> {
   const activeCouple = await store.getActiveCoupleForUser(userId);
   if (activeCouple) {
-    const error = new Error("Bạn đã được ghép đôi trong một mối quan hệ khác.") as Error & { status: number; code: string };
-    error.status = 409;
-    error.code = "COUPLE_ALREADY_PAIRED";
-    throw error;
+    throw new AppError(409, "COUPLE_ALREADY_PAIRED", "Bạn đã được ghép đôi trong một mối quan hệ khác.");
   }
 
   const pendingCouple = await store.getPendingCoupleByCreator(userId);
@@ -53,63 +51,39 @@ export async function joinCouple(user: User, inviteCode: string): Promise<JoinRe
   const rawInviteCode = inviteCode.trim().toUpperCase();
 
   if (!rawInviteCode) {
-    const error = new Error("Mã mời (inviteCode) là bắt buộc.") as Error & { status: number; code: string };
-    error.status = 400;
-    error.code = "INVALID_INVITE_CODE";
-    throw error;
+    throw new AppError(400, "INVALID_INVITE_CODE", "Mã mời (inviteCode) là bắt buộc.");
   }
 
   const invite = await store.getInvite(rawInviteCode);
   if (!invite || new Date(invite.expiresAt).getTime() < Date.now()) {
-    const error = new Error("Mã mời không tồn tại hoặc đã hết hạn.") as Error & { status: number; code: string };
-    error.status = 404;
-    error.code = "INVITE_NOT_FOUND";
-    throw error;
+    throw new AppError(404, "INVITE_NOT_FOUND", "Mã mời không tồn tại hoặc đã hết hạn.");
   }
 
   const couple = await store.getCoupleById(invite.coupleId);
   if (!couple || couple.status !== "CHO_GHEP_DOI") {
-    const error = new Error("Mã mời không tồn tại hoặc đã hết hạn.") as Error & { status: number; code: string };
-    error.status = 404;
-    error.code = "INVITE_NOT_FOUND";
-    throw error;
+    throw new AppError(404, "INVITE_NOT_FOUND", "Mã mời không tồn tại hoặc đã hết hạn.");
   }
   if (couple.inviteCode !== rawInviteCode) {
-    const error = new Error("Mã mời không tồn tại hoặc đã hết hạn.") as Error & { status: number; code: string };
-    error.status = 404;
-    error.code = "INVITE_NOT_FOUND";
-    throw error;
+    throw new AppError(404, "INVITE_NOT_FOUND", "Mã mời không tồn tại hoặc đã hết hạn.");
   }
 
   if (couple.partner1Id === user.id) {
-    const error = new Error("Không thể tự ghép đôi bằng mã của chính mình.") as Error & { status: number; code: string };
-    error.status = 400;
-    error.code = "CANNOT_JOIN_OWN_CODE";
-    throw error;
+    throw new AppError(400, "CANNOT_JOIN_OWN_CODE", "Không thể tự ghép đôi bằng mã của chính mình.");
   }
 
   if (await store.userAlreadyInCouple(user.id)) {
-    const error = new Error("Bạn đang ở trong một mối quan hệ đang hoạt động khác.") as Error & { status: number; code: string };
-    error.status = 409;
-    error.code = "COUPLE_ALREADY_PAIRED";
-    throw error;
+    throw new AppError(409, "COUPLE_ALREADY_PAIRED", "Bạn đang ở trong một mối quan hệ đang hoạt động khác.");
   }
 
   const inviterHasOtherActiveCouple = await store.inviterHasOtherActiveCouple(couple.partner1Id, couple.id);
 
   if (inviterHasOtherActiveCouple) {
-    const error = new Error("Người tạo mã đã ở trong mối quan hệ khác.") as Error & { status: number; code: string };
-    error.status = 409;
-    error.code = "INVITER_ALREADY_PAIRED";
-    throw error;
+    throw new AppError(409, "INVITER_ALREADY_PAIRED", "Người tạo mã đã ở trong mối quan hệ khác.");
   }
 
   const inviter = await store.getUserById(couple.partner1Id);
   if (!inviter) {
-    const error = new Error("Không tìm thấy người dùng đã tạo mã mời.") as Error & { status: number; code: string };
-    error.status = 500;
-    error.code = "USER_NOT_FOUND";
-    throw error;
+    throw new AppError(500, "USER_NOT_FOUND", "Không tìm thấy người dùng đã tạo mã mời.");
   }
 
   // Update couple

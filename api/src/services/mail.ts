@@ -33,9 +33,11 @@ export async function sendOtpMail(email: string, otp: string) {
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`[Mail] Đã gửi OTP đến ${email}`);
+        if (env.nodeEnv !== "production") {
+          console.log(`[Mail] Đã gửi OTP đến ${email}`);
+        }
     } catch (error) {
-        console.error(`[Mail] Lỗi gửi OTP đến ${email}:`, error);
+        console.error(`[Mail] Lỗi gửi OTP:`, error);
         if (env.nodeEnv !== "production") {
           console.log(`[DEV] OTP cho ${email} là: ${otp}`);
         }

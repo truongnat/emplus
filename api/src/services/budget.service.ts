@@ -7,6 +7,7 @@ import type { BudgetItem, BudgetSummary } from "../types.ts";
 import { mapDisplayStatusToInternal } from "../dto/budget.dto.ts";
 import { resolveActiveCoupleIdAsync } from "../utils/couple.ts";
 import { env } from "../config/env.ts";
+import { AppError } from "../utils/http.ts";
 
 export interface BudgetSummaryResponse {
   totalBudget: number;
@@ -27,19 +28,29 @@ export interface PaginatedExpenses<T> {
 }
 
 /**
- * Calculate budget summary for a couple
+ * Calculate budget summary for a couple (SQL aggregate — no full scan).
  */
 export async function calculateBudgetSummary(coupleId: string): Promise<BudgetSummaryResponse> {
-  const items = await store.listBudgetItemsByCouple(coupleId);
   const totalBudget = env.defaultBudgetAmount;
 
-  const totalSpent = items
-    .filter((i) => i.status === "PAID" || i.status === "OVER_BUDGET")
-    .reduce((sum, i) => sum + i.amount, 0);
+  const dataStore = store as unknown as Record<string, unknown>;
+  let totalSpent: number;
+  let pendingAmount: number;
 
-  const pendingAmount = items
-    .filter((i) => i.status === "PENDING")
-    .reduce((sum, i) => sum + i.amount, 0);
+  if (typeof dataStore.aggregateBudgetByCouple === "function") {
+    const agg = await (dataStore as unknown as { aggregateBudgetByCouple: (id: string) => Promise<{ totalSpent: number; pendingAmount: number }> })
+      .aggregateBudgetByCouple(coupleId);
+    totalSpent = agg.totalSpent;
+    pendingAmount = agg.pendingAmount;
+  } else {
+    const items = await store.listBudgetItemsByCouple(coupleId);
+    totalSpent = items
+      .filter((i) => i.status === "PAID" || i.status === "OVER_BUDGET")
+      .reduce((sum, i) => sum + i.amount, 0);
+    pendingAmount = items
+      .filter((i) => i.status === "PENDING")
+      .reduce((sum, i) => sum + i.amount, 0);
+  }
 
   const remainingAmount = totalBudget - totalSpent;
   const usagePercentage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
@@ -56,7 +67,7 @@ export async function calculateBudgetSummary(coupleId: string): Promise<BudgetSu
 }
 
 /**
- * Get paginated expenses for a couple
+ * Get paginated expenses for a couple (SQL-level pagination when available).
  */
 export async function getExpenses(
   coupleId: string,
@@ -64,26 +75,36 @@ export async function getExpenses(
   limit: number,
   status?: string,
 ): Promise<PaginatedExpenses<BudgetItem>> {
-  let items = await store.listBudgetItemsByCouple(coupleId);
+  const internalStatus =
+    status && status !== "Tất cả" ? mapDisplayStatusToInternal(status) : undefined;
 
-  if (status && status !== "Tất cả") {
-    const targetStatus = mapDisplayStatusToInternal(status);
-    items = items.filter((i) => i.status === targetStatus);
+  const dataStore = store as unknown as Record<string, unknown>;
+
+  if (typeof dataStore.paginateBudgetByCouple === "function") {
+    const result = await (dataStore as unknown as {
+      paginateBudgetByCouple: (
+        id: string, p: number, l: number, s?: string,
+      ) => Promise<{ items: BudgetItem[]; totalItems: number }>;
+    }).paginateBudgetByCouple(coupleId, page, limit, internalStatus);
+
+    return {
+      data: result.items,
+      pagination: { page, limit, totalItems: result.totalItems },
+    };
   }
 
-  // Sort by date desc
-  items.sort((a, b) => b.date.localeCompare(a.date));
+  let items = await store.listBudgetItemsByCouple(coupleId);
 
+  if (internalStatus) {
+    items = items.filter((i) => i.status === internalStatus);
+  }
+
+  items.sort((a, b) => b.date.localeCompare(a.date));
   const offset = (page - 1) * limit;
-  const pagedItems = items.slice(offset, offset + limit);
 
   return {
-    data: pagedItems,
-    pagination: {
-      page,
-      limit,
-      totalItems: items.length,
-    },
+    data: items.slice(offset, offset + limit),
+    pagination: { page, limit, totalItems: items.length },
   };
 }
 
@@ -139,10 +160,7 @@ export async function updateExpense(
 ): Promise<BudgetItem> {
   const existing = await store.getBudgetItem(expenseId);
   if (!existing || existing.coupleId !== coupleId) {
-    const error = new Error("Không tìm thấy chi phí.") as Error & { status: number; code: string };
-    error.status = 404;
-    error.code = "EXPENSE_NOT_FOUND";
-    throw error;
+    throw new AppError(404, "EXPENSE_NOT_FOUND", "Không tìm thấy chi phí.");
   }
 
   const updated: BudgetItem = {
@@ -166,10 +184,7 @@ export async function updateExpense(
 export async function deleteExpense(expenseId: string, coupleId: string): Promise<void> {
   const existing = await store.getBudgetItem(expenseId);
   if (!existing || existing.coupleId !== coupleId) {
-    const error = new Error("Không tìm thấy chi phí.") as Error & { status: number; code: string };
-    error.status = 404;
-    error.code = "EXPENSE_NOT_FOUND";
-    throw error;
+    throw new AppError(404, "EXPENSE_NOT_FOUND", "Không tìm thấy chi phí.");
   }
 
   await store.deleteBudgetItem(expenseId);

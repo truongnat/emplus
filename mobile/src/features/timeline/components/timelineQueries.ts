@@ -17,7 +17,6 @@ export function useTimelineMemoriesQuery(
           page: pageParam as number,
           limit: 20,
           order,
-          tag: activeFilter,
         }),
       );
     },

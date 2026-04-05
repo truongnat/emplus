@@ -1,81 +1,118 @@
 import { createMiddleware } from "hono/factory";
+import type { Context } from "hono";
 import type { AppEnv } from "../app-env.ts";
 import { env } from "../config/env.ts";
 
-// Simple in-memory rate limiter store
+// ─── In-memory fallback ──────────────────────────────────────────────────────
+
 interface RateLimitEntry {
   count: number;
   resetTime: number;
 }
 
-const rateLimitStore = new Map<string, RateLimitEntry>();
+const memStore = new Map<string, RateLimitEntry>();
 
-// Cleanup old entries periodically
 setInterval(() => {
   const now = Date.now();
-  for (const [key, entry] of rateLimitStore.entries()) {
+  for (const [key, entry] of memStore.entries()) {
     if (now > entry.resetTime) {
-      rateLimitStore.delete(key);
+      memStore.delete(key);
     }
   }
-}, 60000);
+}, 60_000);
+
+// ─── Redis backend (lazy-initialised) ────────────────────────────────────────
+
+let redis: import("ioredis").default | null = null;
+let redisUnavailable = false;
+
+async function getRedis(): Promise<import("ioredis").default | null> {
+  if (redisUnavailable || !env.redisUrl) return null;
+  if (redis) return redis;
+  try {
+    const { default: Redis } = await import("ioredis");
+    redis = new Redis(env.redisUrl, { lazyConnect: true, maxRetriesPerRequest: 1 });
+    await redis.connect();
+    return redis;
+  } catch {
+    redisUnavailable = true;
+    console.warn("[rate-limit] Redis unavailable — falling back to in-memory");
+    return null;
+  }
+}
+
+async function redisIncrement(key: string, windowSec: number): Promise<{ count: number; ttl: number }> {
+  const r = await getRedis();
+  if (!r) throw new Error("no redis");
+  const count = await r.incr(key);
+  if (count === 1) {
+    await r.expire(key, windowSec);
+  }
+  const ttl = await r.ttl(key);
+  return { count, ttl: ttl > 0 ? ttl : windowSec };
+}
+
+// ─── Config ──────────────────────────────────────────────────────────────────
 
 interface RateLimitConfig {
   windowMs: number;
   max: number;
   message?: string;
-  keyGenerator?: (c: any) => string;
+  keyGenerator?: (c: Context<AppEnv>) => string;
 }
 
 const defaultConfig: RateLimitConfig = {
-  windowMs: 60000, // 1 minute
-  max: 100, // 100 requests per minute
+  windowMs: 60_000,
+  max: 100,
   message: "Quá nhiều yêu cầu. Vui lòng thử lại sau.",
 };
 
 const authConfig: RateLimitConfig = {
-  windowMs: 60000, // 1 minute
-  max: 10, // 10 requests per minute for auth endpoints
+  windowMs: 60_000,
+  max: 10,
   message: "Quá nhiều lần thử. Vui lòng thử lại sau.",
 };
 
-function getClientIp(c: any): string {
+function getClientIp(c: Context<AppEnv>): string {
   const forwarded = c.req.header("X-Forwarded-For");
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
-  }
+  if (forwarded) return forwarded.split(",")[0].trim();
   return c.req.header("X-Real-IP") || "unknown";
 }
 
+// ─── Middleware factory ──────────────────────────────────────────────────────
+
 export const rateLimitMiddleware = (config: RateLimitConfig = defaultConfig) => {
+  const windowSec = Math.ceil(config.windowMs / 1000);
+  const prefix = "rl:";
+
   return createMiddleware<AppEnv>(async (c, next) => {
-    const key = config.keyGenerator ? config.keyGenerator(c) : getClientIp(c);
+    const rawKey = config.keyGenerator ? config.keyGenerator(c) : getClientIp(c);
+    const key = `${prefix}${rawKey}`;
     const now = Date.now();
 
-    let entry = rateLimitStore.get(key);
+    let count: number;
+    let resetTime: number;
 
-    if (!entry || now > entry.resetTime) {
-      entry = {
-        count: 0,
-        resetTime: now + config.windowMs,
-      };
-      rateLimitStore.set(key, entry);
+    try {
+      const result = await redisIncrement(key, windowSec);
+      count = result.count;
+      resetTime = now + result.ttl * 1000;
+    } catch {
+      let entry = memStore.get(key);
+      if (!entry || now > entry.resetTime) {
+        entry = { count: 0, resetTime: now + config.windowMs };
+        memStore.set(key, entry);
+      }
+      entry.count++;
+      count = entry.count;
+      resetTime = entry.resetTime;
     }
 
-    entry.count++;
-
-    // Set rate limit headers
     c.res.headers.set("X-RateLimit-Limit", String(config.max));
-    c.res.headers.set(
-      "X-RateLimit-Remaining",
-      String(Math.max(0, config.max - entry.count))
-    );
-    c.res.headers.set(
-      "X-RateLimit-Reset",
-      String(Math.ceil(entry.resetTime / 1000))
-    );
+    c.res.headers.set("X-RateLimit-Remaining", String(Math.max(0, config.max - count)));
+    c.res.headers.set("X-RateLimit-Reset", String(Math.ceil(resetTime / 1000)));
 
-    if (entry.count > config.max) {
+    if (count > config.max) {
       return c.json(
         {
           success: false,
@@ -84,7 +121,7 @@ export const rateLimitMiddleware = (config: RateLimitConfig = defaultConfig) => 
             message: config.message || "Quá nhiều yêu cầu.",
           },
         },
-        429
+        429,
       );
     }
 
@@ -92,6 +129,5 @@ export const rateLimitMiddleware = (config: RateLimitConfig = defaultConfig) => 
   });
 };
 
-// Pre-configured rate limiters
 export const generalRateLimit = rateLimitMiddleware(defaultConfig);
 export const authRateLimit = rateLimitMiddleware(authConfig);

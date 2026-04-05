@@ -66,6 +66,8 @@ export interface EnvConfig {
   fakeInAppNotifications: boolean;
   /** Khi true: couple chưa có memory nào thì GET /v1/timeline/memories seed 10 demo (dev mặc định). */
   fakeTimelineMemories: boolean;
+  /** 32-byte hex key for AES-256-GCM encryption at rest. Required in production. */
+  dataEncryptionKey?: string;
 }
 
 const googleClientIds = listFromEnv(process.env.GOOGLE_CLIENT_IDS);
@@ -99,7 +101,7 @@ export const env: EnvConfig = {
   minioBucket: process.env.MINIO_BUCKET ?? "emplus",
   minioUseSsl: boolFromEnv(process.env.MINIO_USE_SSL, false),
   minioPublicBaseUrl: process.env.MINIO_PUBLIC_BASE_URL?.trim() || undefined,
-  swaggerEnabled: boolFromEnv(process.env.SWAGGER_ENABLED, true),
+  swaggerEnabled: boolFromEnv(process.env.SWAGGER_ENABLED, nodeEnv !== "production"),
   swaggerPath: process.env.SWAGGER_PATH ?? "/v1/docs",
   allowMockOAuth: isTestEnvironment() && boolFromEnv(process.env.ALLOW_MOCK_OAUTH, false),
   googleClientIds: [...new Set(googleClientIds)],
@@ -122,4 +124,5 @@ export const env: EnvConfig = {
     process.env.FAKE_TIMELINE_MEMORIES,
     nodeEnv === "development",
   ),
+  dataEncryptionKey: process.env.DATA_ENCRYPTION_KEY?.trim() || undefined,
 };

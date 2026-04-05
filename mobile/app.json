@@ -16,7 +16,6 @@
     "ios": {
       "supportsTablet": true,
       "associatedDomains": [
-        "applinks:emplus.app",
         "applinks:emplus.app"
       ],
       "bundleIdentifier": "com.truongdq.emplus",

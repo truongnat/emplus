@@ -5,6 +5,7 @@ import { getDependencyReport } from "../services/dependencies.ts";
 import { success } from "../utils/http.ts";
 import { hienThiTrangThaiPhuThuoc } from "../utils/presentation.ts";
 import { requireAuth } from "../middleware/auth.ts";
+import { isEncryptionEnabled } from "../services/crypto.ts";
 
 export const systemRoutes = new Hono<AppEnv>();
 
@@ -51,6 +52,7 @@ systemRoutes.get("/dependencies", async (context) => {
         smtpConfigured: Boolean(env.smtpHost && env.smtpUser),
         minioConfigured: Boolean(env.minioEndpoint && env.minioAccessKey),
         swaggerEnabled: env.swaggerEnabled,
+        encryptionEnabled: isEncryptionEnabled(),
       },
       dependencies: dependenciesHienThi,
     },

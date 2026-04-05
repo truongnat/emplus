@@ -3,7 +3,7 @@ import type { AppEnv } from "../app-env.ts";
 import { requireAuth } from "../middleware/auth.ts";
 import { getUserProfile, updateUserProfile } from "../services/user.service.ts";
 import { validatePushTokenInput, validateUpdateProfileInput } from "../dto/user.dto.ts";
-import { readJson, success } from "../utils/http.ts";
+import { AppError, readJson, success } from "../utils/http.ts";
 import { store } from "../store.ts";
 
 export const userRoutes = new Hono<AppEnv>();
@@ -16,10 +16,7 @@ userRoutes.get("/me", async (context) => {
   const profile = await getUserProfile(user.id);
 
   if (!profile) {
-    const error = new Error("Không tìm thấy người dùng.") as Error & { status: number; code: string };
-    error.status = 404;
-    error.code = "USER_NOT_FOUND";
-    throw error;
+    throw new AppError(404, "USER_NOT_FOUND", "Không tìm thấy người dùng.");
   }
 
   return success(context, profile);

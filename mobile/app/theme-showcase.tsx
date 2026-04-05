@@ -29,6 +29,11 @@ import { lottieInventory } from "@/src/lottie/inventory";
 import { motionPresets } from "@/src/animations/motion-presets";
 
 export default function ThemeShowcaseScreen() {
+  if (!__DEV__) {
+    const { Redirect } = require("expo-router");
+    return <Redirect href="/" />;
+  }
+
   const router = useRouter();
   const theme = useTheme();
   const colors = useThemeColors();

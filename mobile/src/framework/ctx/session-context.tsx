@@ -117,7 +117,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           storage.auth.getTokens(),
           storage.user.getMetadata(),
         ]);
-        console.log("Session init:", { hasTokens: !!tokens, hasMeta: !!meta });
+        if (__DEV__) console.log("Session init:", { hasTokens: !!tokens, hasMeta: !!meta });
         if (tokens && active) {
           const user = meta?.user || null;
           setSession({ user, tokens });

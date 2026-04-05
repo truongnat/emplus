@@ -21,7 +21,7 @@ import {
 } from "./modules/index.ts";
 import { corsMiddleware } from "./middleware/cors.ts";
 import { securityHeaders } from "./middleware/security.ts";
-import { generalRateLimit } from "./middleware/rate-limit.ts";
+import { generalRateLimit, authRateLimit } from "./middleware/rate-limit.ts";
 import { sanitizeMiddleware } from "./middleware/sanitize.ts";
 import { AppError, fail, success } from "./utils/http.ts";
 
@@ -66,6 +66,9 @@ if (env.swaggerEnabled) {
   }));
 }
 
+// Stricter rate limit on auth endpoints (10 req/min vs 100 general)
+app.use("/v1/auth/*", authRateLimit);
+
 // Route registration
 app.route("/v1/auth", authRoutes);
 app.route("/v1/users", userRoutes);
@@ -93,37 +96,6 @@ app.onError((error, context) => {
   const requestId = context.get("requestId") as string;
   const method = context.req.method;
   const path = context.req.path;
-
-  const legacyError = error as Error & {
-    status?: number;
-    code?: string;
-    details?: unknown[];
-  };
-
-  if (
-    typeof legacyError.status === "number" &&
-    legacyError.status >= 400 &&
-    legacyError.status <= 599 &&
-    typeof legacyError.code === "string"
-  ) {
-    const normalizedError = new AppError(
-      legacyError.status as AppError["status"],
-      legacyError.code,
-      legacyError.message || "Request thất bại.",
-      Array.isArray(legacyError.details) ? legacyError.details : [],
-    );
-    if (normalizedError.status >= 400 && normalizedError.status < 500) {
-      console.warn(
-        `[${requestId}] Warning (${normalizedError.status}): [${method} ${path}] ${normalizedError.code} - ${normalizedError.message}`,
-      );
-    } else {
-      console.error(
-        `[${requestId}] Error (${normalizedError.status}): [${method} ${path}] ${normalizedError.code} - ${normalizedError.message}`,
-        error,
-      );
-    }
-    return fail(context, normalizedError);
-  }
 
   if (error instanceof AppError) {
     if (error.status >= 400 && error.status < 500) {

@@ -43,6 +43,6 @@ export const corsMiddleware = cors({
   },
   allowHeaders: ["Authorization", "Content-Type"],
   allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  exposeHeaders: ["X-Request-Id"],
+  exposeHeaders: ["X-Request-Id", "X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
   credentials: true,
 });

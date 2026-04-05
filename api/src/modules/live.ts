@@ -59,12 +59,12 @@ liveRoutes.get(
       const auth = await authenticateWebSocket(c);
       userId = auth.userId;
       coupleId = auth.coupleId;
-    } catch (error) {
-      // Return a dummy response for unauthenticated connections
+    } catch {
       return {
-        onMessage(event) {
-          console.log("Message from unauthenticated:", event.data);
+        onOpen(_event: unknown, ws: WSContext) {
+          ws.close(4001, "Unauthorized");
         },
+        onMessage() {},
         onClose() {},
         onError() {},
       };
