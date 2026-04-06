@@ -75,7 +75,8 @@
           "mode": "production"
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-camera"
     ],
     "web": {
       "bundler": "metro"

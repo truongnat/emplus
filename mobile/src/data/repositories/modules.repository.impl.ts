@@ -12,6 +12,7 @@ import {
   DashboardRepository,
   CareRepository,
   BudgetRepository,
+  type PairingStatusResponse,
 } from "../../domain/repositories/modules.repository";
 
 export class TimelineRepositoryImpl implements TimelineRepository {
@@ -57,6 +58,13 @@ export class CoupleRepositoryImpl implements CoupleRepository {
     const response = await apiClient.post<
       ApiResponse<CoupleModule.JoinResponse>
     >("/couples/join", params);
+    return response.data;
+  }
+
+  async checkPairingStatus() {
+    const response = await apiClient.get<ApiResponse<PairingStatusResponse>>(
+      "/couples/status",
+    );
     return response.data;
   }
 }

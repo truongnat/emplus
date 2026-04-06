@@ -19,7 +19,6 @@ import { fontSize } from "@/src/theme/tokens";
 import type { SemanticColors } from "@/src/theme/tokens/semantic";
 import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
 import { lottieInventory } from "@/src/lottie/inventory";
-import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
 import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
 import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
 import { homeScreenStyles } from "@/src/features/home/homeScreen.styles";
@@ -278,8 +277,6 @@ export default function NotificationsScreen() {
     >
       <StatusBar style={isDark ? "light" : "dark"} />
       <View style={homeScreenStyles.layerRoot}>
-        <LoginGridAnimatedBackground isDark={isDark} />
-
         <View style={[styles.container, { paddingTop: topPad }]}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>

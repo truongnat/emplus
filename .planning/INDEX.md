@@ -47,6 +47,10 @@ Monorepo **Bun workspaces**: API (Hono), mobile (Expo), công cụ theme (Vite).
 
 Vite + React: công cụ xây / tinh chỉnh theme (Radix, Tailwind, Zustand).
 
+## `.planning/phases/phase-landing-page-seo/` — Landing + blog (SEO)
+
+Astro `web/` workspace (Markdown + Content Collections): foundation đã scaffold; research/plan gốc vẫn có phần Next/Velite là **lịch sử**. Handoff: [phase-landing-page-seo/README.md](phases/phase-landing-page-seo/README.md).
+
 ## Đồng bộ API ↔ Mobile
 
 ```bash

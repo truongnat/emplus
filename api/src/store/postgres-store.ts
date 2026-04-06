@@ -828,7 +828,7 @@ export class PostgresStore implements DataStore {
         SELECT 1
         FROM couples
         WHERE (partner_1_id = ${userId} OR partner_2_id = ${userId})
-          AND status IN ('DATING', 'MARRIED')
+          AND status IN ('DANG_YEU', 'DA_CUOI')
       ) AS found
     `;
 
@@ -841,7 +841,7 @@ export class PostgresStore implements DataStore {
         SELECT 1
         FROM couples
         WHERE id <> ${excludeCoupleId}
-          AND status IN ('DATING', 'MARRIED')
+          AND status IN ('DANG_YEU', 'DA_CUOI')
           AND (partner_1_id = ${inviterId} OR partner_2_id = ${inviterId})
       ) AS found
     `;

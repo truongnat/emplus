@@ -13,6 +13,7 @@ import type {
   DashboardRepository,
   CareRepository,
   BudgetRepository,
+  PairingStatusResponse,
 } from "../../repositories/modules.repository";
 import type { NotificationsRepository } from "../../repositories/notifications.repository";
 import type { NotificationModule } from "../../entities/schemas";
@@ -85,6 +86,18 @@ export class JoinCoupleUseCase extends UseCase<
   }
   execute(params: CoupleModule.JoinRequest) {
     return this.repo.joinCouple(params);
+  }
+}
+
+export class CheckPairingStatusUseCase extends UseCase<
+  void,
+  PairingStatusResponse
+> {
+  constructor(private repo: CoupleRepository) {
+    super();
+  }
+  execute() {
+    return this.repo.checkPairingStatus();
   }
 }
 

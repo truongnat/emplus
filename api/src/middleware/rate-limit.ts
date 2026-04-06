@@ -58,19 +58,26 @@ interface RateLimitConfig {
   windowMs: number;
   max: number;
   message?: string;
+  /** Tách bucket Redis/memory — bắt buộc khác nhau giữa các middleware để không cộng dồn nhầm. */
+  keyNamespace: string;
   keyGenerator?: (c: Context<AppEnv>) => string;
+  /** Bỏ qua giới hạn (ví dụ refresh token: duy trì phiên, không phải brute-force). */
+  shouldSkip?: (c: Context<AppEnv>) => boolean;
 }
 
 const defaultConfig: RateLimitConfig = {
   windowMs: 60_000,
   max: 100,
+  keyNamespace: "global",
   message: "Quá nhiều yêu cầu. Vui lòng thử lại sau.",
 };
 
 const authConfig: RateLimitConfig = {
   windowMs: 60_000,
   max: 10,
+  keyNamespace: "auth",
   message: "Quá nhiều lần thử. Vui lòng thử lại sau.",
+  shouldSkip: (c) => c.req.method === "POST" && c.req.path === "/v1/auth/refresh",
 };
 
 function getClientIp(c: Context<AppEnv>): string {
@@ -81,13 +88,18 @@ function getClientIp(c: Context<AppEnv>): string {
 
 // ─── Middleware factory ──────────────────────────────────────────────────────
 
-export const rateLimitMiddleware = (config: RateLimitConfig = defaultConfig) => {
+export const rateLimitMiddleware = (config: RateLimitConfig) => {
   const windowSec = Math.ceil(config.windowMs / 1000);
   const prefix = "rl:";
 
   return createMiddleware<AppEnv>(async (c, next) => {
+    if (config.shouldSkip?.(c)) {
+      await next();
+      return;
+    }
+
     const rawKey = config.keyGenerator ? config.keyGenerator(c) : getClientIp(c);
-    const key = `${prefix}${rawKey}`;
+    const key = `${prefix}${config.keyNamespace}:${rawKey}`;
     const now = Date.now();
 
     let count: number;

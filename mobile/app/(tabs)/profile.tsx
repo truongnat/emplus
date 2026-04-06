@@ -10,7 +10,6 @@ import { useMutation } from "@tanstack/react-query";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { TOAST_TAB_BAR_OFFSET } from "@/src/components/atoms/Toast";
 import { AppText, PressableScale } from "@/src/ui-kit";
-import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
 import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
 import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
 import { homeScreenStyles } from "@/src/features/home/homeScreen.styles";
@@ -366,7 +365,6 @@ export default function ProfileScreen() {
     >
       <StatusBar style={isDark ? "light" : "dark"} />
       <View style={homeScreenStyles.layerRoot}>
-        <LoginGridAnimatedBackground isDark={isDark} />
         {body}
       </View>
     </AppScreen>

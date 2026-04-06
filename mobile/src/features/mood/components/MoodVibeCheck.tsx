@@ -327,33 +327,55 @@ export function MoodVibeCheck({
       card: {
         backgroundColor: isDark
           ? homeDarkGridCard.backgroundColor
-          : c.surface.default,
-        borderColor: isDark ? homeDarkGridCard.borderColor : c.border.subtle,
-        shadowColor: isDark ? "#0A0809" : c.text.primary,
+          : c.background.subtle,
+        borderColor: isDark ? homeDarkGridCard.borderColor : c.border.default,
+        shadowColor: "#0A0809",
+        ...(isDark
+          ? {}
+          : {
+              shadowOpacity: 0.1,
+              shadowRadius: 22,
+              elevation: 6,
+            }),
       },
       moodStatusLabel: { color: c.text.primary },
       sliderEdgeText: {
-        color: isDark ? c.text.secondary : c.text.tertiary,
+        color: c.text.secondary,
       },
       track: {
         backgroundColor: isDark
           ? "rgba(255,255,255,0.08)"
           : c.surface.sunken,
+        ...(isDark
+          ? {}
+          : {
+              borderWidth: 1,
+              borderColor: c.border.default,
+            }),
       },
       thumbOuter: {
         backgroundColor: isDark
           ? homeDarkGridCard.backgroundColor
           : c.surface.default,
-        borderColor: isDark ? homeDarkGridInset.borderColor : c.border.subtle,
-        shadowColor: isDark ? "#0A0809" : "#000000",
+        borderColor: isDark ? homeDarkGridInset.borderColor : c.border.default,
+        shadowColor: "#0A0809",
+        ...(isDark
+          ? {}
+          : {
+              borderWidth: 0,
+              shadowOpacity: 0.42,
+              shadowRadius: 20,
+              shadowOffset: { width: 0, height: 7 },
+              elevation: 16,
+            }),
       },
-      tagText: { color: c.text.tertiary },
-      iconMuted: c.text.tertiary,
+      tagText: { color: isDark ? c.text.tertiary : c.text.secondary },
+      iconMuted: isDark ? c.text.tertiary : c.text.secondary,
       divider: {
-        backgroundColor: isDark ? homeDarkGridInset.borderColor : c.border.subtle,
+        backgroundColor: isDark ? homeDarkGridInset.borderColor : c.border.default,
       },
       hintText: { color: c.text.secondary },
-      partnerRowTitle: { color: c.text.tertiary },
+      partnerRowTitle: { color: isDark ? c.text.tertiary : c.text.secondary },
       partnerRowValue: { color: c.text.primary },
       partnerRowScore: { color: c.text.secondary },
       partnerRowPending: { color: c.text.secondary },
@@ -493,6 +515,9 @@ export function MoodVibeCheck({
             </View>
 
             <Reanimated.View style={[styles.thumbContainer, thumbStyle]}>
+              {!isDark ? (
+                <View style={styles.thumbLightOuterRing} pointerEvents="none" />
+              ) : null}
               <View style={[styles.thumbOuter, vibeTheme.thumbOuter]}>
                 <View style={[styles.thumbInner, { backgroundColor: moodConfig.color }]} />
               </View>
@@ -662,6 +687,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     zIndex: 30,
+  },
+  /** Light mode: viền tròn đậm phía sau thumb trắng để luôn tách khỏi nền / track. */
+  thumbLightOuterRing: {
+    position: "absolute",
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    top: 1,
+    left: 1,
+    borderWidth: 2.5,
+    borderColor: "#52525B",
+    backgroundColor: "rgba(255,255,255,0.92)",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.22,
+    shadowRadius: 6,
+    elevation: 6,
   },
   thumbOuter: {
     width: 48,

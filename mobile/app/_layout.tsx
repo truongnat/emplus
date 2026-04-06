@@ -130,7 +130,12 @@ function RootLayoutInner() {
               }}
             >
               <Stack.Screen name="index" />
-              <Stack.Screen name="(tabs)" />
+              <Stack.Screen
+                name="(tabs)"
+                options={{
+                  contentStyle: { backgroundColor: "transparent" },
+                }}
+              />
               <Stack.Screen
                 name="login"
                 options={{

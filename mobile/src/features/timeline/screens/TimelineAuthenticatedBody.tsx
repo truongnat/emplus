@@ -8,7 +8,6 @@ import { AppText } from "@/src/ui-kit";
 import { useThemeColors, useThemeMode } from "@/src/theme";
 import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
 import { lottieInventory } from "@/src/lottie/inventory";
-import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
 import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
 import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
 import { homeScreenStyles } from "@/src/features/home/homeScreen.styles";
@@ -84,8 +83,6 @@ export function TimelineAuthenticatedBody() {
     >
       <StatusBar style={isDark ? "light" : "dark"} />
       <View style={homeScreenStyles.layerRoot}>
-        <LoginGridAnimatedBackground isDark={isDark} />
-
         <View style={[styles.container, { paddingTop: topPad, flex: 1 }]}>
           <TimelineHeader
             activeFilter={activeFilter}

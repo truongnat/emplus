@@ -5,7 +5,8 @@
   "workspaces": [
     "mobile",
     "api",
-    "design-builder"
+    "design-builder",
+    "web"
   ],
   "scripts": {
     "dev": "bash ./scripts/dev.sh",
@@ -14,7 +15,9 @@
     "dev:all": "bash ./api/scripts/dev-all.sh",
     "dev:mobile": "bun run --cwd mobile dev",
     "dev:builder": "bun run --cwd design-builder dev",
+    "dev:web": "bun run --cwd web dev",
     "build:builder": "bun run --cwd design-builder build",
+    "build:web": "bun run --cwd web build",
     "start:api": "bun run --cwd api start",
     "test:api": "bun run --cwd api test",
     "typecheck:api": "bun run --cwd api typecheck",
@@ -24,6 +27,7 @@
     "db:down": "docker compose -f docker-compose.yml down",
     "typecheck:mobile": "bun run --cwd mobile typecheck",
     "typecheck:builder": "bun run --cwd design-builder typecheck",
+    "typecheck:web": "bun run --cwd web check",
     "logging:up": "docker compose -f api/docker-compose.logging.yml up -d",
     "logging:down": "docker compose -f api/docker-compose.logging.yml down",
     "ports": "bash ./scripts/ports.sh",

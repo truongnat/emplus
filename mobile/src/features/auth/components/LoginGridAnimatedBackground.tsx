@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { StyleSheet, Dimensions, View } from "react-native";
+import { StyleSheet, View, useWindowDimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Defs, Pattern, Path, Rect } from "react-native-svg";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, {
@@ -14,11 +15,10 @@ import Animated, {
 import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
 import { auraPalette } from "@/src/theme/aura-colors";
 
-const { width: W0, height: H0 } = Dimensions.get("window");
 const G = 26;
 
-/** Top gradient stop — sync StatusBar / system root background on login */
-export const LOGIN_GRID_TOP_LIGHT = "#fff5f7";
+/** Top gradient stop — sync StatusBar / system root background on login (đủ tint để không “trắng xoá”) */
+export const LOGIN_GRID_TOP_LIGHT = "#ffeef3";
 /** Khớp Aura darkBg — tránh nền xanh-lạnh lệch với theme */
 export const LOGIN_GRID_TOP_DARK = auraPalette.darkBg;
 
@@ -26,6 +26,12 @@ export const LOGIN_GRID_TOP_DARK = auraPalette.darkBg;
  * Nền toàn màn: lưới + wash gradient chuyển động nhẹ (transition).
  */
 export function LoginGridAnimatedBackground({ isDark }: { isDark: boolean }) {
+  const { width: winW, height: winH } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  /** Full physical bleed: tránh “lề” trái/phải/dưới khi scene nằm trong safe area + phủ vùng tab bar. */
+  const bleedW = winW + insets.left + insets.right;
+  const bleedH = winH + insets.top + insets.bottom;
+
   const reduced = useReducedMotion();
   const drift = useSharedValue(0);
   const wash = useSharedValue(0);
@@ -59,23 +65,44 @@ export function LoginGridAnimatedBackground({ isDark }: { isDark: boolean }) {
     };
   });
 
-  const washAStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(wash.value, [0, 1], [0.55, 0.2]),
-  }));
+  const washAStyle = useAnimatedStyle(() => {
+    const peak = isDark ? 0.55 : 0.42;
+    const trough = isDark ? 0.2 : 0.12;
+    return {
+      opacity: interpolate(wash.value, [0, 1], [peak, trough]),
+    };
+  }, [isDark]);
 
-  const washBStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(wash.value, [0, 1], [0.18, 0.42]),
-  }));
+  const washBStyle = useAnimatedStyle(() => {
+    const peak = isDark ? 0.42 : 0.34;
+    const trough = isDark ? 0.18 : 0.14;
+    return {
+      opacity: interpolate(wash.value, [0, 1], [trough, peak]),
+    };
+  }, [isDark]);
 
-  const pad = G * 3;
-  const W = W0 + pad * 2;
-  const H = H0 + pad * 2;
+  const pad = G * 4;
+  const W = bleedW + pad * 2;
+  const H = bleedH + pad * 2;
   const stroke = isDark
     ? "rgba(244,240,230,0.055)"
-    : "rgba(123,97,255,0.14)";
+    : "rgba(91,71,199,0.26)";
+  /** Light: nét dày hơn hairline — lưới mới đọc được trên nền sáng. */
+  const gridStrokeWidth = isDark
+    ? StyleSheet.hairlineWidth * 2
+    : Math.max(1, StyleSheet.hairlineWidth * 3);
 
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="none">
+    <View
+      pointerEvents="none"
+      style={{
+        position: "absolute",
+        top: -insets.top,
+        left: -insets.left,
+        width: bleedW,
+        height: bleedH,
+      }}
+    >
       <LinearGradient
         colors={
           isDark
@@ -84,7 +111,11 @@ export function LoginGridAnimatedBackground({ isDark }: { isDark: boolean }) {
                 auraPalette.darkSurf,
                 auraPalette.taupe900,
               ]
-            : [LOGIN_GRID_TOP_LIGHT, "#f8f5ff", "#f0fdf9"]
+            : [
+                LOGIN_GRID_TOP_LIGHT,
+                "#ede4ff",
+                "#dff7f2",
+              ]
         }
         locations={[0, 0.5, 1]}
         style={StyleSheet.absoluteFill}
@@ -111,7 +142,7 @@ export function LoginGridAnimatedBackground({ isDark }: { isDark: boolean }) {
               <Path
                 d={`M ${G} 0 L 0 0 0 ${G}`}
                 stroke={stroke}
-                strokeWidth={StyleSheet.hairlineWidth * 2}
+                strokeWidth={gridStrokeWidth}
                 fill="none"
               />
             </Pattern>
@@ -128,7 +159,7 @@ export function LoginGridAnimatedBackground({ isDark }: { isDark: boolean }) {
           colors={
             isDark
               ? ["rgba(255,107,129,0.16)", "transparent", "transparent"]
-              : ["rgba(255,107,129,0.22)", "transparent", "transparent"]
+              : ["rgba(255,107,129,0.28)", "transparent", "transparent"]
           }
           locations={[0, 0.45, 1]}
           style={StyleSheet.absoluteFill}
@@ -148,7 +179,11 @@ export function LoginGridAnimatedBackground({ isDark }: { isDark: boolean }) {
                   "rgba(168,85,247,0.10)",
                   "rgba(45,212,191,0.07)",
                 ]
-              : ["transparent", "rgba(142,124,255,0.15)", "rgba(79,209,197,0.12)"]
+              : [
+                  "transparent",
+                  "rgba(123,97,255,0.22)",
+                  "rgba(45,212,191,0.18)",
+                ]
           }
           locations={[0, 0.4, 1]}
           style={StyleSheet.absoluteFill}

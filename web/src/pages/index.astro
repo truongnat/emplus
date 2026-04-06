@@ -1,0 +1,15 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { siteDescription, siteName } from '@/lib/site';
+import HeroSection from '@/components/HeroSection.astro';
+import FeatureSection from '@/components/FeatureSection.astro';
+import TestimonialSection from '@/components/TestimonialSection.astro';
+import DownloadCTA from '@/components/DownloadCTA.astro';
+---
+
+<Layout title={siteName} description={siteDescription}>
+  <HeroSection />
+  <FeatureSection />
+  <TestimonialSection />
+  <DownloadCTA />
+</Layout>

@@ -1,0 +1,69 @@
+---
+interface Testimonial {
+  quote: string;
+  author: string;
+  role: string;
+  rating: number;
+}
+
+const testimonials: Testimonial[] = [
+  {
+    quote: 'Em+ giúp chúng mình gần nhau hơn dù ở xa. Tính năng đồng thời gian là thứ chúng mình yêu thích nhất!',
+    author: 'Minh & Linh',
+    role: 'Cặp đôi 2 năm',
+    rating: 5,
+  },
+  {
+    quote: 'Quản lý chi tiêu chung chưa bao giờ dễ dàng như vậy. Không còn cải nhau vì tiền nữa!',
+    author: 'Đức & Trang',
+    role: 'Cặp đôi 3 năm',
+    rating: 5,
+  },
+  {
+    quote: 'Giao diện đẹp, mượt mà. Mỗi ngày đều muốn mở app lên để xem tâm trạng của người yêu.',
+    author: 'Huy & Nhi',
+    role: 'Cặp đôi 1 năm',
+    rating: 5,
+  },
+];
+---
+
+<section class="py-20 md:py-28 bg-muted/30">
+  <div class="container">
+    <!-- Section header -->
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
+        Được các cặp đôi
+        <span class="text-primary">tin tưởng</span>
+      </h2>
+      <p class="mt-4 text-lg text-muted-foreground">
+        Những chia sẻ từ các cặp đôi đang sử dụng Em+
+      </p>
+    </div>
+
+    <!-- Testimonials grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+      {testimonials.map((testimonial) => (
+        <div class="rounded-xl border border-border/40 bg-card/40 backdrop-blur-sm p-6">
+          <!-- Stars -->
+          <div class="flex gap-1 mb-4">
+            {Array.from({ length: testimonial.rating }).map(() => (
+              <span class="text-yellow-400">★</span>
+            ))}
+          </div>
+
+          <!-- Quote -->
+          <blockquote class="text-sm text-foreground leading-relaxed mb-4">
+            "{testimonial.quote}"
+          </blockquote>
+
+          <!-- Author -->
+          <div>
+            <p class="font-semibold text-sm">{testimonial.author}</p>
+            <p class="text-xs text-muted-foreground">{testimonial.role}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

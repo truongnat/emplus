@@ -1,14 +1,20 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useCallback } from "react";
 import { StatusBar } from "expo-status-bar";
 import { View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppScreen } from "@/src/components/organisms/AppScreen";
+import { useSession } from "@/src/framework/ctx/session-context";
+import { RegisterTopBar } from "@/src/features/auth/components/RegisterTopBar";
 import { useThemeColors, useThemeMode } from "@/src/theme";
 import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
 import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
-import { authGridScrollPaddingTopPairing } from "@/src/features/auth/authScreenLayout";
+import {
+  AUTH_GRID_TOP_BAR_OFFSET,
+  authGridScrollPaddingTop,
+} from "@/src/features/auth/authScreenLayout";
 import { loginScreenStyles as styles } from "@/src/features/auth/loginScreen.styles";
 
 type PairingGridShellProps = {
@@ -21,13 +27,22 @@ type PairingGridShellProps = {
  */
 export function PairingGridShell({ children }: PairingGridShellProps) {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { clearSession } = useSession();
   const { isDark } = useThemeMode();
   const colors = useThemeColors();
 
   useAuthGridChrome(isDark, colors.background.default, true);
 
-  const paddingTop = authGridScrollPaddingTopPairing(insets.top);
+  const paddingTop = authGridScrollPaddingTop(insets.top);
   const paddingBottom = Math.max(insets.bottom, 12) + 16;
+
+  const handleBackToLogin = useCallback(() => {
+    void (async () => {
+      await clearSession();
+      router.replace("/login");
+    })();
+  }, [clearSession, router]);
 
   return (
     <AppScreen
@@ -42,6 +57,15 @@ export function PairingGridShell({ children }: PairingGridShellProps) {
       <StatusBar style={isDark ? "light" : "dark"} />
       <View style={styles.layerRoot}>
         <LoginGridAnimatedBackground isDark={isDark} />
+
+        <RegisterTopBar
+          top={insets.top + AUTH_GRID_TOP_BAR_OFFSET}
+          left={insets.left + 12}
+          right={insets.right + 12}
+          showBrand={false}
+          onBackPress={handleBackToLogin}
+          accessibilityLabel="Về màn hình đăng nhập"
+        />
 
         <KeyboardAwareScrollView
           style={styles.scrollView}

@@ -18,11 +18,18 @@ export interface TimelineRepository {
   deleteMemory(id: string): Promise<TimelineModule.DeleteResponse>;
 }
 
+export interface PairingStatusResponse {
+  paired: boolean;
+  coupleId?: string;
+  partner?: { id: string; fullName: string; gender: string };
+}
+
 export interface CoupleRepository {
   generateInvite(): Promise<CoupleModule.GenerateInviteResponse>;
   joinCouple(
     params: CoupleModule.JoinRequest,
   ): Promise<CoupleModule.JoinResponse>;
+  checkPairingStatus(): Promise<PairingStatusResponse>;
 }
 
 export interface DashboardRepository {

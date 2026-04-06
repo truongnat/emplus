@@ -20,7 +20,6 @@ import {
 import { useThemeColors, useThemeMode } from "@/src/theme";
 import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
 import { lottieInventory } from "@/src/lottie/inventory";
-import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
 import { LoginBrandGradientTitle } from "@/src/features/auth/components/LoginBrandGradientTitle";
 import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
 import {
@@ -83,7 +82,6 @@ export default function HomeScreen() {
     >
       <StatusBar style={isDark ? "light" : "dark"} />
       <View style={styles.layerRoot}>
-        <LoginGridAnimatedBackground isDark={isDark} />
         <View
           style={[
             styles.brandTopLeft,

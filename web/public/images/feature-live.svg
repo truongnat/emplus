@@ -1,0 +1,16 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#grad5)"/>
+  <circle cx="200" cy="150" r="50" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  <circle cx="200" cy="150" r="35" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <circle cx="200" cy="150" r="20" fill="rgba(255,255,255,0.3)"/>
+  <circle cx="200" cy="150" r="12" fill="rgba(255,255,255,0.5)"/>
+  <path d="M 200 150 L 200 100" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+  <path d="M 200 150 L 250 150" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+  <text x="200" y="280" text-anchor="middle" font-size="16" fill="rgba(255,255,255,0.5)" font-weight="bold">Live Sync</text>
+</svg>

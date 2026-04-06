@@ -10,6 +10,7 @@ import {
 import { useSession } from "@/src/session-context";
 import { LiveChannelProvider } from "@/src/features/live";
 import { useThemeColors, useThemeMeta, useBlurTint } from "@/src/theme";
+import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
 import { elevation } from "@/src/theme/elevation";
 import { radius, borderWidth } from "@/src/theme/tokens";
 import { BlurView } from "expo-blur";
@@ -328,6 +329,7 @@ export default function TabsLayout() {
     throw e;
   }
   const { hydrated, isAuthenticated, session } = sessionValue;
+  const { isDark } = useThemeMeta();
 
   if (!hydrated) return null;
   if (!isAuthenticated || !session?.user.coupleId)
@@ -335,21 +337,32 @@ export default function TabsLayout() {
 
   return (
     <LiveChannelProvider>
-      <Tabs
-        tabBar={(props) => <CustomTabBar {...props} />}
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Tabs.Screen name="home" options={{ title: "Trang chủ" }} />
-        <Tabs.Screen name="timeline" options={{ title: "Kế hoạch" }} />
-        <Tabs.Screen name="care" options={{ title: "Cảm xúc" }} />
-        <Tabs.Screen name="profile" options={{ title: "Tài khoản" }} />
-        <Tabs.Screen
-          name="notifications"
-          options={{ title: "Thông báo", href: null }}
-        />
-      </Tabs>
+      <View style={{ flex: 1, overflow: "visible" }}>
+        <View
+          pointerEvents="none"
+          style={[StyleSheet.absoluteFillObject, { zIndex: 0 }]}
+        >
+          <LoginGridAnimatedBackground isDark={isDark} />
+        </View>
+        <View style={{ flex: 1, zIndex: 1 }}>
+          <Tabs
+            tabBar={(props) => <CustomTabBar {...props} />}
+            screenOptions={{
+              headerShown: false,
+              sceneStyle: { backgroundColor: "transparent" },
+            }}
+          >
+            <Tabs.Screen name="home" options={{ title: "Trang chủ" }} />
+            <Tabs.Screen name="timeline" options={{ title: "Kế hoạch" }} />
+            <Tabs.Screen name="care" options={{ title: "Cảm xúc" }} />
+            <Tabs.Screen name="profile" options={{ title: "Tài khoản" }} />
+            <Tabs.Screen
+              name="notifications"
+              options={{ title: "Thông báo", href: null }}
+            />
+          </Tabs>
+        </View>
+      </View>
     </LiveChannelProvider>
   );
 }

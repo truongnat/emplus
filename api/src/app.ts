@@ -66,7 +66,7 @@ if (env.swaggerEnabled) {
   }));
 }
 
-// Stricter rate limit on auth endpoints (10 req/min vs 100 general)
+// Stricter rate limit on auth endpoints (10 req/min / IP, bucket riêng); POST /refresh bỏ qua (shouldSkip trong middleware)
 app.use("/v1/auth/*", authRateLimit);
 
 // Route registration

@@ -23,7 +23,6 @@ import { MOOD_BAND_LABEL_VI, moodBandFromValue } from "@/src/features/mood";
 import { useSession } from "@/src/session-context";
 import { palette } from "@/src/theme/tokens";
 import { useThemeColors, useThemeMode } from "@/src/theme";
-import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
 import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
 import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
 import { homeScreenStyles } from "@/src/features/home/homeScreen.styles";
@@ -488,7 +487,6 @@ export default function CareScreen() {
     >
       <StatusBar style={isDark ? "light" : "dark"} />
       <View style={homeScreenStyles.layerRoot}>
-        <LoginGridAnimatedBackground isDark={isDark} />
         {body}
       </View>
     </AppScreen>

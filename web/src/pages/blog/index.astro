@@ -1,0 +1,48 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '@/layouts/Layout.astro';
+
+const posts = (await getCollection('blog', ({ data }) => data.published)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+<Layout title="Blog" description="Bài viết, mẹo và cập nhật từ Em+.">
+  <div class="mx-auto max-w-3xl space-y-8">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight">Blog</h1>
+      <p class="mt-2 text-muted-foreground">
+        Nội dung Markdown trong <code class="rounded bg-muted px-1 py-0.5 text-sm"
+          >src/content/blog/</code
+        >.
+      </p>
+    </div>
+    <ul class="space-y-4">
+      {
+        posts.map((post) => (
+          <li>
+            <a
+              href={`/blog/${post.id}/`}
+              class="block rounded-xl border border-border bg-card p-5 transition hover:border-primary/40 hover:shadow-md"
+            >
+              <p class="text-xs text-muted-foreground">
+                {post.data.date.toLocaleDateString('vi-VN', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}{' '}
+                · {post.data.category}
+              </p>
+              <h2 class="mt-1 text-xl font-semibold text-card-foreground">
+                {post.data.title}
+              </h2>
+              <p class="mt-2 text-sm text-muted-foreground">
+                {post.data.description}
+              </p>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Layout>

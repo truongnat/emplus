@@ -11,9 +11,21 @@ export type RegisterTopBarProps = {
   top: number;
   left: number;
   right: number;
+  /** Thay cho `router.back()` (vd. pairing → đăng xuất và về login). */
+  onBackPress?: () => void;
+  /** Mặc định true — register/forgot; pairing chỉ cần nút back. */
+  showBrand?: boolean;
+  accessibilityLabel?: string;
 };
 
-export function RegisterTopBar({ top, left, right }: RegisterTopBarProps) {
+export function RegisterTopBar({
+  top,
+  left,
+  right,
+  onBackPress,
+  showBrand = true,
+  accessibilityLabel = "Quay lại",
+}: RegisterTopBarProps) {
   const router = useRouter();
   const { isDark } = useThemeMode();
   const colors = useThemeColors();
@@ -38,13 +50,13 @@ export function RegisterTopBar({ top, left, right }: RegisterTopBarProps) {
       pointerEvents="box-none"
     >
       <TouchableOpacity
-        onPress={() => router.back()}
+        onPress={() => (onBackPress ? onBackPress() : router.back())}
         style={[
           regStyles.backButton,
           backSurface,
         ]}
         accessibilityRole="button"
-        accessibilityLabel="Quay lại"
+        accessibilityLabel={accessibilityLabel}
         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
         <Ionicons
@@ -53,9 +65,11 @@ export function RegisterTopBar({ top, left, right }: RegisterTopBarProps) {
           color={colors.text.primary}
         />
       </TouchableOpacity>
-      <View style={regStyles.brandBesideBack} pointerEvents="none">
-        <LoginBrandGradientTitle />
-      </View>
+      {showBrand ? (
+        <View style={regStyles.brandBesideBack} pointerEvents="none">
+          <LoginBrandGradientTitle />
+        </View>
+      ) : null}
     </View>
   );
 }

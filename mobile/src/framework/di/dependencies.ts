@@ -21,6 +21,7 @@ import {
 import {
   GenerateInviteUseCase,
   JoinCoupleUseCase,
+  CheckPairingStatusUseCase,
   GetDashboardUseCase,
   GetMemoriesUseCase,
   CreateMemoryUseCase,
@@ -67,6 +68,7 @@ export const dependencies = {
   couple: {
     generateInvite: new GenerateInviteUseCase(coupleRepo),
     join: new JoinCoupleUseCase(coupleRepo),
+    checkPairingStatus: new CheckPairingStatusUseCase(coupleRepo),
     getDashboard: new GetDashboardUseCase(dashboardRepo),
   },
   timeline: {

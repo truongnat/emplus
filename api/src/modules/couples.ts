@@ -4,6 +4,8 @@ import { requireAuth } from "../middleware/auth.ts";
 import { generateInvite, joinCouple } from "../services/couple.service.ts";
 import { validateJoinCoupleInput } from "../dto/couples.dto.ts";
 import { readJson, success } from "../utils/http.ts";
+import { store } from "../store.ts";
+import { hienThiGioiTinh } from "../utils/presentation.ts";
 
 export const couplesRoutes = new Hono<AppEnv>();
 
@@ -22,6 +24,26 @@ couplesRoutes.post("/generate-invite", async (context) => {
     },
     201,
   );
+});
+
+couplesRoutes.get("/status", async (context) => {
+  const user = context.get("user");
+  const couple = await store.getActiveCoupleForUser(user.id);
+
+  if (!couple || !couple.partner2Id) {
+    return success(context, { paired: false });
+  }
+
+  const partnerId = couple.partner1Id === user.id ? couple.partner2Id : couple.partner1Id;
+  const partner = await store.getUserById(partnerId);
+
+  return success(context, {
+    paired: true,
+    coupleId: couple.id,
+    partner: partner
+      ? { id: partner.id, fullName: partner.fullName, gender: hienThiGioiTinh(partner.gender) }
+      : undefined,
+  });
 });
 
 couplesRoutes.post("/join", async (context) => {

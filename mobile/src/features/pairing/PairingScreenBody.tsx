@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { useMutation } from "@tanstack/react-query";
 import {
   Image,
@@ -35,9 +35,14 @@ import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
 import { usePressAnimation } from "@/src/animations/presets";
 import { lottieInventory } from "@/src/lottie/inventory";
 import { PairingGradientTitle } from "./PairingGradientTitle";
+import { QRScannerSheet } from "./QRScannerSheet";
 import { pairingScreenStyles as styles } from "./pairingScreen.styles";
 
 const QR_SIZE = 160;
+
+/** QR must stay dark-on-light for scanners; never tie module color to theme text. */
+const QR_MODULE_COLOR = "#000000";
+const QR_LOGO_BADGE_BG = "#FFFFFF";
 
 const QR_HEART_IMAGE = require("../../../assets/images/qr-heart.png");
 
@@ -54,7 +59,9 @@ export function PairingScreenBody() {
   const [joinCode, setJoinCode] = useState("");
   const [timeLeft, setTimeLeft] = useState(120);
   const [isCopied, setIsCopied] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const feedbackScale = useRef(new Animated.Value(1)).current;
 
   const placeholderColor = colors.text.secondary;
@@ -128,6 +135,36 @@ export function PairingScreenBody() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot mount: invite + timer
   }, []);
 
+  useEffect(() => {
+    pollRef.current = setInterval(async () => {
+      try {
+        const status = await dependencies.couple.checkPairingStatus.execute();
+        if (status.paired && status.coupleId) {
+          if (session) {
+            setSession({
+              ...session,
+              user: { ...session.user, coupleId: status.coupleId },
+            });
+          }
+          router.replace("/(tabs)/home");
+        }
+      } catch {
+        /* ignore poll errors */
+      }
+    }, 3000);
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [session, setSession, router]);
+
+  const handleScanned = useCallback(
+    (code: string) => {
+      setScannerOpen(false);
+      if (code) joinMutation.mutate(code);
+    },
+    [joinMutation],
+  );
+
   const handleCopy = async () => {
     if (!inviteCode) return;
     await Clipboard.setStringAsync(inviteCode);
@@ -200,7 +237,8 @@ export function PairingScreenBody() {
                   <QRCodeStyled
                     data={inviteCode}
                     size={QR_SIZE}
-                    color={colors.text.primary}
+                    color={QR_MODULE_COLOR}
+                    errorCorrectionLevel="H"
                     pieceBorderRadius={4}
                     isPiecesGlued
                     outerEyesOptions={{
@@ -209,13 +247,13 @@ export function PairingScreenBody() {
                     }}
                     innerEyesOptions={{
                       borderRadius: 6,
-                      color: colors.text.primary,
+                      color: QR_MODULE_COLOR,
                     }}
                   />
                 <View
                   style={[
                     styles.logoOverlay,
-                    { backgroundColor: colors.surface.default },
+                    { backgroundColor: QR_LOGO_BADGE_BG },
                   ]}
                 >
                   <Image
@@ -251,27 +289,67 @@ export function PairingScreenBody() {
             </Text>
           </View>
 
-          <TouchableOpacity
-            onPress={handleCopy}
-            activeOpacity={0.7}
-            style={[styles.copyButton, { backgroundColor: copyBg }]}
-          >
-            <Animated.View
-              style={[
-                styles.buttonInner,
-                { transform: [{ scale: feedbackScale }] },
-              ]}
+          <View style={styles.toolbarRow}>
+            <TouchableOpacity
+              onPress={handleCopy}
+              activeOpacity={0.7}
+              style={[styles.toolbarBtn, { backgroundColor: copyBg }]}
+              accessibilityRole="button"
+              accessibilityLabel={
+                isCopied ? "Đã sao chép mã" : "Sao chép mã mời"
+              }
             >
-              <Ionicons
-                name={isCopied ? "checkmark-circle" : "copy-outline"}
-                size={20}
-                color={copyIconColor}
-              />
-              <Text style={[styles.copyText, { color: copyLabelColor }]}>
-                {isCopied ? "Đã sao chép!" : "Sao chép mã QR"}
-              </Text>
-            </Animated.View>
-          </TouchableOpacity>
+              <Animated.View
+                style={[
+                  styles.toolbarInner,
+                  { transform: [{ scale: feedbackScale }] },
+                ]}
+              >
+                <Ionicons
+                  name={isCopied ? "checkmark-circle" : "copy-outline"}
+                  size={18}
+                  color={copyIconColor}
+                />
+                <Text
+                  style={[styles.toolbarLabel, { color: copyLabelColor }]}
+                  numberOfLines={1}
+                >
+                  {isCopied ? "Đã chép" : "Sao chép"}
+                </Text>
+              </Animated.View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setScannerOpen(true)}
+              activeOpacity={0.7}
+              style={[
+                styles.toolbarBtn,
+                styles.toolbarBtnOutline,
+                {
+                  borderColor: colors.brand.default,
+                  backgroundColor: isDark
+                    ? "rgba(255,255,255,0.06)"
+                    : "rgba(0,0,0,0.03)",
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel="Quét mã QR để nhận lời mời"
+            >
+              <View style={styles.toolbarInner}>
+                <Ionicons
+                  name="scan-outline"
+                  size={18}
+                  color={colors.brand.default}
+                />
+                <Text
+                  style={[styles.toolbarLabel, { color: colors.brand.default }]}
+                  numberOfLines={1}
+                >
+                  Quét mã
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
         </GlassCard>
       </View>
@@ -282,7 +360,7 @@ export function PairingScreenBody() {
             style={[styles.dividerLine, { backgroundColor: colors.border.default }]}
           />
           <Text style={[styles.dividerText, { color: colors.text.tertiary }]}>
-            HOẶC
+            hoặc
           </Text>
           <View
             style={[styles.dividerLine, { backgroundColor: colors.border.default }]}
@@ -291,7 +369,7 @@ export function PairingScreenBody() {
 
         <View style={styles.inputSection}>
           <Text style={[styles.inputLabel, { color: colors.text.secondary }]}>
-            Nhập mã từ người ấy để kết nối
+            Mã invite của đối phương — đủ 6 ký tự sẽ tự kết nối
           </Text>
 
           <Input
@@ -334,7 +412,7 @@ export function PairingScreenBody() {
             ctaDisabled ? styles.ctaDisabled : null,
           ]}
           accessibilityRole="button"
-          accessibilityLabel="Kết nối ngay"
+          accessibilityLabel="Kết nối bằng mã đã nhập"
         >
           <AnimatedRe.View style={[styles.ctaClip, ctaPress.animatedStyle]}>
             <LinearGradient
@@ -356,7 +434,7 @@ export function PairingScreenBody() {
                     gap: 8,
                   }}
                 >
-                  <Text style={styles.ctaLabel}>Kết nối ngay</Text>
+                  <Text style={styles.ctaLabel}>Kết nối</Text>
                   <Ionicons name="heart" size={20} color="#FFFFFF" />
                 </View>
               )}
@@ -365,6 +443,12 @@ export function PairingScreenBody() {
         </Pressable>
         </View>
       </View>
+
+      <QRScannerSheet
+        visible={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        onScanned={handleScanned}
+      />
     </View>
   );
 }
