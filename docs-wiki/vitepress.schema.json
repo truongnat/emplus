@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "docs-wiki VitePress Frontmatter",
+  "description": "Schema for the custom docsWiki frontmatter emitted by docs-wiki markdown pages.",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "layout": {
+      "type": "string",
+      "enum": [
+        "doc",
+        "page",
+        "home"
+      ]
+    },
+    "sidebar": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "object"
+        }
+      ]
+    },
+    "aside": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "outline": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string",
+          "enum": [
+            "deep"
+          ]
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      ]
+    },
+    "editLink": {
+      "type": "boolean"
+    },
+    "lastUpdated": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "pageClass": {
+      "type": "string"
+    },
+    "hero": {
+      "type": "object"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "docsWiki": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "kind",
+        "project",
+        "template",
+        "generatedAt"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "summary",
+            "overview",
+            "feature-index",
+            "feature",
+            "design-index",
+            "design",
+            "reference-index",
+            "reference-redirect",
+            "module-index",
+            "workspace-index",
+            "module",
+            "workspace",
+            "file"
+          ]
+        },
+        "project": {
+          "type": "string"
+        },
+        "template": {
+          "type": "string"
+        },
+        "themePreset": {
+          "type": "string"
+        },
+        "generatedAt": {
+          "type": "string"
+        },
+        "page": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        },
+        "rootDir": {
+          "type": "string"
+        },
+        "directory": {
+          "type": "string"
+        },
+        "featureId": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "packageFile": {
+          "type": "string"
+        },
+        "relativePath": {
+          "type": "string"
+        },
+        "absolutePath": {
+          "type": "string"
+        },
+        "module": {
+          "type": "string"
+        },
+        "workspace": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "fileCount": {
+          "type": "number"
+        },
+        "moduleCount": {
+          "type": "number"
+        },
+        "workspaceCount": {
+          "type": "number"
+        },
+        "featureCount": {
+          "type": "number"
+        },
+        "symbolCount": {
+          "type": "number"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

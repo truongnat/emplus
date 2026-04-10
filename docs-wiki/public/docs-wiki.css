@@ -1,0 +1,149 @@
+:root {
+  --vp-c-brand-1: #0f766e;
+  --vp-c-brand-2: #0a6a63;
+  --vp-c-brand-3: #0b4f4a;
+  --vp-c-brand-soft: rgba(15, 118, 110, 0.14);
+  --docs-wiki-panel: rgba(15, 118, 110, 0.08);
+  --docs-wiki-panel-strong: rgba(15, 118, 110, 0.14);
+  --docs-wiki-accent: #c2410c;
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #0f766e 20%, #14b8a6 55%, #f97316 100%);
+}
+
+.dark {
+  --vp-c-brand-1: #38b2ac;
+  --vp-c-brand-2: #2c9892;
+  --vp-c-brand-3: #217a75;
+  --vp-c-brand-soft: rgba(56, 178, 172, 0.18);
+  --docs-wiki-panel: rgba(56, 178, 172, 0.14);
+  --docs-wiki-panel-strong: rgba(56, 178, 172, 0.2);
+  --docs-wiki-accent: #fb923c;
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #5eead4 15%, #38bdf8 60%, #fb923c 100%);
+}
+
+.docs-wiki--overview .VPHome {
+  padding-bottom: 2rem;
+}
+
+.docs-wiki--overview .VPHero {
+  padding-top: 2rem;
+}
+
+.docs-wiki--overview .VPFeature {
+  border: 1px solid var(--docs-wiki-panel-strong);
+  background: linear-gradient(180deg, var(--docs-wiki-panel), transparent);
+  box-shadow: 0 18px 40px -28px var(--vp-c-brand-soft);
+}
+
+.docs-wiki--overview .VPFeature:hover {
+  border-color: var(--vp-c-brand-1);
+}
+
+.docs-wiki .vp-doc {
+  line-height: 1.72;
+}
+
+.docs-wiki .vp-doc h2 {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.docs-wiki .vp-doc h2:first-of-type {
+  margin-top: 1.25rem;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.docs-wiki .vp-doc h3 {
+  color: var(--vp-c-text-1);
+  letter-spacing: -0.01em;
+}
+
+.docs-wiki .vp-doc ul > li::marker {
+  color: var(--vp-c-brand-1);
+}
+
+.docs-wiki .vp-doc blockquote {
+  margin: 20px 0;
+  border-left: 4px solid var(--vp-c-brand-1);
+  background: var(--docs-wiki-panel);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.docs-wiki .vp-doc table tr:hover {
+  background: var(--docs-wiki-panel);
+}
+
+.docs-wiki .vp-doc a {
+  text-decoration-thickness: 1.5px;
+}
+
+.docs-wiki .vp-doc a:hover {
+  color: var(--vp-c-brand-2);
+}
+
+.docs-wiki--overview .vp-doc h2,
+.docs-wiki--feature .vp-doc h2,
+.docs-wiki--module .vp-doc h2,
+.docs-wiki--workspace .vp-doc h2 {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--docs-wiki-panel-strong);
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--docs-wiki-panel), transparent);
+}
+
+.docs-wiki--file .vp-doc h3 {
+  position: relative;
+  padding-left: 1rem;
+}
+
+.docs-wiki--file .vp-doc h3::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.3em;
+  width: 0.3rem;
+  height: 1.1em;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--vp-c-brand-1), var(--docs-wiki-accent));
+}
+
+.docs-wiki--summary .vp-doc ul,
+.docs-wiki--module-index .vp-doc ul,
+.docs-wiki--workspace-index .vp-doc ul {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 1.1rem;
+}
+
+.docs-wiki--summary .vp-doc li,
+.docs-wiki--module-index .vp-doc li,
+.docs-wiki--workspace-index .vp-doc li {
+  padding: 0.35rem 0;
+}
+
+.docs-wiki-mermaid {
+  margin: 1.25rem 0;
+  padding: 1rem;
+  border: 1px solid var(--docs-wiki-panel-strong);
+  border-radius: 18px;
+  background: linear-gradient(180deg, var(--docs-wiki-panel), transparent);
+  overflow-x: auto;
+}
+
+.docs-wiki-mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.docs-wiki--design .vp-doc h3,
+.docs-wiki--design-index .vp-doc h3,
+.docs-wiki--feature .vp-doc h3,
+.docs-wiki--module .vp-doc h3,
+.docs-wiki--workspace .vp-doc h3 {
+  margin-top: 1.5rem;
+}

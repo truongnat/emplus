@@ -1,0 +1,158 @@
+---
+title: "mobile/package.json"
+description: "mobile/package.json file"
+layout: "doc"
+outline: "deep"
+editLink: false
+lastUpdated: false
+pageClass: "docs-wiki docs-wiki--file"
+docsWiki:
+  schemaVersion: "1.0.0"
+  kind: "file"
+  project: "emplus"
+  template: "detailed"
+  themePreset: "clean"
+  generatedAt: "2026-04-10T00:09:32.387Z"
+  page: "reference/files/mobile/package.json.md"
+  relativePath: "mobile/package.json"
+  absolutePath: "/Users/truongdq/tx/GitHub/emplus/mobile/package.json"
+  module: "mobile"
+  workspace: "mobile"
+  language: "JSON"
+  symbolCount: 1
+---
+
+# mobile/package.json
+
+- Overview: [emplus Docs Wiki](../../../index.md)
+- Summary: [SUMMARY](../../../SUMMARY.md)
+- Feature catalog: [All features](../../../features/index.md)
+- Module: [mobile](../../modules/mobile.md)
+- Workspace: [@emplus/mobile](../../../workspaces/mobile.md)
+
+## Snapshot
+
+- Language: JSON
+- Source path: `/Users/truongdq/tx/GitHub/emplus/mobile/package.json`
+- Lines: 93
+- Symbols: 1
+
+## AI Summary
+
+mobile/package.json file
+
+### Responsibilities
+
+- holds the project's metadata
+
+### Usage Notes
+
+- a JSON object used to configure Expo projects
+
+## Public API
+
+- `Plain-text index (93 lines)`
+
+## Symbols
+
+### source `(file)`
+
+- Signature: `Plain-text index (93 lines)`
+- Lines: 1-93
+- Exported: yes
+
+```json
+{
+  "name": "@emplus/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "lint": "tsc --noEmit",
+    "format": "bun x prettier --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@babel/plugin-transform-react-jsx": "7.28.6",
+    "@expo-google-fonts/be-vietnam-pro": "0.4.1",
+    "@expo-google-fonts/roboto-mono": "0.4.1",
+    "@expo/metro-runtime": "~55.0.6",
+    "@expo/vector-icons": "^15.0.2",
+    "@hookform/resolvers": "5.2.2",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/datetimepicker": "9.1.0",
+    "@react-native-community/netinfo": "11.5.2",
+    "@react-native-masked-view/masked-view": "0.3.2",
+    "@react-native/new-app-screen": "0.84.1",
+    "@react-navigation/bottom-tabs": "^7.15.5",
+    "@shopify/flash-list": "2.0.2",
+    "@tanstack/query-async-storage-persister": "5.90.24",
+    "@tanstack/react-query": "5.90.21",
+    "@tanstack/react-query-persist-client": "5.90.24",
+    "babel-preset-expo": "~55.0.8",
+    "clsx": "2.1.1",
+    "expo": "55.0.6",
+    "expo-auth-session": "~55.0.8",
+    "expo-blur": "~55.0.9",
+    "expo-calendar": "~55.0.9",
+    "expo-camera": "55.0.13",
+    "expo-clipboard": "~55.0.8",
+    "expo-constants": "~55.0.7",
+    "expo-crypto": "~55.0.9",
+    "expo-device": "~55.0.9",
+    "expo-document-picker": "~55.0.8",
+    "expo-file-system": "~55.0.10",
+    "expo-font": "~55.0.4",
+    "expo-glass-effect": "~55.0.8",
+    "expo-haptics": "~55.0.8",
+    "expo-image": "~55.0.6",
+    "expo-image-picker": "~55.0.12",
+    "expo-linear-gradient": "~55.0.8",
+    "expo-linking": "~55.0.7",
+    "expo-localization": "~55.0.8",
+    "expo-media-library": "~55.0.9",
+    "expo-notifications": "~55.0.12",
+    "expo-router": "~55.0.5",
+    "expo-secure-store": "~55.0.8",
+    "expo-sharing": "~55.0.11",
+    "expo-splash-screen": "~55.0.10",
+    "expo-status-bar": "~55.0.4",
+    "expo-system-ui": "~55.0.9",
+    "expo-web-browser": "~55.0.9",
+    "lottie-react-native": "~7.3.4",
+    "lucide-react-native": "0.474.0",
+    "lunar-javascript": "1.7.7",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-hook-form": "7.71.2",
+    "react-native": "0.83.2",
+    "react-native-gesture-handler": "~2.30.0",
+    "react-native-keyboard-aware-scroll-view": "0.9.5",
+    "react-native-qrcode-styled": "0.4.0",
+    "react-native-qrcode-svg": "6.3.21",
+    "react-native-reanimated": "4.2.1",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-screens": "~4.23.0",
+    "react-native-svg": "15.15.3",
+    "react-native-web": "^0.21.0",
+    "react-native-worklets": "0.7.2",
+    "tailwind-merge": "3.5.0",
+    "zeego": "^2.0.0",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@types/bun": "1.3.10",
+    "@types/node": "25.5.0",
+    "@types/qrcode": "1.5.6",
+    "@types/react": "~19.2.10",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "expo-mcp": "~0.2.1",
+    "typescript": "~5.9.2"
+  }
+}
+
+```

@@ -1,0 +1,116 @@
+---
+title: "skills-lock.json"
+description: "Skills lock API documentation"
+layout: "doc"
+outline: "deep"
+editLink: false
+lastUpdated: false
+pageClass: "docs-wiki docs-wiki--file"
+docsWiki:
+  schemaVersion: "1.0.0"
+  kind: "file"
+  project: "emplus"
+  template: "detailed"
+  themePreset: "clean"
+  generatedAt: "2026-04-10T00:09:32.387Z"
+  page: "reference/files/skills-lock.json.md"
+  relativePath: "skills-lock.json"
+  absolutePath: "/Users/truongdq/tx/GitHub/emplus/skills-lock.json"
+  module: ""
+  workspace: ""
+  language: "JSON"
+  symbolCount: 1
+---
+
+# skills-lock.json
+
+- Overview: [emplus Docs Wiki](../../index.md)
+- Summary: [SUMMARY](../../SUMMARY.md)
+- Feature catalog: [All features](../../features/index.md)
+- Module: [(root)](../modules/root.md)
+- Workspace: [emplus](../../workspaces/root.md)
+
+## Snapshot
+
+- Language: JSON
+- Source path: `/Users/truongdq/tx/GitHub/emplus/skills-lock.json`
+- Lines: 51
+- Symbols: 1
+
+## AI Summary
+
+Skills lock API documentation
+
+### Responsibilities
+
+- Handle skills-related JSONP requests to a private API
+
+### Usage Notes
+
+- Does not handle any specific HTTP or URL parameters
+
+## Public API
+
+- `Plain-text index (51 lines)`
+
+## Symbols
+
+### source `(file)`
+
+- Signature: `Plain-text index (51 lines)`
+- Lines: 1-51
+- Exported: yes
+
+```json
+{
+  "version": 1,
+  "skills": {
+    "clean-code": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "computedHash": "af77b8995f255140f1643de753007baf87b734e8b87175489524aadc3559c42a"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
+    },
+    "hono": {
+      "source": "yusukebe/hono-skill",
+      "sourceType": "github",
+      "computedHash": "c7a4ae9efeb7ef47c6473ee4d636fced825a0c26b25372a49417075f6d566af6"
+    },
+    "landing-page-design": {
+      "source": "inference-sh-9/skills",
+      "sourceType": "github",
+      "computedHash": "c489ece3f049aa26c78154d1f67aa5e2b8342216e5f6acf07455cba56e10c19f"
+    },
+    "mobile-design": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "27e338f7267fed0ce198852af954f79ce6746b9c94e4e530e581e19e568b8ba0"
+    },
+    "remotion-best-practices": {
+      "source": "remotion-dev/skills",
+      "sourceType": "github",
+      "computedHash": "9851afb52e1b892c43b2af973bda1776ce01fedfdfe704e0cfd70069a3a9c300"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "computedHash": "e688fcd4c5693e14ebd00d48e982dbd2be060fbea89f5f60531e79c704a1bc28"
+    },
+    "vercel-react-native-skills": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "2e9088a7333666d8c2833b8ff58bd51b955501c42b4c7244f72b4cbf22dafcc4"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a"
+    }
+  }
+}
+
+```
