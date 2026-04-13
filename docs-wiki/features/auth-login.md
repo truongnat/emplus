@@ -14,472 +14,98 @@ docsWiki:
   project: "emplus"
   template: "detailed"
   themePreset: "clean"
-  generatedAt: "2026-04-10T00:09:32.387Z"
+  generatedAt: "2026-04-10T00:30:54.293Z"
   page: "features/auth-login.md"
   featureId: "auth-login"
   domain: "auth"
   action: "login"
-  fileCount: 92
 ---
 
-# Authentication Login
-
-- Overview: [emplus Docs Wiki](../index.md)
-- Feature catalog: [All features](index.md)
-- Reference: [Reference Index](../reference/index.md)
-
-## Overview
-
-Unit tests for anniversary functionality. Functionality to validate and format user input for various types of authentication and login processes. /api/auth.middleware.requireAuth JS API for the admin module. Identifies an identity from an OAuth token and pro…
-
-## Actors & User Stories
-
-### As Anonymous end user
-
-- Goal: Auth login
-- Benefit: Authenticate the caller, validate credentials, and establish a usable session or token.
-
-#### Acceptance Criteria
-
-- api/src/__tests__/anniversary.test.ts receives the request and turns it into an application-level login command. It then hands off to anniversary.ts, date.ts, types.ts.
-- api/src/__tests__/app.test.ts receives the request and turns it into an application-level login command. It then hands off to app.ts, store.ts.
-- api/src/__tests__/auth.test.ts receives the request and turns it into an application-level login command. It then hands off to app.ts.
-
-## Business Flows
-
-### Auth login
-
-Authenticate the caller, validate credentials, and establish a usable session or token.
-
-#### Steps
-
-- api/src/__tests__/anniversary.test.ts receives the request and turns it into an application-level login command. It then hands off to anniversary.ts, date.ts, types.ts.
-- api/src/__tests__/app.test.ts receives the request and turns it into an application-level login command. It then hands off to app.ts, store.ts.
-- api/src/__tests__/auth.test.ts receives the request and turns it into an application-level login command. It then hands off to app.ts.
-- api/src/__tests__/love-days-utc.test.ts receives the request and turns it into an application-level login command. It then hands off to diffDays, date.ts.
-- api/src/__tests__/notifications.test.ts receives the request and turns it into an application-level login command. It then hands off to app.ts, store.ts.
-- api/src/__tests__/security_random.test.ts receives the request and turns it into an application-level login command. It then hands off to code.ts.
-
-#### Flow Diagram
-
-```mermaid
-flowchart LR
-  caller["Caller / upstream trigger"]
-  n1_anniversary_test_ts["api/src/__tests__/anniversary.test.ts\nEntry point"]
-  n2_app_test_ts["api/src/__tests__/app.test.ts\nEntry point"]
-  n3_auth_test_ts["api/src/__tests__/auth.test.ts\nEntry point"]
-  n4_love_days_utc_test_ts["api/src/__tests__/love-days-utc.test.ts\nEntry point"]
-  n5_notifications_test_ts["api/src/__tests__/notifications.test.ts\nEntry point"]
-  n6_security_random_test_ts["api/src/__tests__/security_random.test.ts\nEntry point"]
-  caller --> n1_anniversary_test_ts
-  n1_anniversary_test_ts --> n2_app_test_ts
-  n2_app_test_ts --> n3_auth_test_ts
-  n3_auth_test_ts --> n4_love_days_utc_test_ts
-  n4_love_days_utc_test_ts --> n5_notifications_test_ts
-  n5_notifications_test_ts --> n6_security_random_test_ts
-  store["State / data store"]
-  n6_security_random_test_ts --> store
-  ext["External dependency"]
-  n6_security_random_test_ts --> ext
-  outcome["Auth login outcome"]
-  n6_security_random_test_ts --> outcome
-```
-
-### Auth registration
-
-Execute the module's registration use case inside authentication and access control.
-
-#### Steps
-
-- api/src/__tests__/anniversary.test.ts receives the request and turns it into an application-level registration command. It then hands off to anniversary.ts, date.ts, types.ts.
-- api/src/__tests__/app.test.ts receives the request and turns it into an application-level registration command. It then hands off to app.ts, store.ts.
-- api/src/__tests__/auth.test.ts receives the request and turns it into an application-level registration command. It then hands off to app.ts.
-- api/src/__tests__/love-days-utc.test.ts receives the request and turns it into an application-level registration command. It then hands off to diffDays, date.ts.
-- api/src/__tests__/notifications.test.ts receives the request and turns it into an application-level registration command. It then hands off to app.ts, store.ts.
-- api/src/__tests__/security_random.test.ts receives the request and turns it into an application-level registration command. It then hands off to code.ts.
-
-#### Flow Diagram
-
-```mermaid
-flowchart LR
-  caller["Caller / upstream trigger"]
-  n1_anniversary_test_ts["api/src/__tests__/anniversary.test.ts\nEntry point"]
-  n2_app_test_ts["api/src/__tests__/app.test.ts\nEntry point"]
-  n3_auth_test_ts["api/src/__tests__/auth.test.ts\nEntry point"]
-  n4_love_days_utc_test_ts["api/src/__tests__/love-days-utc.test.ts\nEntry point"]
-  n5_notifications_test_ts["api/src/__tests__/notifications.test.ts\nEntry point"]
-  n6_security_random_test_ts["api/src/__tests__/security_random.test.ts\nEntry point"]
-  caller --> n1_anniversary_test_ts
-  n1_anniversary_test_ts --> n2_app_test_ts
-  n2_app_test_ts --> n3_auth_test_ts
-  n3_auth_test_ts --> n4_love_days_utc_test_ts
-  n4_love_days_utc_test_ts --> n5_notifications_test_ts
-  n5_notifications_test_ts --> n6_security_random_test_ts
-  ext["External dependency"]
-  n6_security_random_test_ts --> ext
-  outcome["Auth registration outcome"]
-  n6_security_random_test_ts --> outcome
-```
-
-### Auth login
-
-Authenticate the caller, validate credentials, and establish a usable session or token.
-
-#### Steps
-
-- api/src/modules/admin.ts receives the request and turns it into an application-level login command. It then hands off to app-env.ts, auth.ts, store.ts.
-- api/src/modules/auth.ts receives the request and turns it into an application-level login command. It then hands off to app-env.ts, auth.dto.ts, auth.ts.
-- api/src/modules/budget.ts receives the request and turns it into an application-level login command. It then hands off to app-env.ts, budget.dto.ts, auth.ts.
-- api/src/modules/care.ts receives the request and turns it into an application-level login command. It then hands off to store.ts, User, AppError.
-- api/src/modules/couples.ts receives the request and turns it into an application-level login command. It then hands off to app-env.ts, couples.dto.ts, auth.ts.
-- api/src/modules/dashboard.ts receives the request and turns it into an application-level login command. It then hands off to app-env.ts, env.ts, anniversary.ts.
-
-#### Flow Diagram
-
-```mermaid
-flowchart LR
-  caller["Caller / upstream trigger"]
-  n1_admin_ts["api/src/modules/admin.ts\nEntry point"]
-  n2_auth_ts["api/src/modules/auth.ts\nEntry point"]
-  n3_budget_ts["api/src/modules/budget.ts\nEntry point"]
-  n4_care_ts["api/src/modules/care.ts\nEntry point"]
-  n5_couples_ts["api/src/modules/couples.ts\nEntry point"]
-  n6_dashboard_ts["api/src/modules/dashboard.ts\nEntry point"]
-  caller --> n1_admin_ts
-  n1_admin_ts --> n2_auth_ts
-  n2_auth_ts --> n3_budget_ts
-  n3_budget_ts --> n4_care_ts
-  n4_care_ts --> n5_couples_ts
-  n5_couples_ts --> n6_dashboard_ts
-  ext["External dependency"]
-  n6_dashboard_ts --> ext
-  outcome["Auth login outcome"]
-  n6_dashboard_ts --> outcome
-```
-
-### Auth login
-
-Authenticate the caller, validate credentials, and establish a usable session or token.
-
-#### Steps
-
-- api/src/oauth/verify.ts receives the request and turns it into an application-level login command. It then hands off to StoreMode, AuthProvider, AppError.
-
-#### Flow Diagram
-
-```mermaid
-flowchart LR
-  caller["Caller / upstream trigger"]
-  n1_verify_ts["api/src/oauth/verify.ts\nEntry point"]
-  caller --> n1_verify_ts
-  ext["External dependency"]
-  n1_verify_ts --> ext
-  outcome["Auth login outcome"]
-  n1_verify_ts --> outcome
-```
-
-### Auth login
-
-Authenticate the caller, validate credentials, and establish a usable session or token.
-
-#### Steps
-
-- api/src/services/auth.service.ts receives the request and turns it into an application-level login command. It then hands off to index.ts, generateNumericCode, generateTokens.
-- api/src/services/budget.service.ts receives the request and turns it into an application-level login command. It then hands off to StoreMode, mapDisplayStatusToInternal, store.ts.
-- api/src/services/couple.service.ts receives the request and turns it into an application-level login command. It then hands off to index.ts, formatDate, store.ts.
-- api/src/services/crypto.ts receives the request and turns it into an application-level login command.
-- api/src/services/dependencies.ts receives the request and turns it into an application-level login command. It then hands off to StoreMode, env.ts.
-- api/src/services/mail.ts receives the request and turns it into an application-level login command. It then hands off to StoreMode, env.ts.
-
-#### Flow Diagram
-
-```mermaid
-flowchart LR
-  caller["Caller / upstream trigger"]
-  n1_auth_service_ts["api/src/services/auth.service.ts\nEntry point"]
-  n2_budget_service_ts["api/src/services/budget.service.ts\nEntry point"]
-  n3_couple_service_ts["api/src/services/couple.service.ts\nEntry point"]
-  n4_crypto_ts["api/src/services/crypto.ts\nEntry point"]
-  n5_dependencies_ts["api/src/services/dependencies.ts\nEntry point"]
-  n6_mail_ts["api/src/services/mail.ts\nEntry point"]
-  caller --> n1_auth_service_ts
-  caller --> n2_budget_service_ts
-  caller --> n3_couple_service_ts
-  caller --> n5_dependencies_ts
-  n1_auth_service_ts -->|"decrypt"| n4_crypto_ts
-  n1_auth_service_ts -->|"sendOtpMail"| n6_mail_ts
-  store["State / data store"]
-  n6_mail_ts --> store
-  ext["External dependency"]
-  n6_mail_ts --> ext
-  outcome["Auth login outcome"]
-  n6_mail_ts --> outcome
-```
-
-### Auth registration
-
-Execute the module's registration use case inside authentication and access control.
-
-#### Steps
-
-- api/src/services/auth.service.ts receives the request and turns it into an application-level registration command. It then hands off to index.ts, generateNumericCode, generateTokens.
-- api/src/services/budget.service.ts receives the request and turns it into an application-level registration command. It then hands off to StoreMode, mapDisplayStatusToInternal, store.ts.
-- api/src/services/couple.service.ts receives the request and turns it into an application-level registration command. It then hands off to index.ts, formatDate, store.ts.
-- api/src/services/crypto.ts receives the request and turns it into an application-level registration command.
-- api/src/services/dependencies.ts receives the request and turns it into an application-level registration command. It then hands off to StoreMode, env.ts.
-- api/src/services/mail.ts receives the request and turns it into an application-level registration command. It then hands off to StoreMode, env.ts.
-
-#### Flow Diagram
-
-```mermaid
-flowchart LR
-  caller["Caller / upstream trigger"]
-  n1_auth_service_ts["api/src/services/auth.service.ts\nEntry point"]
-  n2_budget_service_ts["api/src/services/budget.service.ts\nEntry point"]
-  n3_couple_service_ts["api/src/services/couple.service.ts\nEntry point"]
-  n4_crypto_ts["api/src/services/crypto.ts\nEntry point"]
-  n5_dependencies_ts["api/src/services/dependencies.ts\nEntry point"]
-  n6_mail_ts["api/src/services/mail.ts\nEntry point"]
-  caller --> n1_auth_service_ts
-  caller --> n2_budget_service_ts
-  caller --> n3_couple_service_ts
-  caller --> n5_dependencies_ts
-  n1_auth_service_ts -->|"decrypt"| n4_crypto_ts
-  n1_auth_service_ts -->|"sendOtpMail"| n6_mail_ts
-  store["State / data store"]
-  n6_mail_ts --> store
-  ext["External dependency"]
-  n6_mail_ts --> ext
-  outcome["Auth registration outcome"]
-  n6_mail_ts --> outcome
-```
-
-### Auth login
-
-Authenticate the caller, validate credentials, and establish a usable session or token.
-
-#### Steps
-
-- api/src/store/contracts.ts receives the request and turns it into an application-level login command. It then hands off to Anniversary, types.ts.
-- api/src/store/in-memory-store.ts receives the request and turns it into an application-level login command. It then hands off to generateInviteCode, Anniversary, DataStore.
-- api/src/store/index.ts receives the request and turns it into an application-level login command.
-
-#### Flow Diagram
-
-```mermaid
-flowchart LR
-  caller["Caller / upstream trigger"]
-  n1_contracts_ts["api/src/store/contracts.ts\nEntry point"]
-  n2_in_memory_store_ts["api/src/store/in-memory-store.ts\nEntry point"]
-  n3_index_ts["api/src/store/index.ts\nEntry point"]
-  caller --> n2_in_memory_store_ts
-  caller --> n3_index_ts
-  n2_in_memory_store_ts -->|"DataStore"| n1_contracts_ts
-  outcome["Auth login outcome"]
-  n3_index_ts --> outcome
-```
-
-### Auth login
-
-Authenticate the caller, validate credentials, and establish a usable session or token.
-
-#### Steps
-
-- The user or operator enters the flow through mobile/app/(tabs)/notifications.tsx, which surfaces the login interaction.
-- The user or operator enters the flow through mobile/app/(tabs)/timeline.tsx, which surfaces the login interaction.
-- The user or operator enters the flow through mobile/app/forgot-password.tsx, which surfaces the login interaction.
-- The user or operator enters the flow through mobile/app/register.tsx, which surfaces the login interaction.
-- mobile/app/_layout.tsx receives the request and turns it into an application-level login command.
-- mobile/app/(tabs)/_layout.tsx receives the request and turns it into an application-level login command.
-
-#### Flow Diagram
-
-```mermaid
-flowchart LR
-  caller["Caller / upstream trigger"]
-  n1_notifications_tsx["mobile/app/(tabs)/notifications.tsx\nUI surface"]
-  n2_timeline_tsx["mobile/app/(tabs)/timeline.tsx\nUI surface"]
-  n3_forgot_password_tsx["mobile/app/forgot-password.tsx\nUI surface"]
-  n4_register_tsx["mobile/app/register.tsx\nUI surface"]
-  n5__layout_tsx["mobile/app/_layout.tsx\nEntry point"]
-  n6__layout_tsx["mobile/app/(tabs)/_layout.tsx\nEntry point"]
-  caller --> n1_notifications_tsx
-  n1_notifications_tsx --> n2_timeline_tsx
-  n2_timeline_tsx --> n3_forgot_password_tsx
-  n3_forgot_password_tsx --> n4_register_tsx
-  n4_register_tsx --> n5__layout_tsx
-  n5__layout_tsx --> n6__layout_tsx
-  store["State / data store"]
-  n6__layout_tsx --> store
-  ext["External dependency"]
-  n6__layout_tsx --> ext
-  outcome["Auth login outcome"]
-  n6__layout_tsx --> outcome
-```
-
-
-## Basic Design
-
-Authentication Login captures the login workflow inside authentication. It spans 2 workspaces. Key flows include Auth login, Auth registration, Auth login.
-
-### Boundaries
-
-- Workspaces: @emplus/api, @emplus/mobile
-- Entry points (FE): mobile/app/(tabs)/notifications.tsx, mobile/app/(tabs)/timeline.tsx, mobile/app/forgot-password.tsx, mobile/app/register.tsx, mobile/src/features/auth/authScreenLayout.ts, mobile/src/features/auth/components/AuthGridScreenShell.tsx, mobile/src/features/auth/components/ForgotPasswordHeroSection.tsx, mobile/src/features/auth/components/LoginBrandGradientTitle.tsx
-- Entry points (BE): api/src/__tests__/auth.test.ts, api/src/dto/auth.dto.ts, api/src/dto/live.dto.ts, api/src/middleware/auth.ts, api/src/modules/admin.ts, api/src/modules/auth.ts, api/src/modules/budget.ts, api/src/modules/care.ts
-
-### Context Diagram
-
-```mermaid
-flowchart LR
-  actor_1["Anonymous end user"]
-  actor_2["Authenticated end user"]
-  feature_auth_login["Authentication Login\nFeature boundary"]
-  actor_1 --> feature_auth_login
-  actor_2 --> feature_auth_login
-  ext_1["bun"]
-  feature_auth_login --> ext_1
-  ext_2["@hono"]
-  feature_auth_login --> ext_2
-  ext_3["hono"]
-  feature_auth_login --> ext_3
-  ext_4["node"]
-  feature_auth_login --> ext_4
-  ext_5["postgres"]
-  feature_auth_login --> ext_5
-  ext_6["zod"]
-  feature_auth_login --> ext_6
-```
-
-## Detail Design
-
-- Data stores: Primary database, Session / token state
-- Integrations: bun, @hono, hono, node, postgres, zod, ioredis, @faker-js, google-auth-library, jose, nodemailer, minio, @, @expo-google-fonts, expo-font, expo-router, expo-splash-screen, expo-status-bar, @expo, @react-navigation, expo-blur, expo-haptics, expo-linear-gradient, @tanstack, react, react-native, react-native-safe-area-context, react-native-reanimated, react-native-gesture-handler, react-native-keyboard-aware-scroll-view, expo-system-ui, @react-native-masked-view, expo-image, @react-native-async-storage, @react-native-community
-
-### Component Diagram
-
-```mermaid
-flowchart LR
-  cmp_1["notifications.tsx\nUI surface"]
-  cmp_2["timeline.tsx\nUI surface"]
-  cmp_3["forgot-password.tsx\nUI surface"]
-  cmp_4["register.tsx\nUI surface"]
-  cmp_5["authScreenLayout.ts\nUI surface"]
-  cmp_6["AuthGridScreenShell.tsx\nUI surface"]
-  cmp_7["ForgotPasswordHeroSection.tsx\nUI surface"]
-  cmp_8["LoginBrandGradientTitle.tsx\nUI surface"]
-  cmp_1 --> cmp_2
-  cmp_2 --> cmp_3
-  cmp_3 --> cmp_4
-  cmp_4 --> cmp_5
-  cmp_5 --> cmp_6
-  cmp_6 --> cmp_7
-  cmp_7 --> cmp_8
-  data_store["State / persistence"]
-  cmp_8 --> data_store
-```
-
-## API Contracts
-
-No API contracts were linked to this feature.
-
-## Edge Cases & Error Handling
-
-No edge cases were inferred from the clustered code.
-
-## Related Files
-
-| File | Workspace | Role | Why It Belongs |
-| --- | --- | --- | --- |
-| [mobile/app/(tabs)/notifications.tsx](../reference/files/mobile/app/tabs--7761ed0d/notifications.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/app/(tabs)/timeline.tsx](../reference/files/mobile/app/tabs--7761ed0d/timeline.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/app/forgot-password.tsx](../reference/files/mobile/app/forgot-password.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/app/register.tsx](../reference/files/mobile/app/register.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/authScreenLayout.ts](../reference/files/mobile/src/features/auth/authScreenLayout.ts.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/AuthGridScreenShell.tsx](../reference/files/mobile/src/features/auth/components/AuthGridScreenShell.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/ForgotPasswordHeroSection.tsx](../reference/files/mobile/src/features/auth/components/ForgotPasswordHeroSection.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/LoginBrandGradientTitle.tsx](../reference/files/mobile/src/features/auth/components/LoginBrandGradientTitle.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/LoginBuilderBackdrop.tsx](../reference/files/mobile/src/features/auth/components/LoginBuilderBackdrop.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/LoginDreamHero.tsx](../reference/files/mobile/src/features/auth/components/LoginDreamHero.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/LoginFooterSlot.tsx](../reference/files/mobile/src/features/auth/components/LoginFooterSlot.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/LoginGridAnimatedBackground.tsx](../reference/files/mobile/src/features/auth/components/LoginGridAnimatedBackground.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/LoginHeroBackground.tsx](../reference/files/mobile/src/features/auth/components/LoginHeroBackground.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/LoginHeroSection.tsx](../reference/files/mobile/src/features/auth/components/LoginHeroSection.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/LoginMeshBackground.tsx](../reference/files/mobile/src/features/auth/components/LoginMeshBackground.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/LoginScreenLoading.tsx](../reference/files/mobile/src/features/auth/components/LoginScreenLoading.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/LoginTopDecor.tsx](../reference/files/mobile/src/features/auth/components/LoginTopDecor.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/RegisterHeroSection.tsx](../reference/files/mobile/src/features/auth/components/RegisterHeroSection.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/VerifyOtpHeroSection.tsx](../reference/files/mobile/src/features/auth/components/VerifyOtpHeroSection.tsx.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/forgotPassword.styles.ts](../reference/files/mobile/src/features/auth/forgotPassword.styles.ts.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/loginScreen.styles.ts](../reference/files/mobile/src/features/auth/loginScreen.styles.ts.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/registerScreen.styles.ts](../reference/files/mobile/src/features/auth/registerScreen.styles.ts.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/verifyOtpScreen.styles.ts](../reference/files/mobile/src/features/auth/verifyOtpScreen.styles.ts.md) | @emplus/mobile | UI surface | Matches the login action heuristics for this feature. |
-| [api/src/__tests__/auth.test.ts](../reference/files/api/src/__tests__/auth.test.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/dto/auth.dto.ts](../reference/files/api/src/dto/auth.dto.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/dto/live.dto.ts](../reference/files/api/src/dto/live.dto.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/middleware/auth.ts](../reference/files/api/src/middleware/auth.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/modules/admin.ts](../reference/files/api/src/modules/admin.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/modules/auth.ts](../reference/files/api/src/modules/auth.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/modules/budget.ts](../reference/files/api/src/modules/budget.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/modules/care.ts](../reference/files/api/src/modules/care.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/modules/couples.ts](../reference/files/api/src/modules/couples.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/modules/dashboard.ts](../reference/files/api/src/modules/dashboard.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/modules/debug.ts](../reference/files/api/src/modules/debug.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/modules/live.ts](../reference/files/api/src/modules/live.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/modules/media.ts](../reference/files/api/src/modules/media.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/modules/notifications.ts](../reference/files/api/src/modules/notifications.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/modules/system.ts](../reference/files/api/src/modules/system.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/modules/timeline.ts](../reference/files/api/src/modules/timeline.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/modules/user.ts](../reference/files/api/src/modules/user.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/oauth/verify.ts](../reference/files/api/src/oauth/verify.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/services/auth.service.ts](../reference/files/api/src/services/auth.service.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/store/in-memory-store.ts](../reference/files/api/src/store/in-memory-store.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [api/src/types.ts](../reference/files/api/src/types.ts.md) | @emplus/api | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/(tabs)/_layout.tsx](../reference/files/mobile/app/tabs--7761ed0d/_layout.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/(tabs)/care.tsx](../reference/files/mobile/app/tabs--7761ed0d/care.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/(tabs)/home.tsx](../reference/files/mobile/app/tabs--7761ed0d/home.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/(tabs)/profile.tsx](../reference/files/mobile/app/tabs--7761ed0d/profile.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/add-memory.tsx](../reference/files/mobile/app/add-memory.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/index.tsx](../reference/files/mobile/app/index.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/login.tsx](../reference/files/mobile/app/login.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/memory/[id].tsx](../reference/files/mobile/app/memory/param-id--bb6303db.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/profile-details/appearance.tsx](../reference/files/mobile/app/profile-details/appearance.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/profile-details/help.tsx](../reference/files/mobile/app/profile-details/help.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/profile-details/notifications.tsx](../reference/files/mobile/app/profile-details/notifications.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/profile-details/personal-info.tsx](../reference/files/mobile/app/profile-details/personal-info.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/profile-details/privacy.tsx](../reference/files/mobile/app/profile-details/privacy.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/reset-password.tsx](../reference/files/mobile/app/reset-password.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/app/verify-otp.tsx](../reference/files/mobile/app/verify-otp.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/api.ts](../reference/files/mobile/src/api.ts.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/components/atoms/Input.tsx](../reference/files/mobile/src/components/atoms/Input.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/core/api/index.ts](../reference/files/mobile/src/core/api/index.ts.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/data/repositories/auth.repository.impl.ts](../reference/files/mobile/src/data/repositories/auth.repository.impl.ts.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/ForgotPasswordAuthForm.tsx](../reference/files/mobile/src/features/auth/components/ForgotPasswordAuthForm.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/ForgotPasswordLoginFooter.tsx](../reference/files/mobile/src/features/auth/components/ForgotPasswordLoginFooter.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/LoginAuthForm.tsx](../reference/files/mobile/src/features/auth/components/LoginAuthForm.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/LoginSignUpFooter.tsx](../reference/files/mobile/src/features/auth/components/LoginSignUpFooter.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/RegisterAuthForm.tsx](../reference/files/mobile/src/features/auth/components/RegisterAuthForm.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/RegisterLoginFooter.tsx](../reference/files/mobile/src/features/auth/components/RegisterLoginFooter.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/RegisterTopBar.tsx](../reference/files/mobile/src/features/auth/components/RegisterTopBar.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/VerifyOtpForm.tsx](../reference/files/mobile/src/features/auth/components/VerifyOtpForm.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/hooks/useAuthGridChrome.ts](../reference/files/mobile/src/features/auth/hooks/useAuthGridChrome.ts.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/features/pairing/PairingGridShell.tsx](../reference/files/mobile/src/features/pairing/PairingGridShell.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/features/timeline/components/TimelineAuthGate.tsx](../reference/files/mobile/src/features/timeline/components/TimelineAuthGate.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/features/timeline/screens/TimelineAuthenticatedBody.tsx](../reference/files/mobile/src/features/timeline/screens/TimelineAuthenticatedBody.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/framework/ctx/session-context.tsx](../reference/files/mobile/src/framework/ctx/session-context.tsx.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/presentation/hooks/auth/useForgotPasswordRequest.ts](../reference/files/mobile/src/presentation/hooks/auth/useForgotPasswordRequest.ts.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/presentation/hooks/auth/useLogin.ts](../reference/files/mobile/src/presentation/hooks/auth/useLogin.ts.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/presentation/hooks/auth/useLogout.ts](../reference/files/mobile/src/presentation/hooks/auth/useLogout.ts.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/presentation/hooks/auth/useRegister.ts](../reference/files/mobile/src/presentation/hooks/auth/useRegister.ts.md) | @emplus/mobile | Entry point | Matches the login action heuristics for this feature. |
-| [mobile/src/forms.ts](../reference/files/mobile/src/forms.ts.md) | @emplus/mobile | Guard / middleware | Matches the login action heuristics for this feature. |
-| [mobile/src/domain/usecases/auth/index.ts](../reference/files/mobile/src/domain/usecases/auth/index.ts.md) | @emplus/mobile | Service / use case | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/components/LoginDreamAtmosphere.tsx](../reference/files/mobile/src/features/auth/components/LoginDreamAtmosphere.tsx.md) | @emplus/mobile | Service / use case | Matches the login action heuristics for this feature. |
-| [mobile/src/features/timeline/hooks/useTimelineData.ts](../reference/files/mobile/src/features/timeline/hooks/useTimelineData.ts.md) | @emplus/mobile | Service / use case | Supports the feature as service / use case. |
-| [mobile/src/presentation/hooks/auth/useAuth.ts](../reference/files/mobile/src/presentation/hooks/auth/useAuth.ts.md) | @emplus/mobile | Service / use case | Matches the login action heuristics for this feature. |
-| [mobile/src/domain/repositories/auth.repository.ts](../reference/files/mobile/src/domain/repositories/auth.repository.ts.md) | @emplus/mobile | Repository / persistence | Matches the login action heuristics for this feature. |
-| [mobile/src/framework/di/dependencies.ts](../reference/files/mobile/src/framework/di/dependencies.ts.md) | @emplus/mobile | Repository / persistence | Matches the login action heuristics for this feature. |
-| [mobile/assets/lottie/login-cat-love.json](../reference/files/mobile/assets/lottie/login-cat-love.json.md) | @emplus/mobile | Utility | Matches the login action heuristics for this feature. |
-| [mobile/assets/lottie/verify-otp-password-auth.json](../reference/files/mobile/assets/lottie/verify-otp-password-auth.json.md) | @emplus/mobile | Utility | Matches the login action heuristics for this feature. |
-| [mobile/src/features/auth/auth-hero-assets.ts](../reference/files/mobile/src/features/auth/auth-hero-assets.ts.md) | @emplus/mobile | Utility | Matches the login action heuristics for this feature. |
-| [mobile/src/lottie/inventory.ts](../reference/files/mobile/src/lottie/inventory.ts.md) | @emplus/mobile | Utility | Matches the login action heuristics for this feature. |
-| [mobile/src/presentation/hooks/auth/index.ts](../reference/files/mobile/src/presentation/hooks/auth/index.ts.md) | @emplus/mobile | Utility | Matches the login action heuristics for this feature. |
+# FEATURE: Authentication Login
+
+## 1. Feature Overview
+**Cái gì:** Chức năng cho phép người dùng đăng nhập vào hệ thống Em+ thông qua email và mật khẩu. Hỗ trợ cơ chế "Lazy Registration" thông qua OTP nếu người dùng chưa tồn tại.
+**Tại sao:** Đảm bảo an toàn thông tin người dùng, xác thực danh tính để truy cập vào các tính năng riêng tư như Timeline, Anniversary, và Memory.
+
+## 2. Business Constraints
+*Trích xuất các quy tắc ẩn trong code.*
+
+- **Rate Limiting:** Giới hạn số lần thử đăng nhập (`LOGIN_RATE_LIMIT_COUNT`) để chống tấn công brute-force. -> `auth.service.ts`
+- **Lazy Registration:** Nếu email chưa tồn tại, hệ thống tự động gửi OTP để xác thực và tạo tài khoản sau khi verify thành công. -> `auth.service.ts:loginUser`
+- **OTP Security:** Mã OTP có thời hạn (`OTP_TTL_SECONDS`) và giới hạn số lần nhập sai (`OTP_MAX_VERIFY_ATTEMPTS`). -> `auth.service.ts:verifyOtpAndLogin`
+- **Session Management:** Sử dụng Dual Token (Access & Refresh Token). Access Token có thời hạn ngắn, Refresh Token dùng để lấy session mới mà không cần đăng nhập lại. -> `auth.service.ts:issueAuthPayload`
+- **Unique Identity:** Mỗi email chỉ được gắn với một tài khoản duy nhất. -> `auth.service.ts:registerUser`
+
+## 3. Data Flow (PlantUML Sequence)
+*Thể hiện luồng dữ liệu giữa các tầng.*
+
+### Main Flow: Login with Email/Password
+@startuml
+skinparam handwritten false
+skinparam monochrome true
+skinparam packageStyle rect
+skinparam defaultFontName "Courier"
+
+actor "User" as User
+participant "Mobile App (React Native)" as FE
+participant "API Gateway (Hono)" as API
+participant "Auth Service" as Service
+database "Redis (Session/RateLimit)" as Redis
+database "PostgreSQL (User Data)" as DB
+
+User -> FE : Nhập Email/Password
+FE -> API : POST /api/auth/login
+API -> Service : loginUser(email, password)
+Service -> Redis : Kiểm tra Rate Limit
+Redis --> Service : OK
+Service -> DB : Tìm user theo email
+DB --> Service : User object
+Service -> Service : verifyPassword(password, hash)
+Service -> Service : issueAuthPayload(user)
+Service -> Redis : Lưu Access/Refresh Session
+Service --> API : AuthPayload (User + Tokens)
+API --> FE : 200 OK (JSON)
+FE -> FE : Lưu tokens vào SecureStorage
+FE --> User : Chuyển hướng vào Dashboard
+@enduml
+
+### Alternate Flow: OTP Verification (Lazy Registration)
+@startuml
+skinparam handwritten false
+skinparam monochrome true
+skinparam packageStyle rect
+skinparam defaultFontName "Courier"
+
+actor "User" as User
+participant "Mobile App" as FE
+participant "Auth Service" as Service
+participant "Mail Service" as Mail
+
+User -> FE : Nhập Email mới
+FE -> Service : loginUser(email, password)
+Service -> Service : Không tìm thấy User
+Service -> Service : Tạo OTP 6 chữ số
+Service -> Mail : Gửi email chứa OTP
+Service --> FE : { requiresOTP: true }
+FE -> User : Hiển thị màn hình nhập OTP
+User -> FE : Nhập mã OTP
+FE -> Service : verifyOtpAndLogin(email, otp)
+Service -> Service : verify OTP
+Service -> Service : createUser(email, password)
+Service --> FE : AuthPayload
+@enduml
+
+## 4. Architecture Mapping
+*Bảng liệt kê các File/Symbol quan trọng tham gia vào feature này.*
+
+| Layer | File Path | Symbol | Responsibility |
+| :--- | :--- | :--- | :--- |
+| **UI** | `mobile/app/login.tsx` | `LoginScreen` | Màn hình đăng nhập chính |
+| **UI** | `mobile/src/features/auth/components/LoginAuthForm.tsx` | `LoginAuthForm` | Form nhập liệu và validation |
+| **Server/Fetcher** | `mobile/src/presentation/hooks/auth/useLogin.ts` | `useLogin` | Hook xử lý logic gọi API từ Mobile |
+| **Controller** | `api/src/modules/auth.ts` | `authModule` | Định nghĩa các routes cho Authentication |
+| **Service** | `api/src/services/auth.service.ts` | `loginUser` | Xử lý logic đăng nhập, rate limit và OTP |
+| **Service** | `api/src/services/auth.service.ts` | `issueAuthPayload` | Cấp phát JWT tokens |
+| **Data/DTO** | `api/src/dto/auth.dto.ts` | `LoginDTO` | Schema validate dữ liệu đầu vào |
+| **Database** | `api/src/store/contracts.ts` | `User` | Interface định nghĩa cấu trúc dữ liệu User |
+| **Persistence** | `api/src/store/in-memory-store.ts` | `saveSession` | Lưu trữ session vào Redis |

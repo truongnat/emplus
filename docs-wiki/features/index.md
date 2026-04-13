@@ -14,7 +14,7 @@ docsWiki:
   project: "emplus"
   template: "detailed"
   themePreset: "clean"
-  generatedAt: "2026-04-10T00:09:32.387Z"
+  generatedAt: "2026-04-10T00:30:54.293Z"
   page: "features/index.md"
   featureCount: 38
 ---
@@ -24,6 +24,16 @@ docsWiki:
 - Project: [emplus Docs Wiki](../index.md)
 - Summary: [SUMMARY](../SUMMARY.md)
 - Reference: [Reference Index](../reference/index.md)
+- **Strategy:** [Feature-Centric Documentation Strategy](../DOCS_STRATEGY.md)
+
+## Overview
+Dự án `docs-wiki` đang chuyển đổi sang mô hình **Feature-Centric Documentation**. Thay vì chỉ tóm tắt code đơn lẻ, các tính năng được mô tả theo luồng nghiệp vụ (Business Flows) xuyên suốt các tầng kiến trúc (UI, API, Service, Database).
+
+Mỗi tính năng trong danh mục này sẽ dần được cập nhật theo cấu trúc mới bao gồm:
+1. **Feature Overview:** Cái gì & Tại sao.
+2. **Business Constraints:** Các quy tắc ẩn trong code.
+3. **Data Flow:** Sơ đồ Sequence (PlantUML).
+4. **Architecture Mapping:** Ánh xạ File/Symbol.
 
 ## Features
 
