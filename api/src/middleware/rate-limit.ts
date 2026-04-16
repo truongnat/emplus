@@ -93,6 +93,11 @@ export const rateLimitMiddleware = (config: RateLimitConfig) => {
   const prefix = "rl:";
 
   return createMiddleware<AppEnv>(async (c, next) => {
+    if (env.nodeEnv === "test") {
+      await next();
+      return;
+    }
+
     if (config.shouldSkip?.(c)) {
       await next();
       return;
