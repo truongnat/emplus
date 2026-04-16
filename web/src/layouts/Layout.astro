@@ -240,5 +240,70 @@ const fullTitle = title === siteName ? siteName : `${title} · ${siteName}`;
         });
       }
     </script>
+
+    <script is:inline>
+      // Simple on-scroll reveal for bento/landing blocks
+      (function () {
+        var els = document.querySelectorAll('[data-reveal]');
+        if (!els.length) return;
+
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (reduce.matches) {
+          els.forEach(function (el) {
+            el.classList.add('is-revealed');
+          });
+          return;
+        }
+
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (e) {
+              if (e.isIntersecting) {
+                e.target.classList.add('is-revealed');
+                io.unobserve(e.target);
+              }
+            });
+          },
+          { rootMargin: '0px 0px -10% 0px', threshold: 0.12 },
+        );
+
+        els.forEach(function (el) {
+          io.observe(el);
+        });
+      })();
+    </script>
+
+    <script is:inline>
+      // Lightweight scroll parallax: sets CSS var --parallax-y on [data-parallax] elements
+      (function () {
+        var els = document.querySelectorAll('[data-parallax]');
+        if (!els.length) return;
+
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (reduce.matches) return;
+
+        var ticking = false;
+
+        function update() {
+          ticking = false;
+          var y = window.scrollY || 0;
+          els.forEach(function (el) {
+            var speedRaw = el.getAttribute('data-parallax-speed') || '0.2';
+            var speed = Math.max(-1, Math.min(1, Number(speedRaw) || 0.2));
+            var offset = y * speed;
+            el.style.setProperty('--parallax-y', offset.toFixed(2) + 'px');
+          });
+        }
+
+        function onScroll() {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+
+        update();
+        window.addEventListener('scroll', onScroll, { passive: true });
+      })();
+    </script>
   </body>
 </html>

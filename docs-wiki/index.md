@@ -70,7 +70,7 @@ docsWiki:
   project: "emplus"
   template: "detailed"
   themePreset: "clean"
-  generatedAt: "2026-04-10T00:09:32.387Z"
+  generatedAt: "2026-04-10T00:30:54.293Z"
   page: "index"
   rootDir: "/Users/truongdq/tx/GitHub/emplus"
   fileCount: 399
@@ -80,7 +80,7 @@ docsWiki:
 
 ## Snapshot
 
-- Generated at: `2026-04-10T00:09:32.387Z`
+- Generated at: `2026-04-10T00:30:54.293Z`
 - Project root: `/Users/truongdq/tx/GitHub/emplus`
 - Package version: `1.0.0`
 - Files parsed: 399/402

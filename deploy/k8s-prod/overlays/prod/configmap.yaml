@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: emplus-api-config
+data:
+  DATA_STORE: postgres
+  NODE_ENV: production
+  PORT: "3000"
+  SWAGGER_ENABLED: "false"
+  SWAGGER_PATH: /v1/docs
+

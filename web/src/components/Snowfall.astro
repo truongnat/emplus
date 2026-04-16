@@ -1,0 +1,123 @@
+---
+export type SnowfallProps = {
+  count?: number;
+  class?: string;
+};
+
+const { count = 28, class: className } = Astro.props;
+
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
+}
+
+const safeCount = clamp(count, 0, 80);
+
+const flakes = Array.from({ length: safeCount }, (_, i) => {
+  const left = Math.round(((i + 0.5) / safeCount) * 1000) / 10; // 0..100 with 0.1 precision
+  const jitter = ((i * 37) % 13) - 6; // -6..6
+  const size = 10 + ((i * 29) % 16); // 10..25 px
+  const opacity = 0.22 + (((i * 17) % 60) / 100); // 0.22..0.81
+  const duration = 12 + ((i * 11) % 14); // 12..25s
+  const delay = -((i * 7) % 22); // -0..-21s
+  const drift = 10 + ((i * 19) % 26); // 10..35px
+  const spin = 120 + ((i * 31) % 220); // 120..339deg
+  const blur = ((i * 13) % 3) * 0.4; // 0, 0.4, 0.8
+
+  return {
+    key: i,
+    left: Math.max(0, Math.min(100, left + jitter * 0.6)),
+    size,
+    opacity,
+    duration,
+    delay,
+    drift,
+    spin,
+    blur,
+  };
+});
+---
+
+<div class:list={['snowfall', className]}>
+  {
+    flakes.map((f) => (
+      <span
+        class="snowflake"
+        aria-hidden="true"
+        style={`--x:${f.left}%;--size:${f.size}px;--o:${f.opacity};--dur:${f.duration}s;--delay:${f.delay}s;--drift:${f.drift}px;--spin:${f.spin}deg;--blur:${f.blur}px;`}
+      />
+    ))
+  }
+</div>
+
+<style>
+  .snowfall {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .snowflake {
+    position: absolute;
+    top: 0;
+    left: var(--x);
+    width: var(--size);
+    height: var(--size);
+    opacity: var(--o);
+    filter: blur(var(--blur));
+    transform: translate3d(0, -18vh, 0);
+    will-change: transform, opacity;
+    animation:
+      snow-fall var(--dur) linear infinite,
+      snow-sway calc(var(--dur) * 0.55) ease-in-out infinite;
+    animation-delay: var(--delay), var(--delay);
+  }
+
+  .snowflake::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    opacity: 0.95;
+    transform: rotate(var(--spin));
+    will-change: transform;
+    animation: snow-spin calc(var(--dur) * 0.9) linear infinite;
+    animation-delay: var(--delay);
+    /*
+      Tiny inline SVG snowflake.
+      Stroke uses currentColor so we can tint via `color`.
+    */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M32 6v52'/%3E%3Cpath d='M12 16l40 32'/%3E%3Cpath d='M52 16L12 48'/%3E%3Cpath d='M32 6l-6 6'/%3E%3Cpath d='M32 6l6 6'/%3E%3Cpath d='M32 58l-6-6'/%3E%3Cpath d='M32 58l6-6'/%3E%3Cpath d='M12 16l2 8'/%3E%3Cpath d='M12 16l8 2'/%3E%3Cpath d='M52 16l-2 8'/%3E%3Cpath d='M52 16l-8 2'/%3E%3Cpath d='M12 48l2-8'/%3E%3Cpath d='M12 48l8-2'/%3E%3Cpath d='M52 48l-2-8'/%3E%3Cpath d='M52 48l-8-2'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  @keyframes snow-fall {
+    0% {
+      transform: translate3d(0, -18vh, 0);
+      opacity: 0;
+    }
+    10% { opacity: var(--o); }
+    100% {
+      transform: translate3d(0, 120vh, 0);
+      opacity: 0;
+    }
+  }
+
+  @keyframes snow-sway {
+    0%, 100% { margin-left: 0; }
+    50% { margin-left: var(--drift); }
+  }
+
+  @keyframes snow-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .snowflake {
+      animation: none;
+      opacity: 0;
+    }
+  }
+</style>
+

@@ -7,10 +7,12 @@ export async function GET(context: { site?: URL | string }) {
     await getCollection('blog', ({ data }) => data.published)
   ).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-  const site = context.site ?? siteUrl().href;
+  const site = new URL(context.site ?? siteUrl()).href;
+  const lastBuildDate =
+    posts[0]?.data.updated ?? posts[0]?.data.date ?? new Date();
 
   return rss({
-    title: siteName,
+    title: `${siteName} Blog`,
     description: siteDescription,
     site,
     items: posts.map((post) => ({
@@ -20,6 +22,10 @@ export async function GET(context: { site?: URL | string }) {
       description: post.data.description,
       categories: [post.data.category, ...post.data.tags],
     })),
-    customData: `<language>vi-vn</language>`,
+    customData: [
+      `<language>vi-VN</language>`,
+      `<lastBuildDate>${lastBuildDate.toUTCString()}</lastBuildDate>`,
+      `<ttl>60</ttl>`,
+    ].join(''),
   });
 }

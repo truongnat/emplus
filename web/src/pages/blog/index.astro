@@ -8,41 +8,66 @@ const posts = (await getCollection('blog', ({ data }) => data.published)).sort(
 ---
 
 <Layout title="Blog" description="Bài viết, mẹo và cập nhật từ Em+.">
-  <div class="mx-auto max-w-3xl space-y-8">
-    <div>
-      <h1 class="text-3xl font-bold tracking-tight">Blog</h1>
-      <p class="mt-2 text-muted-foreground">
-        Nội dung Markdown trong <code class="rounded bg-muted px-1 py-0.5 text-sm"
-          >src/content/blog/</code
-        >.
-      </p>
-    </div>
-    <ul class="space-y-4">
+  <section class="blog-shell">
+    <div class="container py-10 md:py-14">
+      <div class="mx-auto max-w-5xl">
+        <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <span class="blog-kicker">
+              <span aria-hidden="true">✨</span>
+              <span>Góc nhỏ cho tụi mình</span>
+            </span>
+            <h1 class="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
+              Blog Em+
+            </h1>
+            <p class="mt-3 max-w-2xl text-base text-muted-foreground sm:text-lg">
+              Mẹo yêu, giao tiếp, tài chính cặp đôi và những thứ “nhỏ mà có võ” để
+              tụi mình gần nhau hơn.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <a
+              href="/rss.xml"
+              class="blog-pill transition hover:border-primary/40 hover:text-foreground"
+            >
+              RSS
+            </a>
+          </div>
+        </div>
+
+        <div class="mt-10 grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2">
       {
         posts.map((post) => (
-          <li>
-            <a
-              href={`/blog/${post.id}/`}
-              class="block rounded-xl border border-border bg-card p-5 transition hover:border-primary/40 hover:shadow-md"
-            >
-              <p class="text-xs text-muted-foreground">
-                {post.data.date.toLocaleDateString('vi-VN', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}{' '}
-                · {post.data.category}
-              </p>
-              <h2 class="mt-1 text-xl font-semibold text-card-foreground">
-                {post.data.title}
-              </h2>
-              <p class="mt-2 text-sm text-muted-foreground">
-                {post.data.description}
-              </p>
-            </a>
-          </li>
+          <a href={`/blog/${post.id}/`} class="blog-card group">
+            <div class="blog-card-inner">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="blog-pill">{post.data.category}</span>
+                <span class="text-xs text-muted-foreground">
+                  {post.data.date.toLocaleDateString('vi-VN', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </span>
+              </div>
+              <h2 class="blog-card-title">{post.data.title}</h2>
+              <p class="blog-card-desc">{post.data.description}</p>
+
+              <div class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-foreground/90">
+                <span>Đọc tiếp</span>
+                <span
+                  class="transition-transform duration-200 group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                  >→</span
+                >
+              </div>
+            </div>
+          </a>
         ))
       }
-    </ul>
-  </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </Layout>

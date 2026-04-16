@@ -12,49 +12,49 @@ const features: Feature[] = [
     id: 'pairing',
     title: 'Kết nối cặp đôi',
     description: 'Quét mã QR để kết nối tài khoản với người yêu. Đơn giản, nhanh chóng và bảo mật.',
-    image: 'https://images.pexels.com/photos/1308881/pexels-photo-1308881.jpeg?w=500&h=300&fit=crop',
+    image: 'https://images.pexels.com/photos/3998365/pexels-photo-3998365.jpeg?w=900&h=600&fit=crop',
     color: 'from-pink-500 to-rose-500',
   },
   {
     id: 'timeline',
     title: 'Timeline & Kỷ niệm',
     description: 'Lưu giữ những khoảnh khắc đáng nhớ. Nhật ký ảnh, đếm ngày yêu thương cùng nhau.',
-    image: 'https://images.pexels.com/photos/3259614/pexels-photo-3259614.jpeg?w=500&h=600&fit=crop',
+    image: 'https://images.pexels.com/photos/1024984/pexels-photo-1024984.jpeg?w=700&h=980&fit=crop',
     color: 'from-purple-500 to-indigo-500',
   },
   {
     id: 'budget',
     title: 'Quản lý chi tiêu',
     description: 'Theo dõi chi tiêu chung một cách dễ dàng. Ngân sách rõ ràng, tài chính lành mạnh.',
-    image: 'https://images.pexels.com/photos/3945683/pexels-photo-3945683.jpeg?w=500&h=300&fit=crop',
+    image: 'https://images.pexels.com/photos/285938/pexels-photo-285938.jpeg?w=900&h=600&fit=crop',
     color: 'from-green-500 to-emerald-500',
   },
   {
     id: 'care',
     title: 'Chăm sóc & Tâm trạng',
     description: 'Theo dõi sức khỏe cảm xúc. Hiểu đối phương hơn qua việc chia sẻ tâm trạng.',
-    image: 'https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?w=500&h=300&fit=crop',
+    image: 'https://images.pexels.com/photos/1024968/pexels-photo-1024968.jpeg?w=900&h=600&fit=crop',
     color: 'from-red-500 to-pink-500',
   },
   {
     id: 'live',
     title: 'Đồng bộ thời gian thực',
     description: 'Mỗi thay đổi được cập nhật ngay lập tức. Luôn kết nối, luôn đồng bộ.',
-    image: 'https://images.pexels.com/photos/3587478/pexels-photo-3587478.jpeg?w=500&h=300&fit=crop',
+    image: 'https://images.pexels.com/photos/300957/pexels-photo-300957.jpeg?w=1100&h=620&fit=crop',
     color: 'from-blue-500 to-cyan-500',
   },
   {
     id: 'notifications',
     title: 'Thông báo thông minh',
     description: 'Không bao giờ bỏ lỡ những điều quan trọng. Thông báo kịp thời mọi lúc.',
-    image: 'https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg?w=500&h=600&fit=crop',
+    image: 'https://images.pexels.com/photos/3605451/pexels-photo-3605451.jpeg?w=700&h=980&fit=crop',
     color: 'from-yellow-500 to-orange-500',
   },
   {
     id: 'theme',
     title: 'Giao diện tinh tế',
     description: 'Hiệu ứng kính mờ, chế độ tối sáng. Trải nghiệm đẹp mắt, mượt mà.',
-    image: 'https://images.pexels.com/photos/1229861/pexels-photo-1229861.jpeg?w=500&h=300&fit=crop',
+    image: 'https://images.pexels.com/photos/11491998/pexels-photo-11491998.jpeg?w=1100&h=620&fit=crop',
     color: 'from-violet-500 to-purple-500',
   },
 ];
@@ -64,19 +64,19 @@ const features: Feature[] = [
   <div class="container">
     <!-- Section header -->
     <div class="text-center mb-12 md:mb-16">
-      <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
+      <h2 data-reveal class="reveal text-3xl font-bold tracking-tight sm:text-4xl">
         Mỗi tính năng, một
         <span class="text-primary">trải nghiệm</span>
       </h2>
-      <p class="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+      <p data-reveal class="reveal mt-4 text-lg text-muted-foreground max-w-2xl mx-auto [--reveal-delay:90ms]">
         Em+ được thiết kế để giúp các cặp đôi kết nối sâu sắc hơn, quản lý cuộc sống chung dễ dàng hơn.
       </p>
     </div>
 
-    <!-- Bento Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <!-- Bento Grid (tight, consistent rows) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:auto-rows-[180px]">
       <!-- Card 1: Pairing (2 cols) -->
-      <div class="md:col-span-2 group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 h-[300px] transition hover:border-primary/30 hover:shadow-lg">
+      <div data-reveal class="reveal lg:col-span-2 lg:row-span-2 group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 lg:h-auto min-h-[260px] transition hover:border-primary/30 hover:shadow-lg">
         <img src={features[0].image} alt={features[0].title} class="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 transition-opacity" loading="lazy" />
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/10 group-hover:via-black/50 transition-all"></div>
         <div class="relative z-10 h-full flex flex-col justify-end p-6">
@@ -86,7 +86,7 @@ const features: Feature[] = [
       </div>
 
       <!-- Card 2: Timeline (2 rows) -->
-      <div class="md:row-span-2 group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 h-[300px] md:h-auto transition hover:border-primary/30 hover:shadow-lg">
+      <div data-reveal class="reveal lg:row-span-2 group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 lg:h-auto min-h-[260px] transition hover:border-primary/30 hover:shadow-lg [--reveal-delay:60ms]">
         <img src={features[1].image} alt={features[1].title} class="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 transition-opacity" loading="lazy" />
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/10 group-hover:via-black/50 transition-all"></div>
         <div class="relative z-10 h-full flex flex-col justify-end p-6">
@@ -96,7 +96,7 @@ const features: Feature[] = [
       </div>
 
       <!-- Card 3: Budget -->
-      <div class="group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 h-[300px] transition hover:border-primary/30 hover:shadow-lg">
+      <div data-reveal class="reveal group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 lg:h-auto min-h-[220px] transition hover:border-primary/30 hover:shadow-lg [--reveal-delay:120ms]">
         <img src={features[2].image} alt={features[2].title} class="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 transition-opacity" loading="lazy" />
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/10 group-hover:via-black/50 transition-all"></div>
         <div class="relative z-10 h-full flex flex-col justify-end p-6">
@@ -106,7 +106,7 @@ const features: Feature[] = [
       </div>
 
       <!-- Card 4: Care -->
-      <div class="group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 h-[300px] transition hover:border-primary/30 hover:shadow-lg">
+      <div data-reveal class="reveal group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 lg:h-auto min-h-[220px] transition hover:border-primary/30 hover:shadow-lg [--reveal-delay:160ms]">
         <img src={features[3].image} alt={features[3].title} class="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 transition-opacity" loading="lazy" />
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/10 group-hover:via-black/50 transition-all"></div>
         <div class="relative z-10 h-full flex flex-col justify-end p-6">
@@ -116,7 +116,7 @@ const features: Feature[] = [
       </div>
 
       <!-- Card 5: Live (2 cols) -->
-      <div class="md:col-span-2 group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 h-[300px] transition hover:border-primary/30 hover:shadow-lg">
+      <div data-reveal class="reveal lg:col-span-2 group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 lg:h-auto min-h-[220px] transition hover:border-primary/30 hover:shadow-lg [--reveal-delay:220ms]">
         <img src={features[4].image} alt={features[4].title} class="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 transition-opacity" loading="lazy" />
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/10 group-hover:via-black/50 transition-all"></div>
         <div class="relative z-10 h-full flex flex-col justify-end p-6">
@@ -126,7 +126,7 @@ const features: Feature[] = [
       </div>
 
       <!-- Card 6: Notifications (2 rows) -->
-      <div class="md:row-span-2 group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 h-[300px] md:h-auto transition hover:border-primary/30 hover:shadow-lg">
+      <div data-reveal class="reveal lg:row-span-2 group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 lg:h-auto min-h-[260px] transition hover:border-primary/30 hover:shadow-lg [--reveal-delay:260ms]">
         <img src={features[5].image} alt={features[5].title} class="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 transition-opacity" loading="lazy" />
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/10 group-hover:via-black/50 transition-all"></div>
         <div class="relative z-10 h-full flex flex-col justify-end p-6">
@@ -136,7 +136,7 @@ const features: Feature[] = [
       </div>
 
       <!-- Card 7: Theme (2 cols) -->
-      <div class="md:col-span-2 group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 h-[300px] transition hover:border-primary/30 hover:shadow-lg">
+      <div data-reveal class="reveal lg:col-span-2 group relative overflow-hidden rounded-xl border border-border/40 bg-card/30 lg:h-auto min-h-[220px] transition hover:border-primary/30 hover:shadow-lg [--reveal-delay:320ms]">
         <img src={features[6].image} alt={features[6].title} class="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-100 transition-opacity" loading="lazy" />
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/10 group-hover:via-black/50 transition-all"></div>
         <div class="relative z-10 h-full flex flex-col justify-end p-6">
@@ -144,13 +144,6 @@ const features: Feature[] = [
           <p class="text-sm text-white/85">{features[6].description}</p>
         </div>
       </div>
-    </div>
-
-    <!-- Update note -->
-    <div class="mt-8 p-4 rounded-lg bg-muted/30 border border-border/40">
-      <p class="text-sm text-muted-foreground text-center">
-        🖼️ <strong>Images:</strong> Using stock photos from Pexels. Update with your own images anytime by changing the URLs in <code class="text-xs bg-muted px-2 py-1 rounded">FeatureSection.astro</code>
-      </p>
     </div>
   </div>
 </section>

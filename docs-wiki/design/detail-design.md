@@ -14,7 +14,7 @@ docsWiki:
   project: "emplus"
   template: "detailed"
   themePreset: "clean"
-  generatedAt: "2026-04-10T00:09:32.387Z"
+  generatedAt: "2026-04-10T00:30:54.293Z"
   page: "design/detail-design.md"
 ---
 

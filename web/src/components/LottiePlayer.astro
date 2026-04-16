@@ -1,0 +1,55 @@
+---
+interface Props {
+  /** Path under /public (e.g. /lottie/heart-pulse.json) */
+  src: string;
+  class?: string;
+  loop?: boolean;
+  autoplay?: boolean;
+  speed?: number;
+  ariaLabel?: string;
+}
+
+const {
+  src,
+  class: className,
+  loop = true,
+  autoplay = true,
+  speed = 1,
+  ariaLabel = 'Animation',
+} = Astro.props;
+
+const id = `lottie-${crypto.randomUUID()}`;
+---
+
+<div class={className} aria-label={ariaLabel} role="img">
+  <div id={id} class="h-full w-full"></div>
+</div>
+
+<script type="module" is:inline define:vars={{ id, src, loop, autoplay, speed }}>
+  import lottie from 'lottie-web';
+
+  const el = document.getElementById(id);
+  if (!el) {
+    // Nothing to do
+  } else {
+    const anim = lottie.loadAnimation({
+      container: el,
+      renderer: 'svg',
+      loop,
+      autoplay,
+      path: src,
+      rendererSettings: {
+        progressiveLoad: true,
+        hideOnTransparent: true,
+      },
+    });
+
+    anim.setSpeed(speed);
+
+    // Respect reduced motion
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (reduce.matches) anim.pause();
+    reduce.addEventListener?.('change', (e) => (e.matches ? anim.pause() : anim.play()));
+  }
+</script>
+
