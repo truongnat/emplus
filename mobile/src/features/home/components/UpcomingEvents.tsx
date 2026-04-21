@@ -4,13 +4,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { PressableScale, AppText } from "@/src/ui-kit";
 import { getEventIcon } from "@/src/utils/home-helpers";
-import { useThemeColors, useThemeMode } from "@/src/theme";
-import { elevation } from "@/src/theme/elevation";
+import { useThemeColors } from "@/src/theme";
 import { typographyRoles } from "@/src/theme/typography-roles";
-import {
-  homeDarkGridCard,
-  homeDarkGridInset,
-} from "@/src/theme/emplus-design-tokens";
 
 export interface UpcomingEventItem {
   id: string;
@@ -33,7 +28,6 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
   upcomingEvents,
 }: UpcomingEventsProps) {
   const colors = useThemeColors();
-  const { isDark } = useThemeMode();
   const router = useRouter();
 
   const visibleEvents = useMemo(
@@ -48,7 +42,7 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
   const renderEventItem = useCallback(
     (event: UpcomingEventItem) => {
       const iconDisplay = getEventIcon(event.category);
-      const tint = `${iconDisplay.color}${isDark ? "30" : "16"}`;
+      const tint = `${iconDisplay.color}16`;
 
       return (
         <PressableScale
@@ -56,16 +50,10 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
           scaleTo={0.98}
           style={[
             styles.eventCard,
-            isDark
-              ? {
-                  backgroundColor: homeDarkGridCard.backgroundColor,
-                  borderColor: homeDarkGridCard.borderColor,
-                }
-              : {
-                  backgroundColor: colors.surface.raised,
-                  borderColor: colors.border.subtle,
-                },
-            elevation.raised,
+            {
+              backgroundColor: colors.surface.raised,
+              borderColor: colors.border.default,
+            },
           ]}
           onPress={handleOpenTimeline}
           accessibilityRole="button"
@@ -111,7 +99,7 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
         </PressableScale>
       );
     },
-    [colors, handleOpenTimeline, isDark],
+    [colors, handleOpenTimeline],
   );
 
   return (
@@ -139,18 +127,7 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
               },
             ]}
           >
-            Kỷ niệm & mốc quan trọng
-          </AppText>
-          <AppText
-            style={[
-              styles.headerSub,
-              {
-                color: colors.text.secondary,
-                fontFamily: typographyRoles.body.fontFamily,
-              },
-            ]}
-          >
-            Những ngày đáng nhớ đang đến gần — chạm để xem trên dòng thời gian.
+            Những ngày đang đến gần
           </AppText>
         </View>
 
@@ -161,33 +138,22 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
             <View
               style={[
                 styles.empty,
-                isDark
-                  ? {
-                      backgroundColor: homeDarkGridCard.backgroundColor,
-                      borderColor: homeDarkGridCard.borderColor,
-                    }
-                  : {
-                      backgroundColor: colors.surface.raised,
-                      borderColor: colors.border.subtle,
-                    },
+                {
+                  backgroundColor: colors.surface.raised,
+                  borderColor: colors.border.subtle,
+                },
               ]}
             >
               <View
                 style={[
                   styles.emptyIcon,
-                  isDark
-                    ? {
-                        backgroundColor: homeDarkGridInset.backgroundColor,
-                        borderWidth: StyleSheet.hairlineWidth,
-                        borderColor: homeDarkGridInset.borderColor,
-                      }
-                    : { backgroundColor: colors.surface.sunken },
+                  { backgroundColor: colors.surface.sunken },
                 ]}
               >
                 <Ionicons
                   name="calendar-outline"
                   size={26}
-                  color={colors.secondary.default}
+                  color={colors.text.tertiary}
                 />
               </View>
               <AppText
@@ -199,7 +165,7 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
                   },
                 ]}
               >
-                Chưa có mốc sắp tới
+                Chưa có ngày nào gần kề
               </AppText>
               <AppText
                 style={[
@@ -210,7 +176,7 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
                   },
                 ]}
               >
-                Thêm sự kiện trong dòng thời gian để hai đứa cùng đếm ngược.
+                Thêm sự kiện trong dòng thời gian để Em+ bắt đầu nhắc đúng lúc.
               </AppText>
             </View>
           )}
@@ -221,39 +187,34 @@ export const UpcomingEvents = React.memo(function UpcomingEvents({
 
 const styles = StyleSheet.create({
   section: {
-    marginBottom: 28,
+    marginBottom: 32,
   },
   header: {
-    marginBottom: 16,
+    marginBottom: 12,
     paddingHorizontal: 2,
-    gap: 6,
+    gap: 2,
   },
   headerEyebrow: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "700",
-    letterSpacing: 1.2,
+    letterSpacing: 1,
     textTransform: "uppercase",
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    letterSpacing: -0.3,
-  },
-  headerSub: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginTop: 2,
+    fontSize: 17,
+    fontWeight: "500",
+    letterSpacing: -0.2,
   },
   list: {
     flexDirection: "column",
-    gap: 12,
+    gap: 10,
   },
   eventCard: {
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 22,
-    paddingVertical: 15,
-    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
     borderWidth: StyleSheet.hairlineWidth,
   },
   eventIcon: {
@@ -271,13 +232,13 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   eventTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: -0.15,
+    fontSize: 15,
+    fontWeight: "500",
+    letterSpacing: -0.1,
   },
   eventMeta: {
     fontSize: 11,
-    fontWeight: "700",
+    fontWeight: "600",
     letterSpacing: 0.4,
     textTransform: "uppercase",
   },

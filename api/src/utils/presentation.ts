@@ -1,57 +1,56 @@
 import type { CoupleStatus, Gender } from "../types.ts";
 
-export type GioiTinhHienThi = "NAM" | "NU" | "KHAC" | "KHONG_TIET_LO";
-export type TrangThaiCapDoiHienThi = "CHO_GHEP_DOI" | "DANG_YEU" | "DA_CUOI" | "DA_CHIA_TAY";
-export type TrangThaiPhuThuocHienThi = "HOAT_DONG" | "SU_CO" | "BO_QUA";
+export type DisplayGender = "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY";
+export type DisplayCoupleStatus = "PENDING" | "DATING" | "MARRIED" | "SEPARATED";
+export type DisplayDependencyStatus = "ACTIVE" | "ERROR" | "SKIPPED";
 
 /**
- * Normalize gender input - accepts both old and new formats
+ * Normalize gender input - accepts English gender values
  */
-export function chuanHoaGioiTinhDauVao(value: string | undefined): Gender {
+export function normalizeGenderInput(value: string | undefined): Gender {
   const normalized = (value ?? "").trim().toUpperCase();
 
-  // Accept both old and new formats
-  if (normalized === "NAM" || normalized === "MALE") {
-    return "NAM";
+  if (normalized === "MALE") {
+    return "MALE";
   }
 
-  if (normalized === "NU" || normalized === "NỮ" || normalized === "FEMALE") {
-    return "NU";
+  if (normalized === "FEMALE") {
+    return "FEMALE";
   }
 
-  if (normalized === "KHAC" || normalized === "OTHER") {
-    return "KHAC";
+  if (normalized === "OTHER") {
+    return "OTHER";
   }
 
-  if (normalized === "KHONG_TIET_LO" || normalized === "KHÔNG_TIẾT_LỘ" || normalized === "PREFER_NOT_TO_SAY") {
-    return "KHONG_TIET_LO";
+  if (normalized === "PREFER_NOT_TO_SAY") {
+    return "PREFER_NOT_TO_SAY";
   }
 
-  return "KHAC";
+  return "OTHER";
 }
 
 /**
  * Display gender - now returns the same value since we use Vietnamese directly
  */
-export function hienThiGioiTinh(gender: Gender): GioiTinhHienThi {
+export function displayGender(gender: Gender): DisplayGender {
   return gender;
 }
 
 /**
  * Display couple status - now returns the same value since we use Vietnamese directly
  */
-export function hienThiTrangThaiCapDoi(status: CoupleStatus): TrangThaiCapDoiHienThi {
+export function displayCoupleStatus(status: CoupleStatus): DisplayCoupleStatus {
   return status;
 }
 
-export function hienThiTrangThaiPhuThuoc(status: "up" | "down" | "skipped"): TrangThaiPhuThuocHienThi {
+export function displayDependencyStatus(status: "up" | "down" | "skipped"): DisplayDependencyStatus {
   if (status === "up") {
-    return "HOAT_DONG";
+    return "ACTIVE";
   }
 
   if (status === "down") {
-    return "SU_CO";
+    return "ERROR";
   }
 
-  return "BO_QUA";
+  return "SKIPPED";
 }

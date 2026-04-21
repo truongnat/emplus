@@ -22,7 +22,7 @@ debugRoutes.post("/seed-user", async (context) => {
         id: crypto.randomUUID(),
         email,
         fullName: `Test User ${randomId}`,
-        gender: "KHONG_TIET_LO",
+        gender: "PREFER_NOT_TO_SAY",
         authProvider: "LOCAL",
         authId: email,
         passwordHash: hashPassword(password),
@@ -57,7 +57,7 @@ debugRoutes.post("/seed-invite", async (context) => {
         id: crypto.randomUUID(),
         email,
         fullName: `Inviter ${randomId}`,
-        gender: "KHONG_TIET_LO",
+        gender: "PREFER_NOT_TO_SAY",
         authProvider: "LOCAL",
         authId: email,
         passwordHash: hashPassword("password123"),
@@ -96,8 +96,8 @@ debugRoutes.post("/seed-happy-case", requireAuth, async (context) => {
         const shadowPartner: User = {
             id: partnerId,
             email: partnerEmail,
-            fullName: "Người Thương",
-            gender: user.gender === "NAM" ? "NU" : "NAM",
+            fullName: "Partner",
+            gender: user.gender === "MALE" ? "FEMALE" : "MALE",
             authProvider: "LOCAL",
             authId: partnerEmail,
             passwordHash: hashPassword("password123"),
@@ -116,7 +116,7 @@ debugRoutes.post("/seed-happy-case", requireAuth, async (context) => {
             id: crypto.randomUUID(),
             partner1Id: user.id,
             partner2Id: partnerId,
-            status: "DANG_YEU",
+            status: "DATING",
             loveStartDate: new Date(Date.now() - 86400000 * 365).toISOString().substring(0, 10), // 1 year ago
             settings: {},
             createdAt: now,
@@ -208,7 +208,7 @@ debugRoutes.post("/seed-happy-case", requireAuth, async (context) => {
 
     const budgetItems = [
         { title: "Đặt cọc địa điểm", amount: 5000, category: "venue", status: "PAID", date: todayStr, place: "The Grand Hall" },
-        { title: "Tiền cọc ăn uống", amount: 3200, category: "catering", status: "CHO_GHEP_DOI", date: todayStr, place: "Savor Co." },
+        { title: "Tiền cọc ăn uống", amount: 3200, category: "catering", status: "PENDING", date: todayStr, place: "Savor Co." },
         { title: "Thử váy cưới", amount: 850, category: "clothing", status: "PAID", date: yesterdayStr, place: "Bridal Boutique" },
         { title: "Phát sinh hoa tươi", amount: 1200, category: "other", status: "OVER_BUDGET", date: yesterdayStr, place: "Lily Flower" },
         { title: "Đặt cọc DJ", amount: 500, category: "music", status: "DRAFT", date: pastStr, place: "Soundwave" },
@@ -231,7 +231,7 @@ debugRoutes.post("/seed-happy-case", requireAuth, async (context) => {
     }
 
     // Seed cycle for female user (either current user or partner 1)
-    const femaleId = user.gender === "NU" ? user.id : couple.partner1Id === user.id ? couple.partner2Id : couple.partner1Id;
+    const femaleId = user.gender === "FEMALE" ? user.id : couple.partner1Id === user.id ? couple.partner2Id : couple.partner1Id;
     if (femaleId) {
         await store.saveCycle({
             id: crypto.randomUUID(),

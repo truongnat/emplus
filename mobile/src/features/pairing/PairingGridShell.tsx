@@ -8,12 +8,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { useSession } from "@/src/framework/ctx/session-context";
 import { RegisterTopBar } from "@/src/features/auth/components/RegisterTopBar";
-import { useThemeColors, useThemeMode } from "@/src/theme";
+import { useThemeColors } from "@/src/theme";
 import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
 import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
 import {
   AUTH_GRID_TOP_BAR_OFFSET,
-  authGridScrollPaddingTop,
+  authGridScrollPaddingTopPairing,
 } from "@/src/features/auth/authScreenLayout";
 import { loginScreenStyles as styles } from "@/src/features/auth/loginScreen.styles";
 
@@ -29,12 +29,11 @@ export function PairingGridShell({ children }: PairingGridShellProps) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { clearSession } = useSession();
-  const { isDark } = useThemeMode();
   const colors = useThemeColors();
 
-  useAuthGridChrome(isDark, colors.background.default, true);
+  useAuthGridChrome(false, colors.background.default, true);
 
-  const paddingTop = authGridScrollPaddingTop(insets.top);
+  const paddingTop = authGridScrollPaddingTopPairing(insets.top);
   const paddingBottom = Math.max(insets.bottom, 12) + 16;
 
   const handleBackToLogin = useCallback(() => {
@@ -54,9 +53,9 @@ export function PairingGridShell({ children }: PairingGridShellProps) {
       contentContainerStyle={styles.appContent}
       animatedEntrance={false}
     >
-      <StatusBar style={isDark ? "light" : "dark"} />
+      <StatusBar style="dark" />
       <View style={styles.layerRoot}>
-        <LoginGridAnimatedBackground isDark={isDark} />
+        <LoginGridAnimatedBackground isDark={false} />
 
         <RegisterTopBar
           top={insets.top + AUTH_GRID_TOP_BAR_OFFSET}

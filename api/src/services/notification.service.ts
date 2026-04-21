@@ -4,6 +4,7 @@ import { sendNotificationEmail } from "./mail.ts";
 import type { InAppNotification } from "../types.ts";
 
 export interface NotifyInput {
+  id?: string;
   userId: string;
   coupleId?: string;
   type: string;
@@ -23,7 +24,15 @@ export interface NotifyInput {
  * Fire-and-forget push/email — failures are logged but never block the caller.
  */
 export async function notify(input: NotifyInput): Promise<InAppNotification> {
+  if (input.id) {
+    const existing = await store.getNotificationForUser(input.userId, input.id);
+    if (existing) {
+      return existing;
+    }
+  }
+
   const notification = await store.createInAppNotification({
+    id: input.id,
     userId: input.userId,
     coupleId: input.coupleId,
     type: input.type,

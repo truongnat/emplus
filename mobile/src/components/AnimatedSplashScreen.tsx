@@ -12,11 +12,9 @@ import Animated, {
   withTiming,
   withDelay,
   withSpring,
-  withSequence,
-  withRepeat,
-  interpolate,
   Easing,
   runOnJS,
+  interpolate,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Circle, Defs, RadialGradient, Stop, Rect } from "react-native-svg";
@@ -55,29 +53,6 @@ function FloatingOrb({ config, masterProgress }: {
   useEffect(() => {
     opacity.value = withDelay(config.delay, withTiming(1, { duration: 1200, easing: Easing.out(Easing.quad) }));
     scale.value = withDelay(config.delay, withTiming(1, { duration: 1000, easing: Easing.out(Easing.quad) }));
-
-    translateX.value = withDelay(
-      config.delay,
-      withRepeat(
-        withSequence(
-          withTiming(config.driftX, { duration: 4000, easing: Easing.inOut(Easing.sin) }),
-          withTiming(-config.driftX * 0.6, { duration: 3500, easing: Easing.inOut(Easing.sin) }),
-        ),
-        -1,
-        true,
-      ),
-    );
-    translateY.value = withDelay(
-      config.delay,
-      withRepeat(
-        withSequence(
-          withTiming(config.driftY, { duration: 3800, easing: Easing.inOut(Easing.sin) }),
-          withTiming(-config.driftY * 0.7, { duration: 4200, easing: Easing.inOut(Easing.sin) }),
-        ),
-        -1,
-        true,
-      ),
-    );
   }, []);
 
   const style = useAnimatedStyle(() => ({
@@ -146,39 +121,8 @@ function Sparkle({ config, masterProgress }: {
   const translateY = useSharedValue(0);
 
   useEffect(() => {
-    opacity.value = withDelay(
-      config.delay,
-      withRepeat(
-        withSequence(
-          withTiming(1, { duration: 800, easing: Easing.out(Easing.quad) }),
-          withTiming(0.1, { duration: 1200, easing: Easing.inOut(Easing.quad) }),
-        ),
-        -1,
-        true,
-      ),
-    );
-    scale.value = withDelay(
-      config.delay,
-      withRepeat(
-        withSequence(
-          withTiming(1.3, { duration: 900, easing: Easing.out(Easing.quad) }),
-          withTiming(0.5, { duration: 1100, easing: Easing.inOut(Easing.quad) }),
-        ),
-        -1,
-        true,
-      ),
-    );
-    translateY.value = withDelay(
-      config.delay,
-      withRepeat(
-        withSequence(
-          withTiming(-16, { duration: 2200, easing: Easing.inOut(Easing.sin) }),
-          withTiming(16, { duration: 2200, easing: Easing.inOut(Easing.sin) }),
-        ),
-        -1,
-        true,
-      ),
-    );
+    opacity.value = withDelay(config.delay, withTiming(1, { duration: 600, easing: Easing.out(Easing.quad) }));
+    scale.value = withDelay(config.delay, withTiming(1, { duration: 600, easing: Easing.out(Easing.quad) }));
   }, []);
 
   const style = useAnimatedStyle(() => ({
@@ -231,35 +175,11 @@ export function AnimatedSplashScreen({ onFinish, isReady }: AnimatedSplashScreen
     iconOpacity.value = withDelay(200, withTiming(1, { duration: 600, easing: Easing.out(Easing.quad) }));
     iconScale.value = withDelay(
       200,
-      withSpring(1, { damping: 12, stiffness: 100, mass: 0.8 }),
+      withTiming(1, { duration: 600, easing: Easing.out(Easing.quad) }),
     );
 
     glowOpacity.value = withDelay(400, withTiming(0.7, { duration: 800 }));
-    glowScale.value = withDelay(
-      400,
-      withRepeat(
-        withSequence(
-          withTiming(1.25, { duration: 2200, easing: Easing.inOut(Easing.sin) }),
-          withTiming(0.85, { duration: 2200, easing: Easing.inOut(Easing.sin) }),
-        ),
-        -1,
-        true,
-      ),
-    );
-
     sparkleProgress.value = withDelay(500, withTiming(1, { duration: 600 }));
-
-    iconPulse.value = withDelay(
-      900,
-      withRepeat(
-        withSequence(
-          withTiming(1.04, { duration: 1500, easing: Easing.inOut(Easing.sin) }),
-          withTiming(0.97, { duration: 1500, easing: Easing.inOut(Easing.sin) }),
-        ),
-        -1,
-        true,
-      ),
-    );
   }, []);
 
   const handleExit = useCallback(() => {

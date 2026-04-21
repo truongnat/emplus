@@ -272,7 +272,7 @@ async function ensureCouple(
       UPDATE couples
       SET partner_1_id = ${partner1Id},
           partner_2_id = ${partner2Id},
-          status = 'DANG_YEU',
+          status = 'DATING',
           love_start_date = ${loveStartDate},
           wedding_date = NULL,
           invite_code = NULL,
@@ -300,7 +300,7 @@ async function ensureCouple(
       ${partner2Id},
       ${loveStartDate},
       NULL,
-      ${"DANG_YEU"},
+      ${"DATING"},
       ${JSON.stringify(settings)}::jsonb,
       NOW()
     )

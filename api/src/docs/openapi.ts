@@ -27,6 +27,7 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
       { name: "Cặp đôi" },
       { name: "Trang chủ" },
       { name: "Kỷ niệm" },
+      { name: "Ghi nhớ" },
       { name: "Media" },
       { name: "Chăm sóc" },
       { name: "Debug" },
@@ -155,7 +156,7 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             partner2Id: { type: "string", format: "uuid" },
             loveStartDate: { type: "string", format: "date" },
             weddingDate: { type: "string", format: "date" },
-            status: { type: "string", enum: ["CHO_GHEP_DOI", "DANG_YEU", "DA_CUOI", "DA_CHIA_TAY"] },
+            status: { type: "string", enum: ["PENDING", "DATING", "MARRIED", "SEPARATED"] },
             inviteCode: { type: "string" },
             inviteExpiresAt: { type: "string", format: "date-time" },
             settings: { type: "object" },
@@ -175,6 +176,20 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             mediaUrls: { type: "array", items: { type: "string" } },
             tags: { type: "array", items: { type: "string" } },
             createdAt: { type: "string", format: "date-time" },
+          },
+        },
+        PartnerNote: {
+          type: "object",
+          required: ["id", "userId", "title", "content", "createdAt", "updatedAt"],
+          properties: {
+            id: { type: "string", format: "uuid" },
+            userId: { type: "string", format: "uuid" },
+            coupleId: { type: "string", format: "uuid" },
+            title: { type: "string" },
+            content: { type: "string" },
+            category: { type: "string" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
           },
         },
         DashboardHome: {
@@ -898,9 +913,179 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             404: { description: "Không tìm thấy" },
           },
         },
+        put: {
+          tags: ["Kỷ niệm"],
+          summary: "Cập nhật một mục timeline",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { in: "path", name: "id", required: true, schema: { type: "string", format: "uuid" } },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["title", "memoryDate"],
+                  properties: {
+                    title: { type: "string" },
+                    description: { type: "string" },
+                    memoryDate: { type: "string", format: "date" },
+                    mediaUrls: { type: "array", items: { type: "string" } },
+                    tags: { type: "array", items: { type: "string" } },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            200: {
+              description: "Cập nhật thành công",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/Memory" },
+                },
+              },
+            },
+            400: { description: "Dữ liệu gửi lên không hợp lệ" },
+            404: { description: "Không tìm thấy" },
+          },
+        },
         delete: {
           tags: ["Kỷ niệm"],
           summary: "Xoá mục timeline",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { in: "path", name: "id", required: true, schema: { type: "string", format: "uuid" } },
+          ],
+          responses: {
+            200: {
+              description: "Đã xoá",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["ok"],
+                    properties: { ok: { type: "boolean" } },
+                  },
+                },
+              },
+            },
+            404: { description: "Không tìm thấy" },
+          },
+        },
+      },
+      "/v1/partner-notes": {
+        get: {
+          tags: ["Ghi nhớ"],
+          summary: "Lấy danh sách ghi nhớ về người ấy",
+          security: [{ bearerAuth: [] }],
+          responses: {
+            200: {
+              description: "Danh sách ghi nhớ",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "array",
+                    items: { $ref: "#/components/schemas/PartnerNote" },
+                  },
+                },
+              },
+            },
+          },
+        },
+        post: {
+          tags: ["Ghi nhớ"],
+          summary: "Tạo ghi nhớ mới về người ấy",
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["title", "content"],
+                  properties: {
+                    title: { type: "string" },
+                    content: { type: "string" },
+                    category: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Tạo ghi nhớ thành công",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/PartnerNote" },
+                },
+              },
+            },
+            400: { description: "Dữ liệu gửi lên không hợp lệ" },
+          },
+        },
+      },
+      "/v1/partner-notes/{id}": {
+        get: {
+          tags: ["Ghi nhớ"],
+          summary: "Chi tiết một ghi nhớ",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { in: "path", name: "id", required: true, schema: { type: "string", format: "uuid" } },
+          ],
+          responses: {
+            200: {
+              description: "Ghi nhớ",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/PartnerNote" },
+                },
+              },
+            },
+            404: { description: "Không tìm thấy" },
+          },
+        },
+        put: {
+          tags: ["Ghi nhớ"],
+          summary: "Cập nhật ghi nhớ",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { in: "path", name: "id", required: true, schema: { type: "string", format: "uuid" } },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["title", "content"],
+                  properties: {
+                    title: { type: "string" },
+                    content: { type: "string" },
+                    category: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            200: {
+              description: "Cập nhật thành công",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/PartnerNote" },
+                },
+              },
+            },
+            400: { description: "Dữ liệu gửi lên không hợp lệ" },
+            404: { description: "Không tìm thấy" },
+          },
+        },
+        delete: {
+          tags: ["Ghi nhớ"],
+          summary: "Xoá ghi nhớ",
           security: [{ bearerAuth: [] }],
           parameters: [
             { in: "path", name: "id", required: true, schema: { type: "string", format: "uuid" } },

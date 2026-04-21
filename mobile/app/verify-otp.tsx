@@ -21,7 +21,7 @@ export default function VerifyOtpScreen() {
 
   if (!hydrated) {
     return (
-      <AuthGridScreenShell centerContent>
+      <AuthGridScreenShell centerContent compact>
         <View style={styles.loadingWrap}>
           <EmplusLottie
             source={lottieInventory.loader}
@@ -34,7 +34,7 @@ export default function VerifyOtpScreen() {
   }
 
   return (
-    <AuthGridScreenShell centerContent>
+    <AuthGridScreenShell centerContent compact>
       <VerifyOtpHeroSection email={emailToVerify} />
       <VerifyOtpForm email={emailToVerify} />
     </AuthGridScreenShell>

@@ -8,6 +8,7 @@ import type {
   InAppNotification,
   Invite,
   MemoryItem,
+  PartnerNote,
   User,
   UserMoodState,
 } from "../types.ts";
@@ -21,7 +22,7 @@ function randomToken(prefix: string): string {
   return `${prefix}_${crypto.randomUUID()}`;
 }
 
-const ACTIVE_COUPLE_STATUSES = new Set<string>(["DANG_YEU", "DA_CUOI"]);
+const ACTIVE_COUPLE_STATUSES = new Set<string>(["DATING", "MARRIED"]);
 
 export class InMemoryStore implements DataStore {
   users = new Map<string, User>();
@@ -32,6 +33,7 @@ export class InMemoryStore implements DataStore {
   couples = new Map<string, Couple>();
   invites = new Map<string, Invite>();
   memories = new Map<string, MemoryItem>();
+  partnerNotes = new Map<string, PartnerNote>();
   userMoods = new Map<string, UserMoodState>();
   budgetItems = new Map<string, BudgetItem>();
   anniversaries = new Map<string, Anniversary>();
@@ -51,6 +53,7 @@ export class InMemoryStore implements DataStore {
     this.couples.clear();
     this.invites.clear();
     this.memories.clear();
+    this.partnerNotes.clear();
     this.userMoods.clear();
     this.budgetItems.clear();
     this.anniversaries.clear();
@@ -152,7 +155,7 @@ export class InMemoryStore implements DataStore {
 
   async getPendingCoupleByCreator(userId: string): Promise<Couple | undefined> {
     return Array.from(this.couples.values()).find(
-      (couple) => couple.partner1Id === userId && !couple.partner2Id && couple.status === "CHO_GHEP_DOI",
+      (couple) => couple.partner1Id === userId && !couple.partner2Id && couple.status === "PENDING",
     );
   }
 
@@ -160,7 +163,7 @@ export class InMemoryStore implements DataStore {
     const couple: Couple = {
       id: crypto.randomUUID(),
       partner1Id: creatorId,
-      status: "CHO_GHEP_DOI",
+      status: "PENDING",
       settings: {},
       createdAt: nowIso(),
     };
@@ -222,7 +225,7 @@ export class InMemoryStore implements DataStore {
   async userAlreadyInCouple(userId: string): Promise<boolean> {
     return Array.from(this.couples.values()).some(
       (couple) =>
-        (couple.partner1Id === userId || couple.partner2Id === userId) && couple.status !== "DA_CHIA_TAY",
+        (couple.partner1Id === userId || couple.partner2Id === userId) && couple.status !== "SEPARATED",
     );
   }
 
@@ -297,6 +300,37 @@ export class InMemoryStore implements DataStore {
     const m = this.memories.get(memoryId);
     if (!m || m.coupleId !== coupleId) return false;
     this.memories.delete(memoryId);
+    return true;
+  }
+
+  async listPartnerNotesByUser(userId: string): Promise<PartnerNote[]> {
+    return Array.from(this.partnerNotes.values())
+      .filter((note) => note.userId === userId)
+      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  }
+
+  async getPartnerNoteByUser(userId: string, noteId: string): Promise<PartnerNote | undefined> {
+    const note = this.partnerNotes.get(noteId);
+    if (!note || note.userId !== userId) return undefined;
+    return note;
+  }
+
+  async savePartnerNote(note: PartnerNote): Promise<void> {
+    this.partnerNotes.set(note.id, note);
+  }
+
+  async updatePartnerNote(note: PartnerNote): Promise<void> {
+    const existing = this.partnerNotes.get(note.id);
+    if (!existing || existing.userId !== note.userId) {
+      return;
+    }
+    this.partnerNotes.set(note.id, note);
+  }
+
+  async deletePartnerNote(userId: string, noteId: string): Promise<boolean> {
+    const note = this.partnerNotes.get(noteId);
+    if (!note || note.userId !== userId) return false;
+    this.partnerNotes.delete(noteId);
     return true;
   }
 

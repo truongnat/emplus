@@ -23,6 +23,8 @@ export const appConfig = {
     loginRememberEmail: "emplus.login.rememberEmail.v1",
     /** Người dùng bật đăng ký thông báo đẩy (`1` / `0`). Mặc định khi chưa lưu: coi như bật (hành vi cũ). */
     pushNotificationsEnabled: "emplus.settings.pushNotifications.enabled.v1",
+    /** Ngày quan trọng đầu tiên cho user chưa ghép đôi. */
+    soloImportantDate: "emplus.solo.importantDate.v1",
   },
 
   // Authentication & Session

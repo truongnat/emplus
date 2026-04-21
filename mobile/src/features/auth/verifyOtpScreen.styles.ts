@@ -3,38 +3,39 @@ import { StyleSheet } from "react-native";
 export const verifyOtpScreenStyles = StyleSheet.create({
   hero: {
     alignItems: "center",
-    marginBottom: 18,
+    marginBottom: 10,
     width: "100%",
-    paddingHorizontal: 20,
+    paddingHorizontal: 18,
   },
-  /** Không nền/bo — Lottie nằm trực tiếp trên lưới nền (giống logo login). */
-  lottieHeroWrap: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 14,
+  eyebrow: {
+    fontFamily: "BeVietnamPro_500Medium",
+    fontSize: 11,
+    letterSpacing: 0.2,
+    textTransform: "uppercase",
+    marginBottom: 8,
   },
   title: {
-    fontFamily: "BeVietnamPro_800ExtraBold",
-    fontSize: 24,
+    fontFamily: "BeVietnamPro_600SemiBold",
+    fontSize: 22,
     textAlign: "center",
-    marginBottom: 8,
-    letterSpacing: -0.4,
-    paddingHorizontal: 8,
+    marginBottom: 6,
+    letterSpacing: -0.3,
+    paddingHorizontal: 4,
   },
   subtitle: {
     fontFamily: "BeVietnamPro_400Regular",
-    fontSize: 15,
+    fontSize: 13,
     textAlign: "center",
-    lineHeight: 22,
-    marginBottom: 8,
-    paddingHorizontal: 12,
+    lineHeight: 19,
+    marginBottom: 5,
+    paddingHorizontal: 8,
   },
   emailText: {
-    fontFamily: "BeVietnamPro_700Bold",
-    fontSize: 16,
+    fontFamily: "BeVietnamPro_600SemiBold",
+    fontSize: 13,
     textAlign: "center",
-    lineHeight: 22,
-    paddingHorizontal: 16,
+    lineHeight: 19,
+    paddingHorizontal: 12,
   },
   otpOuterContainer: {
     width: "100%",
@@ -49,22 +50,21 @@ export const verifyOtpScreenStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
-    gap: 8,
+    gap: 6,
     paddingHorizontal: 0,
   },
   otpCell: {
     flex: 1,
-    height: 56,
+    height: 52,
     minWidth: 0,
-    /** Bo góc set trong form (24 sáng / 16 tối — giống Input login). */
-    borderWidth: StyleSheet.hairlineWidth * 2,
+    borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
   },
   otpCellText: {
-    fontFamily: "BeVietnamPro_700Bold",
-    fontSize: 22,
+    fontFamily: "BeVietnamPro_600SemiBold",
+    fontSize: 20,
   },
   cursor: {
     position: "absolute",
@@ -77,16 +77,16 @@ export const verifyOtpScreenStyles = StyleSheet.create({
   },
   countdownText: {
     fontFamily: "BeVietnamPro_400Regular",
-    fontSize: 14,
+    fontSize: 13,
     textAlign: "center",
-    lineHeight: 20,
+    lineHeight: 18,
   },
   resendText: {
     fontFamily: "BeVietnamPro_600SemiBold",
-    fontSize: 14,
+    fontSize: 13,
   },
   formOuterSpacing: {
-    marginTop: 2,
+    marginTop: 6,
     width: "100%",
   },
   loadingWrap: {
@@ -100,9 +100,4 @@ export const verifyOtpScreenStyles = StyleSheet.create({
 export const verifyOtpLottieLoader = {
   width: 120,
   height: 120,
-};
-
-export const verifyOtpLottieHero = {
-  width: 150,
-  height: 150,
 };

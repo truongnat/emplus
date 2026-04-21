@@ -22,7 +22,7 @@ export function RegisterLoginFooter() {
 
   return (
     <Animated.View entering={enteringFooter}>
-      <LoginFooterSlot>
+      <LoginFooterSlot compact>
         <View style={styles.signUpContainer}>
           <Text
             style={[

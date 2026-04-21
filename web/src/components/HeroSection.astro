@@ -1,318 +1,122 @@
 ---
 import { siteDescription } from '@/lib/site';
 import { androidAppUrl, iosAppUrl } from '@/lib/site';
-import LottiePlayer from '@/components/LottiePlayer.astro';
-import Snowfall from '@/components/Snowfall.astro';
 
 const iosHref = iosAppUrl() ?? '#download';
 const androidHref = androidAppUrl() ?? '#download';
+const primaryHref = iosHref !== '#download' ? iosHref : androidHref;
+
+const checklist = [
+  {
+    label: 'Kỷ niệm sắp tới',
+    title: 'Còn 3 ngày đến ngày đầu yêu',
+    detail: 'Em+ nhắc sớm để bạn không phải xoay xở phút cuối.',
+  },
+  {
+    label: 'Điều cần nhớ',
+    title: 'Người ấy thích thư tay hơn quà phô trương',
+    detail: 'Những chi tiết nhỏ được giữ lại ở nơi bạn dễ tìm nhất.',
+  },
+  {
+    label: 'Gợi ý hôm nay',
+    title: 'Nhắn một câu ngắn trước 22:00',
+    detail: 'Đủ nhẹ để làm ngay, đủ đúng để tạo khác biệt.',
+  },
+];
 ---
 
-<section class="relative overflow-hidden py-20 md:py-32 lg:py-40">
-  <!-- Gradient background orbs for glass morphism -->
-  <div class="absolute inset-0 -z-10">
-    <div
-      data-parallax
-      data-parallax-speed="0.18"
-      class="parallax-layer absolute top-1/4 left-1/4 w-72 h-72 bg-primary/20 rounded-full blur-3xl opacity-60"
-    ></div>
-    <div
-      data-parallax
-      data-parallax-speed="0.26"
-      class="parallax-layer absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/15 rounded-full blur-3xl opacity-50"
-    ></div>
-    <div
-      data-parallax
-      data-parallax-speed="0.12"
-      class="parallax-layer absolute top-1/2 right-1/3 w-64 h-64 bg-accent/10 rounded-full blur-3xl opacity-40"
-    ></div>
-
-    <Snowfall count={34} />
+<section class="relative overflow-hidden py-18 md:py-24 lg:py-28">
+  <div class="absolute inset-x-0 top-0 -z-10 h-[30rem]">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.16),transparent_34%),radial-gradient(circle_at_top_right,hsl(var(--secondary)/0.12),transparent_30%)]"></div>
   </div>
 
   <div class="container">
-    <div class="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 md:grid-cols-2">
-      <div class="text-center md:text-left">
-      <!-- Badge -->
-      <div data-reveal class="reveal inline-flex items-center gap-2 rounded-full border border-border bg-card/40 backdrop-blur px-4 py-1.5 text-sm text-muted-foreground mb-8">
-        <svg class="h-4 w-4 text-primary fill-primary" viewBox="0 0 24 24">
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-        </svg>
-        <span>Ứng dụng dành cho các cặp đôi</span>
-      </div>
+    <div class="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 lg:grid-cols-[1.02fr_0.98fr]">
+      <div class="text-center lg:text-left">
+        <div data-reveal class="reveal mb-6 inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/80 px-4 py-2 text-sm text-muted-foreground shadow-sm">
+          <span class="inline-flex h-2.5 w-2.5 rounded-full bg-primary"></span>
+          <span>Cho người đang yêu nhưng không muốn quên những điều nhỏ, kể cả khi bắt đầu một mình</span>
+        </div>
 
-      <!-- Main headline -->
-      <h1 data-reveal class="reveal text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl [--reveal-delay:80ms]">
-        Cùng nhau xây dựng
-        <span class="block bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-          tình yêu
-        </span>
-      </h1>
+        <h1 data-reveal class="reveal text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl [--reveal-delay:70ms]">
+          Nhớ đúng lúc.
+          <span class="block text-primary">Quan tâm đúng cách.</span>
+        </h1>
 
-      <!-- Description -->
-      <p data-reveal class="reveal mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto md:mx-0 [--reveal-delay:140ms]">
-        {siteDescription}
-      </p>
+        <p data-reveal class="reveal mt-6 max-w-2xl text-lg leading-8 text-muted-foreground lg:mx-0 [--reveal-delay:120ms]">
+          {siteDescription}
+          {' '}
+          Em+ giúp bạn giữ những ngày quan trọng, những điều nên nhớ về người ấy,
+          và một gợi ý nhỏ để hôm nay không trôi qua vô tâm. Khi cả hai đã sẵn sàng,
+          pairing sẽ giúp đồng bộ trải nghiệm chung.
+        </p>
 
-      <!-- CTA Buttons -->
-      <div data-reveal class="reveal mt-10 flex flex-col sm:flex-row gap-4 justify-center md:justify-start [--reveal-delay:200ms]">
-        <a
-          href={iosHref}
-          target={iosHref.startsWith('http') ? '_blank' : undefined}
-          rel={iosHref.startsWith('http') ? 'noopener noreferrer' : undefined}
-          class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-8 py-3 text-base font-semibold text-primary-foreground shadow-lg transition hover:opacity-90 active:scale-95"
-        >
-          <svg
-            class="h-5 w-5"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
+        <div data-reveal class="reveal mt-9 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start [--reveal-delay:180ms]">
+          <a
+            href={primaryHref}
+            target={primaryHref.startsWith('http') ? '_blank' : undefined}
+            rel={primaryHref.startsWith('http') ? 'noopener noreferrer' : undefined}
+            class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-3.5 text-base font-semibold text-primary-foreground shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
-            <path
-              d="M16.7 13.2c0 2.6 2.3 3.5 2.4 3.6-.02.06-.36 1.24-1.2 2.45-.72 1.04-1.46 2.08-2.63 2.1-1.15.02-1.52-.67-2.84-.67-1.33 0-1.73.65-2.83.69-1.13.04-1.99-1.15-2.72-2.19-1.49-2.15-2.63-6.08-1.1-8.73.76-1.31 2.12-2.14 3.6-2.16 1.12-.02 2.18.76 2.84.76.66 0 1.9-.94 3.2-.8.54.02 2.06.22 3.04 1.67-.08.05-1.81 1.06-1.79 3.22z"
-            />
-            <path
-              d="M14.6 2.6c.63.8 1.04 1.92.93 3.04-1.02.04-2.25-.67-2.98-1.47-.65-.7-1.22-1.84-1.07-2.93 1.14-.09 2.34.61 3.12 1.36z"
-            />
-          </svg>
-          Tải cho iOS
-        </a>
-        <a
-          href={androidHref}
-          target={androidHref.startsWith('http') ? '_blank' : undefined}
-          rel={androidHref.startsWith('http') ? 'noopener noreferrer' : undefined}
-          class="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card/40 backdrop-blur px-8 py-3 text-base font-semibold text-foreground transition hover:bg-card active:scale-95"
-        >
-          <svg
-            class="h-5 w-5"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
+            Bắt đầu với Em+
+          </a>
+          <a
+            href="#features"
+            class="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-card px-8 py-3.5 text-base font-semibold text-foreground transition hover:border-primary/25 hover:bg-card/90"
           >
-            <path d="M17.6 9.5c-.1 0-.2 0-.3-.1l1.1-2c.1-.2.4-.3.6-.1.2.1.3.4.1.6l-1.2 2c-.1.1-.2.2-.3.2zM6.7 9.5c-.1 0-.3-.1-.3-.2l-1.2-2c-.1-.2 0-.5.1-.6.2-.1.5 0 .6.1l1.1 2c.1.2 0 .5-.2.6-.1.1-.1.1-.1.1z" />
-            <path d="M8.1 7.6c0-1 .9-1.9 1.9-1.9h4c1 0 1.9.9 1.9 1.9v.5H8.1v-.5z" />
-            <path d="M6.6 9.1c-1 0-1.9.9-1.9 1.9v6.3c0 1 .9 1.9 1.9 1.9h.6v1.4c0 .5.4.9.9.9s.9-.4.9-.9v-1.4h6.8v1.4c0 .5.4.9.9.9s.9-.4.9-.9v-1.4h.6c1 0 1.9-.9 1.9-1.9V11c0-1-.9-1.9-1.9-1.9H6.6zm2.2 8.6H7.1v-5.8h1.7v5.8zm8.1 0h-1.7v-5.8h1.7v5.8z" />
-          </svg>
-          Tải cho Android
-        </a>
-      </div>
+            Xem cách Em+ giúp
+          </a>
+        </div>
 
-      <!-- Scroll indicator -->
-      <div data-reveal class="reveal mt-16 [--reveal-delay:260ms]">
-        <div class="animate-bounce flex justify-center">
-          <svg class="h-6 w-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-          </svg>
+        <div data-reveal class="reveal mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-muted-foreground lg:justify-start [--reveal-delay:230ms]">
+          <span>Miễn phí để bắt đầu</span>
+          <span class="hidden h-1 w-1 rounded-full bg-border sm:inline-flex"></span>
+          <span>Dùng một mình trước, ghép đôi sau nếu thấy cần</span>
         </div>
       </div>
-      </div>
 
-      <div class="relative mx-auto w-full max-w-md md:max-w-none">
-        <div class="relative overflow-hidden rounded-2xl border border-border/40 bg-card/30 backdrop-blur">
-          <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10"></div>
-          <div class="relative p-6 md:p-8">
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Today
-                </div>
-                <div class="mt-1 flex items-center gap-2 text-base font-semibold tracking-tight">
-                  <span>Em+ moments</span>
-                  <span class="inline-flex items-center">
-                    <svg
-                      class="h-4 w-4 text-accent opacity-90 animate-pulse"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      aria-hidden="true"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M12 2l1.1 6.2L19 9.9l-5.1 3.4L15 20l-3-2.2L9 20l1.1-6.7L5 9.9l5.9-1.7L12 2z"
-                      />
-                    </svg>
-                  </span>
-                </div>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-2 rounded-full border border-border/50 bg-background/40 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-                  <span class="relative inline-flex h-2 w-2">
-                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent/60"></span>
-                    <span class="relative inline-flex h-2 w-2 rounded-full bg-accent/70"></span>
-                  </span>
-                  <span>3 cập nhật</span>
-                </span>
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary">
-                  <svg
-                    class="h-3.5 w-3.5"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path d="M12 21.23 4.22 13.45a5.5 5.5 0 0 1 7.78-7.78L12 6.67l0.99-0.99a5.5 5.5 0 0 1 7.78 7.78L12 21.23z"></path>
-                  </svg>
-                  <span>Nhẹ nhàng</span>
-                </span>
-              </div>
+      <div data-reveal class="reveal relative mx-auto w-full max-w-xl [--reveal-delay:210ms]">
+        <div class="rounded-[30px] border border-border/80 bg-card/95 p-5 shadow-sm md:p-6">
+          <div class="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Hôm nay trong Em+
+              </p>
+              <h2 class="mt-2 text-[1.55rem] font-semibold tracking-tight text-foreground md:text-[1.7rem]">
+                Một nơi để không bỏ sót điều quan trọng
+              </h2>
             </div>
+            <span class="inline-flex rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+              Solo-first
+            </span>
+          </div>
 
-            <div class="mt-5 grid grid-cols-3 gap-2 rounded-xl border border-border/40 bg-background/35 p-3">
-              <div class="rounded-lg bg-card/40 px-3 py-2">
-                <div class="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
-                  <span>Chuỗi</span>
-                  <svg
-                    class="h-3.5 w-3.5 text-primary/80"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    aria-hidden="true"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21.23 4.22 13.45a5.5 5.5 0 0 1 7.78-7.78L12 6.67l0.99-0.99a5.5 5.5 0 0 1 7.78 7.78L12 21.23z" />
-                  </svg>
-                </div>
-                <div class="mt-0.5 text-sm font-semibold">7 ngày</div>
+          <div class="space-y-2.5">
+            {checklist.map((item) => (
+              <div class="rounded-2xl border border-border/80 bg-background/90 px-4 py-4">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  {item.label}
+                </p>
+                <p class="mt-2 text-base font-semibold tracking-tight text-foreground">
+                  {item.title}
+                </p>
+                <p class="mt-2 text-sm leading-6 text-muted-foreground">
+                  {item.detail}
+                </p>
               </div>
-              <div class="rounded-lg bg-card/40 px-3 py-2">
-                <div class="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
-                  <span>Kỷ niệm</span>
-                  <svg
-                    class="h-3.5 w-3.5 text-secondary/80"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    aria-hidden="true"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h10a2 2 0 0 1 2 2v10a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V9a2 2 0 0 1 2-2z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6M9 16h6" />
-                  </svg>
-                </div>
-                <div class="mt-0.5 text-sm font-semibold">12</div>
-              </div>
-              <div class="rounded-lg bg-card/40 px-3 py-2">
-                <div class="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
-                  <span>Nhắc nhở</span>
-                  <svg
-                    class="h-3.5 w-3.5 text-accent/80"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    aria-hidden="true"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 0 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a3 3 0 0 0 6 0" />
-                  </svg>
-                </div>
-                <div class="mt-0.5 text-sm font-semibold">2</div>
-              </div>
-            </div>
+            ))}
+          </div>
 
-            <div class="mt-5 grid grid-cols-2 gap-4">
-              <div class="group relative overflow-hidden rounded-xl border border-border/40 bg-background/40 p-4">
-                <div class="absolute inset-0 opacity-0 transition group-hover:opacity-100 bg-gradient-to-br from-primary/10 via-transparent to-transparent"></div>
-                <div class="relative flex items-center gap-3">
-                  <div class="rounded-lg border border-border/40 bg-card/50 p-1.5">
-                    <LottiePlayer
-                      src="/lottie/heart-pulse.json"
-                      class="h-9 w-9"
-                      speed={1.05}
-                      ariaLabel="Heart pulse"
-                    />
-                  </div>
-                  <div class="min-w-0">
-                    <div class="text-sm font-semibold">Đếm ngày yêu</div>
-                    <div class="mt-0.5 text-xs text-muted-foreground">
-                      Nhìn lại từng mốc nhỏ
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="group relative overflow-hidden rounded-xl border border-border/40 bg-background/40 p-4">
-                <div class="absolute inset-0 opacity-0 transition group-hover:opacity-100 bg-gradient-to-br from-secondary/10 via-transparent to-transparent"></div>
-                <div class="relative flex items-center gap-3">
-                  <div class="rounded-lg border border-border/40 bg-card/50 p-1.5">
-                    <LottiePlayer
-                      src="/lottie/sparkle-loop.json"
-                      class="h-9 w-9"
-                      speed={1}
-                      ariaLabel="Sparkles"
-                    />
-                  </div>
-                  <div class="min-w-0">
-                    <div class="text-sm font-semibold">Timeline</div>
-                    <div class="mt-0.5 text-xs text-muted-foreground">
-                      Lưu kỷ niệm đẹp
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-span-2 rounded-xl border border-border/40 bg-background/40 p-4">
-                <div class="flex items-start justify-between gap-3">
-                  <div class="min-w-0">
-                    <div class="flex items-center gap-2">
-                      <div class="text-sm font-semibold">Gợi ý hôm nay</div>
-                      <span class="rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-semibold text-accent-foreground">
-                        Check-in 2 phút
-                      </span>
-                    </div>
-                    <p class="mt-2 text-sm text-muted-foreground">
-                      “Hôm nay điều gì làm em/anh vui nhất?” — hỏi đúng một câu,
-                      gần nhau hơn một bước.
-                    </p>
-                  </div>
-
-                  <div class="shrink-0">
-                    <div class="flex -space-x-2">
-                      <span class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background/60 text-xs font-semibold">
-                        A
-                      </span>
-                      <span class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background/60 text-xs font-semibold">
-                        E
-                      </span>
-                    </div>
-                    <div class="mt-2 text-center text-[11px] text-muted-foreground">
-                      đôi mình
-                    </div>
-                  </div>
-                </div>
-
-                <div class="mt-4 grid grid-cols-2 gap-2">
-                  <div class="flex items-center gap-2 rounded-lg border border-border/40 bg-card/40 px-3 py-2 text-xs text-muted-foreground">
-                    <svg class="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M20 6 9 17l-5-5" />
-                    </svg>
-                    <span>Nhắc đúng lúc</span>
-                  </div>
-                  <div class="flex items-center gap-2 rounded-lg border border-border/40 bg-card/40 px-3 py-2 text-xs text-muted-foreground">
-                    <svg class="h-4 w-4 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M20 6 9 17l-5-5" />
-                    </svg>
-                    <span>Lưu “moment”</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="mt-4 rounded-2xl border border-primary/15 bg-primary/5 px-4 py-4">
+            <p class="text-sm font-medium text-foreground">
+              Không cần chờ pairing mới bắt đầu.
+            </p>
+            <p class="mt-1 text-sm leading-6 text-muted-foreground">
+              Dùng một mình đã có ích. Pairing chỉ làm nhắc nhở và bối cảnh chung liền mạch hơn.
+            </p>
           </div>
         </div>
-
-        <div class="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-primary/15 blur-2xl"></div>
-        <div class="pointer-events-none absolute -bottom-8 -left-8 h-28 w-28 rounded-full bg-secondary/15 blur-2xl"></div>
       </div>
     </div>
   </div>
 </section>
-
-<style>
-  @keyframes gradient-animation {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
-  }
-</style>

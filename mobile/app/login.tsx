@@ -27,7 +27,7 @@ import { loginScreenStyles as styles } from "@/src/features/auth/loginScreen.sty
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const { isDark } = useThemeMode();
-  const { isAuthenticated, hydrated: isHydrated, session } = useSession();
+  const { isAuthenticated, hydrated: isHydrated } = useSession();
   const colors = useThemeColors();
 
   useAuthGridChrome(
@@ -41,8 +41,7 @@ export default function LoginScreen() {
   }
 
   if (isAuthenticated) {
-    const isPaired = Boolean(session?.user?.coupleId);
-    return <Redirect href={isPaired ? "/(tabs)/home" : "/pairing"} />;
+    return <Redirect href="/(tabs)/home" />;
   }
 
   return (

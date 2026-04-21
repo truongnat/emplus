@@ -4,7 +4,7 @@ import { useSession } from "@/src/session-context";
 import { useThemeColors } from "@/src/theme";
 
 export default function Index() {
-  const { hydrated, isAuthenticated, session } = useSession();
+  const { hydrated, isAuthenticated } = useSession();
   const colors = useThemeColors();
 
   if (!hydrated) {
@@ -31,10 +31,6 @@ export default function Index() {
 
   if (!isAuthenticated) {
     return <Redirect href="/login" />;
-  }
-
-  if (!session?.user?.coupleId) {
-    return <Redirect href="/pairing" />;
   }
 
   return <Redirect href="/(tabs)/home" />;

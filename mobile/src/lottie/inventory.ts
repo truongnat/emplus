@@ -24,6 +24,8 @@ export const lottieInventory = {
   notificationsEmptyCat: require("../../assets/lottie/notifications-empty-cat.json"),
   /** Timeline empty — `Love.lottie` (dotLottie → JSON, vector). */
   timelineEmptyLove: require("../../assets/lottie/timeline-empty-love.json"),
+  /** Home header decoration — `Cute bunnies love animation.lottie` → JSON. */
+  homeLoveBunnies: require("../../assets/lottie/love-bunnies.json"),
 } as const;
 
 export type LottieInventoryKey = keyof typeof lottieInventory;

@@ -7,7 +7,7 @@ import { AuthGridScreenShell } from "@/src/features/auth/components/AuthGridScre
 
 export default function RegisterScreen() {
   return (
-    <AuthGridScreenShell>
+    <AuthGridScreenShell compact>
       <RegisterHeroSection />
       <RegisterAuthForm />
       <RegisterLoginFooter />

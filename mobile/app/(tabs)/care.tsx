@@ -430,6 +430,7 @@ export default function CareScreen() {
 
   const user = session?.user;
   const isMale = user?.gender === "NAM";
+  const isPaired = Boolean(user?.coupleId);
 
   const { data, error } = useQuery({
     queryKey: ["maleSuggestions"],
@@ -437,14 +438,14 @@ export default function CareScreen() {
       const result = await getMaleSuggestions();
       return result as ExtendedMaleSuggestions;
     },
-    enabled: isMale,
+    enabled: isMale && isPaired,
     retry: false,
   });
 
   const { data: coupleMood } = useQuery({
     queryKey: ["coupleMood"],
     queryFn: getCoupleMood,
-    enabled: isAuthenticated && isMale,
+    enabled: isAuthenticated && isMale && isPaired,
     staleTime: 15_000,
     refetchInterval: 20_000,
   });

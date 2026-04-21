@@ -5,7 +5,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppScreen } from "@/src/components/organisms/AppScreen";
-import { useThemeColors, useThemeMode } from "@/src/theme";
+import { useThemeColors } from "@/src/theme";
 import { LoginGridAnimatedBackground } from "./LoginGridAnimatedBackground";
 import { RegisterTopBar } from "./RegisterTopBar";
 import { useAuthGridChrome } from "../hooks/useAuthGridChrome";
@@ -20,6 +20,7 @@ type AuthGridScreenShellProps = {
   children: ReactNode;
   /** Vertically center hero + form in the scroll area (e.g. forgot-password); register stays top-aligned. */
   centerContent?: boolean;
+  compact?: boolean;
 };
 
 /**
@@ -29,14 +30,14 @@ type AuthGridScreenShellProps = {
 export function AuthGridScreenShell({
   children,
   centerContent = false,
+  compact = false,
 }: AuthGridScreenShellProps) {
   const insets = useSafeAreaInsets();
-  const { isDark } = useThemeMode();
   const colors = useThemeColors();
 
-  useAuthGridChrome(isDark, colors.background.default, true);
+  useAuthGridChrome(false, colors.background.default, true);
 
-  const paddingTop = authGridScrollPaddingTop(insets.top);
+  const paddingTop = authGridScrollPaddingTop(insets.top) - (compact ? 18 : 0);
 
   return (
     <AppScreen
@@ -48,9 +49,9 @@ export function AuthGridScreenShell({
       contentContainerStyle={styles.appContent}
       animatedEntrance={false}
     >
-      <StatusBar style={isDark ? "light" : "dark"} />
+      <StatusBar style="dark" />
       <View style={styles.layerRoot}>
-        <LoginGridAnimatedBackground isDark={isDark} />
+        <LoginGridAnimatedBackground isDark={false} />
 
         <RegisterTopBar
           top={insets.top + AUTH_GRID_TOP_BAR_OFFSET}
@@ -80,6 +81,7 @@ export function AuthGridScreenShell({
           <View
             style={[
               regStyles.registerScrollInner,
+              compact ? regStyles.registerScrollInnerCompact : null,
               centerContent && { justifyContent: "center" },
             ]}
           >

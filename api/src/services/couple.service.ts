@@ -7,7 +7,7 @@ import type { Couple, User } from "../types.ts";
 import { INVITE_CODE_TTL_SECONDS } from "../constants/index.ts";
 import { generateInviteCode } from "../shared/code.ts";
 import { formatDate, todayUtc } from "../shared/date.ts";
-import { hienThiGioiTinh, hienThiTrangThaiCapDoi } from "../utils/presentation.ts";
+import { displayGender, displayCoupleStatus } from "../utils/presentation.ts";
 import { notify } from "./notification.service.ts";
 import { AppError } from "../utils/http.ts";
 
@@ -61,7 +61,7 @@ export async function joinCouple(user: User, inviteCode: string): Promise<JoinRe
   }
 
   const couple = await store.getCoupleById(invite.coupleId);
-  if (!couple || couple.status !== "CHO_GHEP_DOI") {
+  if (!couple || couple.status !== "PENDING") {
     throw new AppError(404, "INVITE_NOT_FOUND", "Mã mời không tồn tại hoặc đã hết hạn.");
   }
   if (couple.inviteCode !== rawInviteCode) {
@@ -89,7 +89,7 @@ export async function joinCouple(user: User, inviteCode: string): Promise<JoinRe
 
   // Update couple
   couple.partner2Id = user.id;
-  couple.status = "DANG_YEU";
+  couple.status = "DATING";
   couple.loveStartDate = couple.loveStartDate ?? formatDate(todayUtc());
   couple.inviteCode = undefined;
   couple.inviteExpiresAt = undefined;
@@ -123,11 +123,11 @@ export async function joinCouple(user: User, inviteCode: string): Promise<JoinRe
 
   return {
     coupleId: couple.id,
-    status: hienThiTrangThaiCapDoi(couple.status),
+    status: displayCoupleStatus(couple.status),
     partnerInfo: {
       id: inviter.id,
       fullName: inviter.fullName,
-      gender: hienThiGioiTinh(inviter.gender),
+      gender: displayGender(inviter.gender),
     },
   };
 }

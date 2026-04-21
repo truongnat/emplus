@@ -17,6 +17,8 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  withTiming,
+  Easing,
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
@@ -119,17 +121,11 @@ const SwipeableItem = memo(function SwipeableItem<T>({
       const pos = translateX.value;
 
       if (pos > leftWidth / 2) {
-        translateX.value = withSpring(leftWidth, {
-          damping: 20,
-          stiffness: 300,
-        });
+        translateX.value = withTiming(leftWidth, { duration: 250, easing: Easing.out(Easing.quad) });
       } else if (pos < -rightWidth / 2) {
-        translateX.value = withSpring(-rightWidth, {
-          damping: 20,
-          stiffness: 300,
-        });
+        translateX.value = withTiming(-rightWidth, { duration: 250, easing: Easing.out(Easing.quad) });
       } else {
-        translateX.value = withSpring(0, { damping: 20, stiffness: 300 });
+        translateX.value = withTiming(0, { duration: 250, easing: Easing.out(Easing.quad) });
       }
     });
 

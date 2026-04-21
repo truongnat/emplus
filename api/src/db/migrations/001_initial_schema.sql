@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS couples (
   invite_expires_at TIMESTAMPTZ,
   settings JSONB NOT NULL DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  CONSTRAINT chk_couples_status CHECK (status IN ('CHO_GHEP_DOI', 'DANG_YEU', 'DA_CUOI', 'DA_CHIA_TAY')),
+  CONSTRAINT chk_couples_status CHECK (status IN ('PENDING', 'DATING', 'MARRIED', 'SEPARATED')),
   CONSTRAINT chk_couples_not_self CHECK (partner_1_id IS DISTINCT FROM partner_2_id)
 );
 

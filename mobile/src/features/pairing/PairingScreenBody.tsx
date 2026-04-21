@@ -25,7 +25,7 @@ import { useSession } from "@/src/framework/ctx/session-context";
 import { useToast } from "@/src/toast-context";
 import { dependencies } from "@/src/framework/di/dependencies";
 import { toDisplayError } from "@/src/core/api/to-display-error";
-import { useThemeColors, useThemeMode } from "@/src/theme";
+import { useThemeColors } from "@/src/theme";
 import {
   authGlassBlurIntensity,
   authSoftFieldSurface,
@@ -34,11 +34,10 @@ import {
 import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
 import { usePressAnimation } from "@/src/animations/presets";
 import { lottieInventory } from "@/src/lottie/inventory";
-import { PairingGradientTitle } from "./PairingGradientTitle";
 import { QRScannerSheet } from "./QRScannerSheet";
 import { pairingScreenStyles as styles } from "./pairingScreen.styles";
 
-const QR_SIZE = 160;
+const QR_SIZE = 148;
 
 /** QR must stay dark-on-light for scanners; never tie module color to theme text. */
 const QR_MODULE_COLOR = "#000000";
@@ -49,7 +48,6 @@ const QR_HEART_IMAGE = require("../../../assets/images/qr-heart.png");
 export function PairingScreenBody() {
   const router = useRouter();
   const colors = useThemeColors();
-  const { isDark } = useThemeMode();
   const { session, setSession } = useSession();
   const { showToast } = useToast();
   const reducedMotion = useReducedMotion();
@@ -65,12 +63,10 @@ export function PairingScreenBody() {
   const feedbackScale = useRef(new Animated.Value(1)).current;
 
   const placeholderColor = colors.text.secondary;
-  const loginPlaceholder = isDark ? placeholderColor : loginFigmaLight.subtitle;
-  const loginLabelColor = isDark ? undefined : loginFigmaLight.titleDark;
-  const loginSoft = isDark
-    ? authSoftFieldSurface.dark
-    : authSoftFieldSurface.light;
-  const loginInputRadius = !isDark ? loginFigmaLight.inputPillRadius : 16;
+  const loginPlaceholder = loginFigmaLight.subtitle;
+  const loginLabelColor = loginFigmaLight.titleDark;
+  const loginSoft = authSoftFieldSurface.light;
+  const loginInputRadius = loginFigmaLight.inputPillRadius;
 
   const generateInviteMutation = useMutation({
     mutationFn: () => dependencies.couple.generateInvite.execute(),
@@ -205,32 +201,27 @@ export function PairingScreenBody() {
     <View style={styles.screenColumn}>
       <View style={styles.upperBlock}>
         <AnimatedRe.View entering={enteringHeader} style={styles.header}>
-          <View style={styles.titleWrap}>
-            <PairingGradientTitle />
-          </View>
+          <Text style={[styles.title, { color: colors.text.primary }]}>
+            Ghép đôi khi bạn đã sẵn sàng
+          </Text>
           <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
-            Kết nối trái tim của hai bạn
+            Đồng bộ ngày quan trọng và nhắc nhở chung. Bạn có thể quay lại bước này bất kỳ lúc nào.
           </Text>
         </AnimatedRe.View>
 
-        <View style={styles.lottieWrap}>
-          <EmplusLottie
-            source={lottieInventory.pairingFamilyLove}
-            style={styles.lottieHero}
-            loop
-            speed={0.9}
-          />
-        </View>
-
         <GlassCard
-          intensity={
-            isDark ? authGlassBlurIntensity.dark : authGlassBlurIntensity.light
-          }
-          tint={isDark ? "dark" : "light"}
+          intensity={authGlassBlurIntensity.light}
+          tint="light"
           isLiquid={isLiquidGlassSupported}
           style={styles.qrCard}
         >
           <View style={styles.qrContent}>
+            <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
+              Chia sẻ mã này
+            </Text>
+            <Text style={[styles.sectionBody, { color: colors.text.secondary }]}>
+              Cách nhanh nhất để ghép đôi.
+            </Text>
             <View style={styles.qrWrapper}>
               {inviteCode ? (
                 <View style={styles.qrContainer}>
@@ -293,7 +284,11 @@ export function PairingScreenBody() {
             <TouchableOpacity
               onPress={handleCopy}
               activeOpacity={0.7}
-              style={[styles.toolbarBtn, { backgroundColor: copyBg }]}
+              style={[
+                styles.toolbarBtn,
+                styles.toolbarBtnPrimary,
+                { backgroundColor: copyBg },
+              ]}
               accessibilityRole="button"
               accessibilityLabel={
                 isCopied ? "Đã sao chép mã" : "Sao chép mã mời"
@@ -314,7 +309,7 @@ export function PairingScreenBody() {
                   style={[styles.toolbarLabel, { color: copyLabelColor }]}
                   numberOfLines={1}
                 >
-                  {isCopied ? "Đã chép" : "Sao chép"}
+                  {isCopied ? "Đã chép" : "Chia sẻ"}
                 </Text>
               </Animated.View>
             </TouchableOpacity>
@@ -324,12 +319,11 @@ export function PairingScreenBody() {
               activeOpacity={0.7}
               style={[
                 styles.toolbarBtn,
+                styles.toolbarBtnSecondary,
                 styles.toolbarBtnOutline,
                 {
                   borderColor: colors.brand.default,
-                  backgroundColor: isDark
-                    ? "rgba(255,255,255,0.06)"
-                    : "rgba(0,0,0,0.03)",
+                  backgroundColor: "rgba(0,0,0,0.03)",
                 },
               ]}
               accessibilityRole="button"
@@ -369,7 +363,7 @@ export function PairingScreenBody() {
 
         <View style={styles.inputSection}>
           <Text style={[styles.inputLabel, { color: colors.text.secondary }]}>
-            Mã invite của đối phương — đủ 6 ký tự sẽ tự kết nối
+            Đã có mã? Nhập vào đây.
           </Text>
 
           <Input
@@ -409,16 +403,17 @@ export function PairingScreenBody() {
           disabled={ctaDisabled}
           style={[
             styles.ctaPressable,
+            styles.secondaryCtaWrap,
             ctaDisabled ? styles.ctaDisabled : null,
           ]}
           accessibilityRole="button"
           accessibilityLabel="Kết nối bằng mã đã nhập"
-        >
+          >
           <AnimatedRe.View style={[styles.ctaClip, ctaPress.animatedStyle]}>
-            <LinearGradient
-              colors={
-                isDark ? ["#FF8FA3", "#8E7CFF"] : ["#FF6B81", "#7B61FF"]
-              }
+              <LinearGradient
+                colors={
+                  ["#8F8790", "#6E6773"]
+                }
               locations={[0, 1]}
               start={{ x: 0, y: 0.5 }}
               end={{ x: 1, y: 0.5 }}
@@ -434,13 +429,17 @@ export function PairingScreenBody() {
                     gap: 8,
                   }}
                 >
-                  <Text style={styles.ctaLabel}>Kết nối</Text>
-                  <Ionicons name="heart" size={20} color="#FFFFFF" />
+                  <Text style={styles.ctaLabel}>Đồng bộ ngay</Text>
+                  <Ionicons name="link" size={18} color="#FFFFFF" />
                 </View>
               )}
             </LinearGradient>
           </AnimatedRe.View>
         </Pressable>
+
+        <Text style={[styles.footnote, { color: colors.text.tertiary }]}>
+          Chưa cần ghép đôi ngay cũng không sao.
+        </Text>
         </View>
       </View>
 

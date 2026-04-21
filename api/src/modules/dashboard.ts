@@ -5,19 +5,34 @@ import { buildMaleSuggestions, getEmotionalPhase } from "../engines/emotional.ts
 import { requireAuth } from "../middleware/auth.ts";
 import { store } from "../store.ts";
 import { diffDays, parseDate, todayUtc } from "../utils/date.ts";
-import { AppError, success } from "../utils/http.ts";
+import { success } from "../utils/http.ts";
 import { env } from "../config/env.ts";
 
 export const dashboardRoutes = new Hono<AppEnv>();
 
 dashboardRoutes.use("*", requireAuth);
 
+function buildSoloHomePayload() {
+  return {
+    coupleContext: {
+      loveDays: 0,
+      loveStartDate: "",
+    },
+    upcomingEvents: [],
+    careAdvice: {
+      greeting: "Bắt đầu từ một điều quan trọng",
+      subGreeting: "Thêm ngày quan trọng đầu tiên để Em+ nhắc bạn đúng lúc. Ghép đôi khi cả hai đã sẵn sàng.",
+      iconName: "sparkles-outline",
+    },
+  };
+}
+
 dashboardRoutes.get("/home", async (context) => {
   const user = context.get("user");
   const couple = await store.getActiveCoupleForUser(user.id);
 
   if (!couple) {
-    throw new AppError(404, "COUPLE_NOT_FOUND", "Bạn chưa có mối quan hệ đang hoạt động.");
+    return success(context, buildSoloHomePayload());
   }
 
   const cached = await store.getHomeCache(couple.id);
@@ -54,10 +69,10 @@ dashboardRoutes.get("/home", async (context) => {
       loveStartDate,
     },
     upcomingEvents,
-    dailySuggestion: {
-      quote: randomQuote,
-      actionHint,
-      actionType,
+    careAdvice: {
+      greeting: randomQuote,
+      subGreeting: actionHint,
+      iconName: actionType === "MO_TAB_CHAM_SOC" ? "heart-outline" : "calendar-outline",
     },
   };
 

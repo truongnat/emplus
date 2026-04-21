@@ -5,8 +5,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withDelay,
-  withRepeat,
-  withSequence,
   withTiming,
 } from "react-native-reanimated";
 import { EmplusLottie } from "@/src/components/atoms/EmplusLottie";
@@ -25,51 +23,21 @@ const STRING_CONFIG = [
 
 function HangingString({
   length,
-  delayMs,
   width,
-  swingMs,
   color,
-  reduced,
 }: {
   length: number;
-  delayMs: number;
   width: number;
-  swingMs: number;
   color: string;
-  reduced: boolean;
 }) {
-  const rotation = useSharedValue(0);
+  const opacity = useSharedValue(0);
 
   useEffect(() => {
-    if (reduced) {
-      rotation.value = 0;
-      return;
-    }
-    rotation.value = withDelay(
-      delayMs,
-      withRepeat(
-        withSequence(
-          withTiming(5, {
-            duration: swingMs,
-            easing: Easing.inOut(Easing.sin),
-          }),
-          withTiming(-5, {
-            duration: swingMs,
-            easing: Easing.inOut(Easing.sin),
-          }),
-        ),
-        -1,
-        false,
-      ),
-    );
-  }, [delayMs, reduced, rotation, swingMs]);
+    opacity.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.quad) });
+  }, [opacity]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateY: length / 2 },
-      { rotate: `${rotation.value}deg` },
-      { translateY: -length / 2 },
-    ],
+    opacity: opacity.value,
   }));
 
   return (
@@ -116,11 +84,8 @@ export function LoginTopDecor({
           <HangingString
             key={i}
             length={s.length}
-            delayMs={s.delay}
             width={s.width}
-            swingMs={s.swing}
             color={stringColor}
-            reduced={reduced}
           />
         ))}
       </View>

@@ -4,13 +4,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+
 import { AppScreen } from "@/src/components/organisms/AppScreen";
 import { AppText } from "@/src/ui-kit";
 import { LoginGridAnimatedBackground } from "@/src/features/auth/components/LoginGridAnimatedBackground";
 import { useAuthGridChrome } from "@/src/features/auth/hooks/useAuthGridChrome";
 import { loginScreenStyles } from "@/src/features/auth/loginScreen.styles";
 import { homeScreenStyles } from "@/src/features/home/homeScreen.styles";
-import { palette, useThemeColors, useThemeMode } from "@/src/theme";
+import { useThemeColors } from "@/src/theme";
 import type { SemanticColors } from "@/src/theme/tokens/semantic";
 
 function createStyles(c: SemanticColors) {
@@ -38,46 +39,87 @@ function createStyles(c: SemanticColors) {
       fontSize: 13,
       fontWeight: "bold",
       color: c.text.tertiary,
-      textTransform: "uppercase" as "uppercase",
+      textTransform: "uppercase" as const,
       letterSpacing: 1,
       paddingHorizontal: 4,
       marginBottom: 16,
     },
-    themeRow: { flexDirection: "row", gap: 16 },
-    themeButton: { flex: 1 },
-    themePreview: {
-      width: "100%",
-      height: 72,
-      borderRadius: 16,
-      borderWidth: 2,
-      padding: 12,
-      marginBottom: 8,
+    previewCard: {
+      borderRadius: 24,
+      borderWidth: 1,
+      borderColor: c.border.subtle,
+      backgroundColor: c.surface.default,
+      padding: 20,
+      gap: 14,
     },
-    themeLabel: {
-      fontSize: 11,
-      fontWeight: "bold",
-      textTransform: "uppercase" as "uppercase",
-      letterSpacing: 1,
-    },
-    themeLabelDefault: { color: c.text.tertiary },
-    /* Tạm tắt màu nhấn — chưa nối theme engine; bật lại khi có persist + override brand.
-    colorRow: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
-    colorButton: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
+    previewHeader: {
+      flexDirection: "row",
       alignItems: "center",
-      justifyContent: "center",
+      justifyContent: "space-between",
+      gap: 12,
     },
-    colorDot: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      borderWidth: 3,
-      borderColor: c.surface.default,
+    previewBadge: {
+      alignSelf: "flex-start",
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 999,
+      backgroundColor: c.brand.muted,
     },
-    colorDotSelected: { borderColor: c.text.primary },
-    */
+    previewBadgeText: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: c.brand.text,
+    },
+    previewTitle: {
+      fontSize: 18,
+      fontWeight: "800",
+      color: c.text.primary,
+    },
+    previewBody: {
+      fontSize: 14,
+      lineHeight: 21,
+      color: c.text.secondary,
+    },
+    previewFrame: {
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: c.border.subtle,
+      backgroundColor: c.background.default,
+      padding: 16,
+      gap: 10,
+    },
+    previewLineStrong: {
+      width: "58%",
+      height: 8,
+      borderRadius: 999,
+      backgroundColor: c.text.primary,
+      opacity: 0.12,
+    },
+    previewLineSoft: {
+      width: "42%",
+      height: 8,
+      borderRadius: 999,
+      backgroundColor: c.text.secondary,
+      opacity: 0.12,
+    },
+    previewSurface: {
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: c.border.subtle,
+      backgroundColor: c.surface.default,
+      padding: 14,
+      gap: 8,
+    },
+    previewSurfaceTitle: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: c.text.primary,
+    },
+    previewSurfaceBody: {
+      fontSize: 13,
+      lineHeight: 19,
+      color: c.text.secondary,
+    },
   });
 }
 
@@ -85,42 +127,10 @@ export default function AppearanceScreen() {
   const themeColors = useThemeColors();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const {
-    colorScheme,
-    setThemePreference,
-    themePreference,
-    isDark,
-  } = useThemeMode();
-  useAuthGridChrome(isDark, themeColors.background.default, true);
+  useAuthGridChrome(false, themeColors.background.default, true);
   const styles = useMemo(() => createStyles(themeColors), [themeColors]);
 
-  /* Tạm tắt — màu nhấn chỉ đổi state local, không ảnh hưởng app theme.
-  const [accentColor, setAccentColor] = useState("#ec1334");
-  const accentSwatches = [
-    "#ec1334",
-    "#f43f5e",
-    "#8b5cf6",
-    "#3b82f6",
-    "#10b981",
-    "#f59e0b",
-  ];
-  */
-
-  const lightSelected =
-    themePreference === "light" ||
-    ((themePreference === "system" || themePreference === "daylight") &&
-      colorScheme === "light");
-  const darkSelected =
-    themePreference === "dark" ||
-    ((themePreference === "system" || themePreference === "daylight") &&
-      colorScheme === "dark");
-
   const scrollPadBottom = Math.max(insets.bottom + 32, 48);
-
-  /** Preview “Sáng” trên nền dark: tránh trắng tinh chói; trên nền light giữ nền app sáng. */
-  const lightPreviewSurface = isDark ? palette.zinc100 : palette.white;
-  const lightPreviewBorder = isDark ? palette.zinc400 : palette.zinc200;
-  const lightPreviewSkeleton = isDark ? palette.zinc500 : palette.zinc300;
 
   return (
     <AppScreen
@@ -133,9 +143,9 @@ export default function AppearanceScreen() {
       contentContainerStyle={loginScreenStyles.appContent}
       animatedEntrance={false}
     >
-      <StatusBar style={isDark ? "light" : "dark"} />
+      <StatusBar style="dark" />
       <View style={homeScreenStyles.layerRoot}>
-        <LoginGridAnimatedBackground isDark={isDark} />
+        <LoginGridAnimatedBackground isDark={false} />
         <View style={styles.screenRoot}>
           <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
             <TouchableOpacity
@@ -160,203 +170,47 @@ export default function AppearanceScreen() {
             contentContainerStyle={{ padding: 20, paddingBottom: scrollPadBottom }}
             showsVerticalScrollIndicator={false}
           >
-            <>
-              <AppText style={styles.sectionLabel}>Chế độ hiển thị</AppText>
-              <View style={styles.themeRow}>
-                <TouchableOpacity
-                  style={styles.themeButton}
-                  onPress={() => setThemePreference("light")}
-                  accessibilityRole="button"
-                  accessibilityLabel="Chế độ sáng"
-                  accessibilityState={{ selected: lightSelected }}
-                >
-                  <View
-                    style={[
-                      styles.themePreview,
-                      {
-                        backgroundColor: lightPreviewSurface,
-                        borderColor: lightPreviewBorder,
-                      },
-                      isDark && {
-                        shadowColor: "#000",
-                        shadowOffset: { width: 0, height: 1 },
-                        shadowOpacity: 0.35,
-                        shadowRadius: 3,
-                        elevation: 3,
-                      },
-                      lightSelected && {
-                        borderColor: themeColors.brand.default,
-                      },
-                    ]}
-                  >
-                    <View
-                      style={{
-                        width: "60%",
-                        height: 6,
-                        backgroundColor: lightPreviewSkeleton,
-                        borderRadius: 3,
-                        marginBottom: 6,
-                      }}
-                    />
-                    <View
-                      style={{
-                        width: "40%",
-                        height: 6,
-                        backgroundColor: lightPreviewSkeleton,
-                        borderRadius: 3,
-                      }}
-                    />
-                  </View>
-                  <AppText
-                    style={[
-                      styles.themeLabel,
-                      lightSelected
-                        ? { color: themeColors.brand.default }
-                        : styles.themeLabelDefault,
-                    ]}
-                  >
-                    Sáng
-                  </AppText>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.themeButton}
-                  onPress={() => setThemePreference("dark")}
-                  accessibilityRole="button"
-                  accessibilityLabel="Chế độ tối"
-                  accessibilityState={{ selected: darkSelected }}
-                >
-                  <View
-                    style={[
-                      styles.themePreview,
-                      {
-                        backgroundColor: palette.zinc800,
-                        borderColor: palette.zinc700,
-                      },
-                      darkSelected && {
-                        borderColor: themeColors.brand.default,
-                      },
-                    ]}
-                  >
-                    <View
-                      style={{
-                        width: "60%",
-                        height: 6,
-                        backgroundColor: palette.zinc600,
-                        borderRadius: 3,
-                        marginBottom: 6,
-                      }}
-                    />
-                    <View
-                      style={{
-                        width: "40%",
-                        height: 6,
-                        backgroundColor: palette.zinc600,
-                        borderRadius: 3,
-                      }}
-                    />
-                  </View>
-                  <AppText
-                    style={[
-                      styles.themeLabel,
-                      darkSelected
-                        ? { color: themeColors.brand.default }
-                        : styles.themeLabelDefault,
-                    ]}
-                  >
-                    Tối
-                  </AppText>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  marginTop: 16,
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  justifyContent: "center",
-                  gap: 16,
-                  rowGap: 10,
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => setThemePreference("system")}
-                  style={{ paddingVertical: 8, paddingHorizontal: 4 }}
-                  accessibilityRole="button"
-                  accessibilityLabel="Theo cài đặt hệ thống"
-                  accessibilityState={{ selected: themePreference === "system" }}
-                >
-                  <AppText
-                    style={{
-                      fontSize: 14,
-                      fontWeight: "600",
-                      color:
-                        themePreference === "system"
-                          ? themeColors.brand.default
-                          : themeColors.text.tertiary,
-                    }}
-                  >
-                    Theo hệ thống
-                  </AppText>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => setThemePreference("daylight")}
-                  style={{ paddingVertical: 8, paddingHorizontal: 4 }}
-                  accessibilityRole="button"
-                  accessibilityLabel="Theo ngày và đêm theo giờ địa phương"
-                  accessibilityState={{ selected: themePreference === "daylight" }}
-                >
-                  <AppText
-                    style={{
-                      fontSize: 14,
-                      fontWeight: "600",
-                      color:
-                        themePreference === "daylight"
-                          ? themeColors.brand.default
-                          : themeColors.text.tertiary,
-                    }}
-                  >
-                    Theo ngày / đêm
-                  </AppText>
-                </TouchableOpacity>
-              </View>
-              {themePreference === "daylight" ? (
-                <AppText
-                  style={{
-                    marginTop: 6,
-                    textAlign: "center",
-                    fontSize: 12,
-                    color: themeColors.text.tertiary,
-                    paddingHorizontal: 12,
-                  }}
-                >
-                  Tự động: sáng khoảng 6:00–19:00, tối các giờ còn lại (giờ máy).
-                </AppText>
-              ) : null}
-            </>
+            <AppText style={styles.sectionLabel}>Theme mặc định</AppText>
 
-            {/* Tạm tắt màu nhấn — chưa nối theme engine (xem comment đầu file / createStyles).
-            <>
-              <AppText style={[styles.sectionLabel, { marginTop: 32 }]}>
-                Màu nhấn
-              </AppText>
-              <View style={styles.colorRow}>
-                {accentSwatches.map((color) => (
-                  <TouchableOpacity
-                    key={color}
-                    style={styles.colorButton}
-                    onPress={() => setAccentColor(color)}
-                  >
-                    <View
-                      style={[
-                        styles.colorDot,
-                        { backgroundColor: color },
-                        accentColor === color && styles.colorDotSelected,
-                      ]}
-                    />
-                  </TouchableOpacity>
-                ))}
+            <View style={styles.previewCard}>
+              <View style={styles.previewHeader}>
+                <View>
+                  <View style={styles.previewBadge}>
+                    <AppText style={styles.previewBadgeText}>
+                      LookAway-inspired
+                    </AppText>
+                  </View>
+                </View>
+                <Ionicons
+                  name="sunny-outline"
+                  size={20}
+                  color={themeColors.brand.default}
+                />
               </View>
-            </>
-            */}
+
+              <AppText style={styles.previewTitle}>
+                Em+ hiện dùng một theme sáng duy nhất
+              </AppText>
+              <AppText style={styles.previewBody}>
+                Để giữ trải nghiệm calm, rõ ràng, và nhất quán hơn cho release
+                v1, Em+ không còn chuyển giữa sáng và tối. Toàn bộ app dùng cùng
+                một theme sáng theo hướng nhẹ, yên, và dễ đọc.
+              </AppText>
+
+              <View style={styles.previewFrame}>
+                <View style={styles.previewLineStrong} />
+                <View style={styles.previewLineSoft} />
+                <View style={styles.previewSurface}>
+                  <AppText style={styles.previewSurfaceTitle}>
+                    Nhớ đúng lúc
+                  </AppText>
+                  <AppText style={styles.previewSurfaceBody}>
+                    Một giao diện sáng, ổn định và dễ nhìn giúp những điều quan
+                    trọng nổi bật hơn.
+                  </AppText>
+                </View>
+              </View>
+            </View>
           </ScrollView>
         </View>
       </View>

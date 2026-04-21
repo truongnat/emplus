@@ -6,10 +6,8 @@ import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
-  withRepeat,
   withTiming,
   interpolate,
-  withSequence,
 } from "react-native-reanimated";
 import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
 
@@ -44,25 +42,9 @@ export function TabBarGridAnimatedBackground({
   const wash = useSharedValue(0);
 
   useEffect(() => {
-    if (reduced) {
-      drift.value = 0.5;
-      wash.value = 0.5;
-      return;
-    }
-    drift.value = withRepeat(
-      withTiming(1, { duration: 18_000, easing: Easing.linear }),
-      -1,
-      false,
-    );
-    wash.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 7200, easing: Easing.inOut(Easing.sin) }),
-        withTiming(0, { duration: 7200, easing: Easing.inOut(Easing.sin) }),
-      ),
-      -1,
-      false,
-    );
-  }, [drift, reduced, wash]);
+    drift.value = withTiming(1, { duration: 1000, easing: Easing.out(Easing.quad) });
+    wash.value = withTiming(1, { duration: 1000, easing: Easing.out(Easing.quad) });
+  }, [drift, wash]);
 
   const gridWrapStyle = useAnimatedStyle(() => {
     const tx = interpolate(drift.value, [0, 1], [0, G]);

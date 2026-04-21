@@ -9,7 +9,6 @@ import {
 import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -20,8 +19,12 @@ import { GlassCard } from "@/src/components/glass/GlassCard";
 import { isLiquidGlassSupported } from "@/src/components/glass/LiquidGlassView";
 import { RegisterFields, RegisterSchema } from "@/src/forms";
 import { useRegister } from "@/src/presentation/hooks/auth/useRegister";
-import { useThemeColors, useThemeMode } from "@/src/theme";
-import { loginFigmaLight } from "@/src/theme/emplus-design-tokens";
+import { useThemeColors } from "@/src/theme";
+import {
+  authGlassBlurIntensity,
+  authSoftFieldSurface,
+  loginFigmaLight,
+} from "@/src/theme/emplus-design-tokens";
 import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
 import { usePressAnimation } from "@/src/animations/presets";
 
@@ -37,7 +40,6 @@ const GENDERS: { value: RegisterFields["gender"]; label: string }[] = [
 
 export function RegisterAuthForm() {
   const router = useRouter();
-  const { isDark } = useThemeMode();
   const colors = useThemeColors();
   const reducedMotion = useReducedMotion();
   const ctaPress = usePressAnimation();
@@ -54,6 +56,7 @@ export function RegisterAuthForm() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [genderExpanded, setGenderExpanded] = useState(false);
 
   const registerForm = useForm<RegisterFields>({
     resolver: zodResolver(RegisterSchema),
@@ -82,18 +85,10 @@ export function RegisterAuthForm() {
 
   const isRegistering = registerMutation.isPending;
   const placeholderColor = colors.text.secondary;
-  const loginPlaceholder = isDark ? placeholderColor : loginFigmaLight.subtitle;
-  const loginLabelColor = isDark ? undefined : loginFigmaLight.titleDark;
-  const loginSoft = !isDark
-    ? {
-        backgroundColor: "rgba(255,255,255,0.55)",
-        borderColor: "rgba(255,107,129,0.22)",
-      }
-    : {
-        backgroundColor: "rgba(255,255,255,0.06)",
-        borderColor: "rgba(255,255,255,0.12)",
-      };
-  const loginInputRadius = !isDark ? loginFigmaLight.inputPillRadius : 16;
+  const loginPlaceholder = loginFigmaLight.subtitle;
+  const loginLabelColor = loginFigmaLight.titleDark;
+  const loginSoft = authSoftFieldSurface.light;
+  const loginInputRadius = loginFigmaLight.inputPillRadius;
 
   const enteringForm = reducedMotion
     ? FadeIn.duration(0)
@@ -109,10 +104,11 @@ export function RegisterAuthForm() {
   return (
     <Animated.View entering={enteringForm} style={shellStyles.formOuter}>
       <GlassCard
-        intensity={isDark ? 30 : 26}
-        tint={isDark ? "dark" : "light"}
-        isLiquid={isLiquidGlassSupported}
+        intensity={authGlassBlurIntensity.light}
+        tint="light"
+        isLiquid={false && isLiquidGlassSupported}
         style={shellStyles.glassCard}
+        contentStyle={shellStyles.glassCardContent}
       >
         <View style={shellStyles.formInner}>
           <Controller
@@ -129,45 +125,76 @@ export function RegisterAuthForm() {
                   Giới tính
                 </Text>
                 <View style={regStyles.genderRow}>
-                  {GENDERS.map((g) => {
-                    const selected = value === g.value;
-                    return (
-                      <TouchableOpacity
-                        key={g.value}
-                        onPress={() => onChange(g.value)}
-                        accessibilityRole="button"
-                        accessibilityLabel={g.label}
-                        accessibilityState={{ selected }}
-                        style={[
-                          regStyles.genderChip,
-                          {
-                            borderColor: selected
-                              ? colors.brand.default
-                              : loginSoft.borderColor,
-                            backgroundColor: selected
-                              ? isDark
-                                ? "rgba(255,107,129,0.18)"
-                                : "rgba(255,107,129,0.12)"
-                              : loginSoft.backgroundColor,
-                          },
-                        ]}
-                      >
-                        <Text
+                  <TouchableOpacity
+                    onPress={() => setGenderExpanded((v) => !v)}
+                    accessibilityRole="button"
+                    accessibilityLabel="Chọn giới tính"
+                    style={[
+                      regStyles.genderSummary,
+                      {
+                        borderColor: loginSoft.borderColor,
+                        backgroundColor: loginSoft.backgroundColor,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        regStyles.genderSummaryText,
+                        { color: colors.text.primary },
+                      ]}
+                    >
+                      {GENDERS.find((g) => g.value === value)?.label ?? "Chọn"}
+                    </Text>
+                    <Ionicons
+                      name={genderExpanded ? "chevron-up" : "chevron-down"}
+                      size={18}
+                      color={colors.text.secondary}
+                    />
+                  </TouchableOpacity>
+                </View>
+                {genderExpanded ? (
+                  <View style={regStyles.genderOptions}>
+                    {GENDERS.map((g) => {
+                      const selected = value === g.value;
+                      return (
+                        <TouchableOpacity
+                          key={g.value}
+                          onPress={() => {
+                            onChange(g.value);
+                            setGenderExpanded(false);
+                          }}
+                          accessibilityRole="button"
+                          accessibilityLabel={g.label}
+                          accessibilityState={{ selected }}
                           style={[
-                            regStyles.genderChipText,
+                            regStyles.genderChip,
                             {
-                              color: selected
-                                ? colors.brand.text
-                                : colors.text.secondary,
+                              borderColor: selected
+                                ? colors.brand.default
+                                : loginSoft.borderColor,
+                              backgroundColor: selected
+                                ? "rgba(184,106,74,0.10)"
+                                : loginSoft.backgroundColor,
                             },
                           ]}
                         >
-                          {g.label}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
+                          <Text
+                            style={[
+                              regStyles.genderChipText,
+                              {
+                                color: selected
+                                  ? colors.brand.text
+                                  : colors.text.secondary,
+                              },
+                            ]}
+                          >
+                            {g.label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                ) : null}
               </View>
             )}
           />
@@ -426,21 +453,18 @@ export function RegisterAuthForm() {
             <Animated.View
               style={[shellStyles.ctaClip, ctaPress.animatedStyle]}
             >
-              <LinearGradient
-                colors={
-                  isDark ? ["#FF8FA3", "#8E7CFF"] : ["#FF6B81", "#7B61FF"]
-                }
-                locations={[0, 1]}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={shellStyles.ctaGradient}
+              <View
+                style={[
+                  shellStyles.ctaGradient,
+                  { backgroundColor: colors.brand.default },
+                ]}
               >
                 {isRegistering ? (
                   <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
                   <Text style={shellStyles.ctaLabel}>Đăng ký</Text>
                 )}
-              </LinearGradient>
+              </View>
             </Animated.View>
           </Pressable>
         </View>

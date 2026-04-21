@@ -45,6 +45,7 @@ import {
 import { useToast } from "@/src/toast-context";
 import { useSession } from "@/src/session-context";
 import type { TimelineModule } from "@/src/domain/entities/schemas";
+import { setSoloImportantDate } from "@/src/features/home/solo-important-date";
 
 const MAX_IMAGES = 12;
 
@@ -83,9 +84,10 @@ export default function AddMemoryScreen() {
   const insets = useSafeAreaInsets();
   const colors = useThemeColors();
   const { isDark } = useThemeMode();
-  const { withAccessToken } = useSession();
+  const { withAccessToken, session } = useSession();
   const { showToast } = useToast();
   const queryClient = useQueryClient();
+  const isPaired = Boolean(session?.user?.coupleId);
 
   useAuthGridChrome(isDark, colors.background.default, true);
 
@@ -102,6 +104,18 @@ export default function AddMemoryScreen() {
       if (!t) {
         throw new Error("TITLE_REQUIRED");
       }
+      const n = note.trim();
+
+      if (!isPaired) {
+        await setSoloImportantDate({
+          title: t,
+          memoryDate: toIsoDateLocal(memoryDate),
+          description: n || undefined,
+          createdAt: new Date().toISOString(),
+        });
+        return null;
+      }
+
       const mediaUrls: string[] = [];
       for (const asset of assets) {
         const fd = new FormData();
@@ -119,15 +133,19 @@ export default function AddMemoryScreen() {
         mediaUrls,
         tags: [memoryType],
       };
-      const n = note.trim();
       if (n) body.description = n;
       return withAccessToken((token) => createMemory(token, body));
     },
     onSuccess: () => {
-      showToast("Đã thêm kỷ niệm!", "success");
-      void queryClient.invalidateQueries({
-        predicate: (q) => q.queryKey[0] === "timelineMemories",
-      });
+      showToast(
+        isPaired ? "Đã thêm kỷ niệm!" : "Đã lưu ngày quan trọng đầu tiên!",
+        "success",
+      );
+      if (isPaired) {
+        void queryClient.invalidateQueries({
+          predicate: (q) => q.queryKey[0] === "timelineMemories",
+        });
+      }
       router.back();
     },
     onError: (err: unknown) => {
@@ -228,7 +246,7 @@ export default function AddMemoryScreen() {
             ]}
             accessibilityRole="header"
           >
-            Thêm kỷ niệm
+            {isPaired ? "Thêm kỷ niệm" : "Thêm ngày quan trọng"}
           </AppText>
           <View style={{ width: 44 }} />
         </View>
@@ -244,174 +262,214 @@ export default function AddMemoryScreen() {
           keyboardDismissMode="on-drag"
         >
           <AppText style={[styles.lead, { color: colors.text.tertiary }]}>
-            Chọn loại mục (lọc giống dòng thời gian), ảnh tuỳ chọn, tiêu đề, ngày và ghi
-            chú.
+            {isPaired
+              ? "Chọn loại mục (lọc giống dòng thời gian), ảnh tuỳ chọn, tiêu đề, ngày và ghi chú."
+              : "Lưu một ngày bạn không muốn quên trước. Khi ghép đôi, Em+ sẽ nâng nó thành bối cảnh chung cho cả hai."}
           </AppText>
 
-          <AppText style={[styles.fieldLabel, { color: colors.text.secondary }]}>
-            Loại
-          </AppText>
-          <View style={styles.typeRow}>
-            {MEMORY_TYPES.map((opt) => {
-              const active = memoryType === opt.id;
-              return (
-                <PressableScale
-                  key={opt.id}
-                  onPress={() => setMemoryType(opt.id)}
-                  style={[
-                    styles.typeChip,
-                    active
-                      ? isDark
-                        ? {
-                            backgroundColor: colors.interactive.primary,
-                            borderColor: "rgba(255, 255, 255, 0.22)",
-                          }
-                        : {
-                            backgroundColor: colors.background.inverse,
-                            borderColor: colors.border.inverse,
-                          }
-                      : isDark
-                        ? {
-                            backgroundColor: homeDarkGridCard.backgroundColor,
-                            borderColor: homeDarkGridCard.borderColor,
-                          }
-                        : {
-                            backgroundColor: colors.surface.default,
-                            borderColor: colors.border.subtle,
-                          },
-                  ]}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: active }}
-                  accessibilityLabel={`Loại ${opt.label}`}
-                >
-                  <Ionicons
-                    name={opt.icon}
-                    size={18}
-                    color={
-                      active
-                        ? isDark
-                          ? colors.text.onBrand
-                          : colors.text.inverse
-                        : colors.text.secondary
-                    }
-                  />
-                  <AppText
-                    numberOfLines={1}
-                    style={[
-                      styles.typeChipLabel,
-                      {
-                        color: active
-                          ? isDark
-                            ? colors.text.onBrand
-                            : colors.text.inverse
-                          : colors.text.tertiary,
-                      },
-                    ]}
-                  >
-                    {opt.label}
-                  </AppText>
-                </PressableScale>
-              );
-            })}
-          </View>
-
-          <View
-            style={[
-              styles.previewCard,
-              isDark
-                ? {
-                    backgroundColor: homeDarkGridCard.backgroundColor,
-                    borderColor: homeDarkGridCard.borderColor,
-                    shadowColor: "#0A0809",
-                  }
-                : {
-                    backgroundColor: colors.surface.default,
-                    borderColor: colors.border.subtle,
-                    shadowColor: colors.text.primary,
-                  },
-            ]}
-          >
-            {assets.length === 0 ? (
-              <PressableScale
-                onPress={addPhotos}
-                style={[
-                  styles.emptyPreview,
-                  isDark
-                    ? { backgroundColor: homeDarkGridInset.backgroundColor }
-                    : { backgroundColor: colors.surface.sunken },
-                ]}
-                accessibilityRole="button"
-                accessibilityLabel="Thêm ảnh kỷ niệm"
+          {isPaired ? (
+            <>
+              <AppText
+                style={[styles.fieldLabel, { color: colors.text.secondary }]}
               >
-                <Ionicons
-                  name="images-outline"
-                  size={40}
-                  color={colors.text.tertiary}
-                />
-                <AppText style={[styles.emptyPreviewText, { color: colors.text.tertiary }]}>
-                  Chạm để thêm ảnh (tối đa {MAX_IMAGES})
-                </AppText>
-              </PressableScale>
-            ) : (
-              <View style={styles.thumbStrip}>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.thumbRow}
-                >
-                  {assets.map((a) => (
-                    <View key={a.uri} style={styles.thumbWrap}>
-                      <Image
-                        source={{ uri: a.uri }}
-                        style={styles.thumb}
-                        contentFit="cover"
-                        transition={0}
-                        cachePolicy="memory-disk"
-                        priority="high"
-                        recyclingKey={a.uri}
-                      />
-                      <TouchableOpacity
-                        style={[
-                          styles.thumbRemove,
-                          { backgroundColor: colors.background.inverse },
-                        ]}
-                        onPress={() => removeAsset(a.uri)}
-                        accessibilityRole="button"
-                        accessibilityLabel="Xoá ảnh"
-                      >
-                        <Ionicons name="close" size={16} color={colors.text.inverse} />
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                  {assets.length < MAX_IMAGES ? (
+                Loại
+              </AppText>
+              <View style={styles.typeRow}>
+                {MEMORY_TYPES.map((opt) => {
+                  const active = memoryType === opt.id;
+                  return (
                     <PressableScale
-                      onPress={addPhotos}
+                      key={opt.id}
+                      onPress={() => setMemoryType(opt.id)}
                       style={[
-                        styles.addMoreTile,
-                        isDark
-                          ? {
-                              borderColor: homeDarkGridInset.borderColor,
-                              backgroundColor: homeDarkGridInset.backgroundColor,
-                            }
-                          : {
-                              borderColor: colors.border.subtle,
-                              backgroundColor: colors.surface.sunken,
-                            },
+                        styles.typeChip,
+                        active
+                          ? isDark
+                            ? {
+                                backgroundColor: colors.interactive.primary,
+                                borderColor: "rgba(255, 255, 255, 0.22)",
+                              }
+                            : {
+                                backgroundColor: colors.background.inverse,
+                                borderColor: colors.border.inverse,
+                              }
+                          : isDark
+                            ? {
+                                backgroundColor: homeDarkGridCard.backgroundColor,
+                                borderColor: homeDarkGridCard.borderColor,
+                              }
+                            : {
+                                backgroundColor: colors.surface.default,
+                                borderColor: colors.border.subtle,
+                              },
                       ]}
                       accessibilityRole="button"
-                      accessibilityLabel="Thêm ảnh nữa"
+                      accessibilityState={{ selected: active }}
+                      accessibilityLabel={`Loại ${opt.label}`}
                     >
-                      <Ionicons name="add" size={28} color={colors.text.secondary} />
+                      <Ionicons
+                        name={opt.icon}
+                        size={18}
+                        color={
+                          active
+                            ? isDark
+                              ? colors.text.onBrand
+                              : colors.text.inverse
+                            : colors.text.secondary
+                        }
+                      />
+                      <AppText
+                        numberOfLines={1}
+                        style={[
+                          styles.typeChipLabel,
+                          {
+                            color: active
+                              ? isDark
+                                ? colors.text.onBrand
+                                : colors.text.inverse
+                              : colors.text.tertiary,
+                          },
+                        ]}
+                      >
+                        {opt.label}
+                      </AppText>
                     </PressableScale>
-                  ) : null}
-                </ScrollView>
+                  );
+                })}
               </View>
-            )}
-          </View>
+            </>
+          ) : (
+            <View
+              style={[
+                styles.helpCard,
+                isDark
+                  ? {
+                      backgroundColor: homeDarkGridCard.backgroundColor,
+                      borderColor: homeDarkGridCard.borderColor,
+                    }
+                  : {
+                      backgroundColor: colors.surface.default,
+                      borderColor: colors.border.subtle,
+                    },
+              ]}
+            >
+              <AppText style={[styles.helpTitle, { color: colors.text.primary }]}>
+                Lưu trước trên thiết bị này
+              </AppText>
+              <AppText style={[styles.helpBody, { color: colors.text.secondary }]}>
+                Đây là bước solo-first cho V1. Bạn có thể bắt đầu bằng một ngày
+                đầu tiên, rồi ghép đôi sau để mở trải nghiệm chung.
+              </AppText>
+            </View>
+          )}
+
+          {isPaired ? (
+            <View
+              style={[
+                styles.previewCard,
+                isDark
+                  ? {
+                      backgroundColor: homeDarkGridCard.backgroundColor,
+                      borderColor: homeDarkGridCard.borderColor,
+                      shadowColor: "#0A0809",
+                    }
+                  : {
+                      backgroundColor: colors.surface.default,
+                      borderColor: colors.border.subtle,
+                      shadowColor: colors.text.primary,
+                    },
+              ]}
+            >
+              {assets.length === 0 ? (
+                <PressableScale
+                  onPress={addPhotos}
+                  style={[
+                    styles.emptyPreview,
+                    isDark
+                      ? { backgroundColor: homeDarkGridInset.backgroundColor }
+                      : { backgroundColor: colors.surface.sunken },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Thêm ảnh kỷ niệm"
+                >
+                  <Ionicons
+                    name="images-outline"
+                    size={40}
+                    color={colors.text.tertiary}
+                  />
+                  <AppText
+                    style={[styles.emptyPreviewText, { color: colors.text.tertiary }]}
+                  >
+                    Chạm để thêm ảnh (tối đa {MAX_IMAGES})
+                  </AppText>
+                </PressableScale>
+              ) : (
+                <View style={styles.thumbStrip}>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.thumbRow}
+                  >
+                    {assets.map((a) => (
+                      <View key={a.uri} style={styles.thumbWrap}>
+                        <Image
+                          source={{ uri: a.uri }}
+                          style={styles.thumb}
+                          contentFit="cover"
+                          transition={0}
+                          cachePolicy="memory-disk"
+                          priority="high"
+                          recyclingKey={a.uri}
+                        />
+                        <TouchableOpacity
+                          style={[
+                            styles.thumbRemove,
+                            { backgroundColor: colors.background.inverse },
+                          ]}
+                          onPress={() => removeAsset(a.uri)}
+                          accessibilityRole="button"
+                          accessibilityLabel="Xoá ảnh"
+                        >
+                          <Ionicons
+                            name="close"
+                            size={16}
+                            color={colors.text.inverse}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                    {assets.length < MAX_IMAGES ? (
+                      <PressableScale
+                        onPress={addPhotos}
+                        style={[
+                          styles.addMoreTile,
+                          isDark
+                            ? {
+                                borderColor: homeDarkGridInset.borderColor,
+                                backgroundColor: homeDarkGridInset.backgroundColor,
+                              }
+                            : {
+                                borderColor: colors.border.subtle,
+                                backgroundColor: colors.surface.sunken,
+                              },
+                        ]}
+                        accessibilityRole="button"
+                        accessibilityLabel="Thêm ảnh nữa"
+                      >
+                        <Ionicons name="add" size={28} color={colors.text.secondary} />
+                      </PressableScale>
+                    ) : null}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          ) : null}
 
           <Input
             label="Tiêu đề"
-            placeholder="Ví dụ: Buổi sáng cùng nhau"
+            placeholder={
+              isPaired ? "Ví dụ: Buổi sáng cùng nhau" : "Ví dụ: Sinh nhật của cô ấy"
+            }
             value={title}
             onChangeText={setTitle}
             variant="soft"
@@ -419,7 +477,7 @@ export default function AddMemoryScreen() {
           />
 
           <AppText style={[styles.fieldLabel, { color: colors.text.secondary }]}>
-            Ngày kỷ niệm
+            {isPaired ? "Ngày kỷ niệm" : "Ngày quan trọng"}
           </AppText>
           <PressableScale
             onPress={() => setShowDatePicker(true)}
@@ -436,7 +494,9 @@ export default function AddMemoryScreen() {
                   },
             ]}
             accessibilityRole="button"
-            accessibilityLabel="Chọn ngày kỷ niệm"
+            accessibilityLabel={
+              isPaired ? "Chọn ngày kỷ niệm" : "Chọn ngày quan trọng"
+            }
           >
             <Ionicons name="calendar-outline" size={20} color={colors.brand.default} />
             <AppText style={[styles.dateFieldText, { color: colors.text.primary }]}>
@@ -503,7 +563,11 @@ export default function AddMemoryScreen() {
 
           <Input
             label="Ghi chú"
-            placeholder="Viết thêm chi tiết…"
+            placeholder={
+              isPaired
+                ? "Viết thêm chi tiết…"
+                : "Ví dụ: dịp không muốn quên, món quà định chuẩn bị, hoặc điều cần nhắc trước đó…"
+            }
             value={note}
             onChangeText={setNote}
             variant="soft"
@@ -521,11 +585,7 @@ export default function AddMemoryScreen() {
             loading={isPending}
             fullWidth
             style={styles.submit}
-            leftIcon={
-              !isPending ? (
-                <Ionicons name="heart" size={20} color="#fff" />
-              ) : undefined
-            }
+            leftIcon={!isPending ? <Ionicons name="heart" size={20} color="#fff" /> : undefined}
           />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -680,6 +740,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "800",
     flexShrink: 1,
+  },
+  helpCard: {
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 16,
+    gap: 6,
+    marginBottom: 18,
+  },
+  helpTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    lineHeight: 21,
+  },
+  helpBody: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   modalOverlay: {
     flex: 1,

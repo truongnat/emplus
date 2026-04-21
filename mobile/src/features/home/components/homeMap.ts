@@ -23,12 +23,12 @@ export function mapDashboardData(dashboard: DashboardPayload | null) {
     return {
       greetingInfo: cachedGreeting,
       loveDays: 0,
-      startDateLabel: formatLoveDate(undefined),
+      startDateLabel: "Chưa thêm ngày bắt đầu",
       cycleLabel: normalizeCycleLabel(undefined),
       upcomingEvents: [],
       nextDateLabel: "Chưa có sự kiện",
-      focusTitle: "Kết nối hôm nay",
-      focusSubtitle: "Một chạm nhỏ để hai bạn gần hơn.",
+      focusTitle: "Nhắn một câu ngắn trước khi ngày khép lại",
+      focusSubtitle: "Không cần dài. Chỉ cần đúng lúc và đủ thật.",
     };
   }
 
@@ -52,6 +52,6 @@ export function mapDashboardData(dashboard: DashboardPayload | null) {
     nextDateLabel,
     focusTitle: dashboard.careAdvice?.greeting || "Kết nối hôm nay",
     focusSubtitle:
-      dashboard.careAdvice?.subGreeting || "Một chạm nhỏ để hai bạn gần hơn.",
+      dashboard.careAdvice?.subGreeting || "Một điều nhỏ hôm nay vẫn tốt hơn đợi đến khi đã quá muộn.",
   };
 }

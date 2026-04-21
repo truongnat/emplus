@@ -10,7 +10,6 @@ import {
 import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -22,7 +21,7 @@ import { GlassCard } from "@/src/components/glass/GlassCard";
 import { isLiquidGlassSupported } from "@/src/components/glass/LiquidGlassView";
 import { AuthFlowFields, AuthFlowSchema } from "@/src/forms";
 import { useLogin } from "@/src/presentation/hooks/auth/useLogin";
-import { useThemeColors, useThemeMode } from "@/src/theme";
+import { useThemeColors } from "@/src/theme";
 import {
   authGlassBlurIntensity,
   authSoftFieldSurface,
@@ -37,7 +36,6 @@ import { loginScreenStyles as styles } from "../loginScreen.styles";
 
 export function LoginAuthForm() {
   const router = useRouter();
-  const { isDark } = useThemeMode();
   const colors = useThemeColors();
   const loginMutation = useLogin();
   const login = loginMutation.mutate;
@@ -112,20 +110,16 @@ export function LoginAuthForm() {
     });
   }, [authForm, login, resetLoginError, router, rememberMe]);
 
-  const loginPlaceholder = isDark ? placeholderColor : loginFigmaLight.subtitle;
-  const loginLabelColor = isDark ? undefined : loginFigmaLight.titleDark;
-  const loginSoft = isDark
-    ? authSoftFieldSurface.dark
-    : authSoftFieldSurface.light;
-  const loginInputRadius = !isDark ? loginFigmaLight.inputPillRadius : 16;
+  const loginPlaceholder = loginFigmaLight.subtitle;
+  const loginLabelColor = loginFigmaLight.titleDark;
+  const loginSoft = authSoftFieldSurface.light;
+  const loginInputRadius = loginFigmaLight.inputPillRadius;
 
   const enteringForm = reducedMotion
     ? FadeIn.duration(0)
     : FadeInDown.delay(140).springify().damping(22).stiffness(180);
 
-  const switchTrackOff = isDark
-    ? "rgba(255,255,255,0.2)"
-    : "rgba(0,0,0,0.08)";
+  const switchTrackOff = "rgba(102,86,77,0.12)";
 
   const togglePassword = useCallback(() => {
     setShowPassword((v) => !v);
@@ -134,12 +128,11 @@ export function LoginAuthForm() {
   return (
     <Animated.View entering={enteringForm} style={styles.formOuter}>
       <GlassCard
-        intensity={
-          isDark ? authGlassBlurIntensity.dark : authGlassBlurIntensity.light
-        }
-        tint={isDark ? "dark" : "light"}
-        isLiquid={isLiquidGlassSupported}
+        intensity={authGlassBlurIntensity.light}
+        tint="light"
+        isLiquid={false && isLiquidGlassSupported}
         style={styles.glassCard}
+        contentStyle={styles.glassCardContent}
       >
         <View style={styles.formInner}>
           <Controller
@@ -256,9 +249,7 @@ export function LoginAuthForm() {
                 style={[
                   styles.rememberLabel,
                   {
-                    color: isDark
-                      ? colors.text.secondary
-                      : loginFigmaLight.footerLink,
+                    color: loginFigmaLight.footerLink,
                   },
                 ]}
                 numberOfLines={1}
@@ -300,23 +291,24 @@ export function LoginAuthForm() {
             accessibilityHint="Gửi email và mật khẩu để vào ứng dụng"
           >
             <Animated.View style={[styles.ctaClip, ctaPress.animatedStyle]}>
-              <LinearGradient
-                colors={
-                  isDark ? ["#FF8FA3", "#8E7CFF"] : ["#FF6B81", "#7B61FF"]
-                }
-                locations={[0, 1]}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={styles.ctaGradient}
+              <View
+                style={[
+                  styles.ctaGradient,
+                  { backgroundColor: colors.brand.default },
+                ]}
               >
                 {isLoggingIn ? (
                   <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
                   <Text style={styles.ctaLabel}>Đăng nhập</Text>
                 )}
-              </LinearGradient>
+              </View>
             </Animated.View>
           </Pressable>
+
+          <Text style={[styles.trustNote, { color: colors.text.tertiary }]}>
+            Vào lại trước. Ghép đôi chỉ là bước mở rộng sau đó.
+          </Text>
         </View>
       </GlassCard>
     </Animated.View>

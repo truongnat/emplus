@@ -62,7 +62,7 @@ async function run() {
         if (existingCouple) {
             coupleId = existingCouple.id;
             await sql`
-        UPDATE couples SET status = 'DANG_YEU', love_start_date = NOW() - INTERVAL '1 year'
+        UPDATE couples SET status = 'DATING', love_start_date = NOW() - INTERVAL '1 year'
         WHERE id = ${coupleId}
       `;
         } else {
@@ -71,7 +71,7 @@ async function run() {
         INSERT INTO couples (
           id, partner_1_id, partner_2_id, status, love_start_date
         ) VALUES (
-          ${coupleId}, ${user1.id}, ${user2.id}, 'DANG_YEU', NOW() - INTERVAL '1 year'
+          ${coupleId}, ${user1.id}, ${user2.id}, 'DATING', NOW() - INTERVAL '1 year'
         )
       `;
         }

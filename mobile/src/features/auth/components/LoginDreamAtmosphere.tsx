@@ -10,7 +10,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withDelay,
-  withRepeat,
   withTiming,
 } from "react-native-reanimated";
 import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
@@ -37,31 +36,12 @@ function DreamOrb({
   const phase = useSharedValue(0);
 
   useEffect(() => {
-    if (reduced) {
-      phase.value = 0.25;
-      return;
-    }
-    phase.value = withDelay(
-      delayMs,
-      withRepeat(
-        withTiming(1, {
-          duration: durationMs,
-          easing: Easing.inOut(Easing.sin),
-        }),
-        -1,
-        true,
-      ),
-    );
-  }, [delayMs, durationMs, phase, reduced]);
+    phase.value = withDelay(delayMs, withTiming(1, { duration: 1000, easing: Easing.out(Easing.quad) }));
+  }, [delayMs, phase]);
 
   const animatedStyle = useAnimatedStyle(() => {
-    const p = phase.value * Math.PI * 2;
-    const driftX = Math.sin(p) * 14;
-    const driftY = Math.cos(p * 0.85) * 18;
-    const pulse = 0.42 + Math.sin(p * 1.3) * 0.12;
     return {
-      transform: [{ translateX: driftX }, { translateY: driftY }],
-      opacity: reduced ? 0.35 : pulse,
+      opacity: phase.value * 0.35,
     };
   });
 

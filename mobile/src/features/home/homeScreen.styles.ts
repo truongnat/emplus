@@ -8,14 +8,22 @@ export const homeScreenStyles = StyleSheet.create({
     flex: 1,
     position: "relative",
   },
+  headerBlur: {
+    position: "absolute",
+    zIndex: 3,
+  },
+  headerOverlay: {
+    position: "absolute",
+    zIndex: 3,
+  },
   brandTopLeft: {
     position: "absolute",
-    zIndex: 2,
+    zIndex: 4,
   },
   /** Cùng hàng với `LoginBrandGradientTitle` (maskRoot height 40). */
   brandTopRight: {
     position: "absolute",
-    zIndex: 2,
+    zIndex: 4,
     height: 40,
     justifyContent: "center",
   },
@@ -24,7 +32,7 @@ export const homeScreenStyles = StyleSheet.create({
     zIndex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 22,
+    paddingHorizontal: 20,
     /** Default; home screen overrides with `insets.bottom` for tab bar. */
     paddingBottom: 128,
   },

@@ -5,58 +5,53 @@ const iosHref = iosAppUrl() ?? '#download';
 const androidHref = androidAppUrl() ?? '#download';
 ---
 
-<section id="download" class="relative py-20 md:py-28 overflow-hidden">
-  <!-- Gradient background -->
-  <div class="absolute inset-0 -z-10">
-    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5"></div>
-  </div>
+<section id="download" class="relative overflow-hidden py-18 md:py-24">
+  <div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_bottom,hsl(var(--primary)/0.10),transparent_40%)]"></div>
 
   <div class="container text-center">
-    <!-- Icon -->
-    <div class="text-5xl mb-6">❤️</div>
+    <div class="mx-auto max-w-3xl rounded-[30px] border border-border/80 bg-card/95 px-6 py-9 shadow-sm md:px-10 md:py-11">
+      <div class="mb-4 text-4xl">❤️</div>
 
-    <!-- Headline -->
-    <h2 class="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-      Bắt đầu hành trình cùng nhau
-    </h2>
+      <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">
+        Bắt đầu một mình trước
+      </h2>
 
-    <!-- Description -->
-    <p class="text-lg text-muted-foreground max-w-xl mx-auto mb-10">
-      Tải {siteName} ngay hôm nay và khám phá cách mới để yêu thương, chia sẻ và gắn kết.
-    </p>
+      <p class="mx-auto mt-4 max-w-2xl text-lg leading-8 text-muted-foreground">
+        Tải {siteName} để lưu những ngày không nên quên, những điều rất nhỏ về người ấy, và nhận một lời nhắc nhẹ khi bạn cần nhất.
+        Khi cả hai đã sẵn sàng, pairing sẽ giúp đồng bộ trải nghiệm chung.
+      </p>
 
-    <!-- CTA Buttons -->
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a
-        href={iosHref}
-        target={iosHref.startsWith('http') ? '_blank' : undefined}
-        rel={iosHref.startsWith('http') ? 'noopener noreferrer' : undefined}
-        class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-8 py-3 text-base font-semibold text-primary-foreground shadow-lg transition hover:opacity-90 active:scale-95"
-      >
-        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M16.7 13.2c0 2.6 2.3 3.5 2.4 3.6-.02.06-.36 1.24-1.2 2.45-.72 1.04-1.46 2.08-2.63 2.1-1.15.02-1.52-.67-2.84-.67-1.33 0-1.73.65-2.83.69-1.13.04-1.99-1.15-2.72-2.19-1.49-2.15-2.63-6.08-1.1-8.73.76-1.31 2.12-2.14 3.6-2.16 1.12-.02 2.18.76 2.84.76.66 0 1.9-.94 3.2-.8.54.02 2.06.22 3.04 1.67-.08.05-1.81 1.06-1.79 3.22z" />
-          <path d="M14.6 2.6c.63.8 1.04 1.92.93 3.04-1.02.04-2.25-.67-2.98-1.47-.65-.7-1.22-1.84-1.07-2.93 1.14-.09 2.34.61 3.12 1.36z" />
-        </svg>
-        <span>Tải cho iOS</span>
-      </a>
-      <a
-        href={androidHref}
-        target={androidHref.startsWith('http') ? '_blank' : undefined}
-        rel={androidHref.startsWith('http') ? 'noopener noreferrer' : undefined}
-        class="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card/40 backdrop-blur px-8 py-3 text-base font-semibold text-foreground transition hover:bg-card active:scale-95"
-      >
-        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M17.6 9.5c-.1 0-.2 0-.3-.1l1.1-2c.1-.2.4-.3.6-.1.2.1.3.4.1.6l-1.2 2c-.1.1-.2.2-.3.2zM6.7 9.5c-.1 0-.3-.1-.3-.2l-1.2-2c-.1-.2 0-.5.1-.6.2-.1.5 0 .6.1l1.1 2c.1.2 0 .5-.2.6-.1.1-.1.1-.1.1z" />
-          <path d="M8.1 7.6c0-1 .9-1.9 1.9-1.9h4c1 0 1.9.9 1.9 1.9v.5H8.1v-.5z" />
-          <path d="M6.6 9.1c-1 0-1.9.9-1.9 1.9v6.3c0 1 .9 1.9 1.9 1.9h.6v1.4c0 .5.4.9.9.9s.9-.4.9-.9v-1.4h6.8v1.4c0 .5.4.9.9.9s.9-.4.9-.9v-1.4h.6c1 0 1.9-.9 1.9-1.9V11c0-1-.9-1.9-1.9-1.9H6.6zm2.2 8.6H7.1v-5.8h1.7v5.8zm8.1 0h-1.7v-5.8h1.7v5.8z" />
-        </svg>
-        <span>Tải cho Android</span>
-      </a>
-    </div>
+      <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+        <a
+          href={iosHref}
+          target={iosHref.startsWith('http') ? '_blank' : undefined}
+          rel={iosHref.startsWith('http') ? 'noopener noreferrer' : undefined}
+          class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-3 text-base font-semibold text-primary-foreground shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M16.7 13.2c0 2.6 2.3 3.5 2.4 3.6-.02.06-.36 1.24-1.2 2.45-.72 1.04-1.46 2.08-2.63 2.1-1.15.02-1.52-.67-2.84-.67-1.33 0-1.73.65-2.83.69-1.13.04-1.99-1.15-2.72-2.19-1.49-2.15-2.63-6.08-1.1-8.73.76-1.31 2.12-2.14 3.6-2.16 1.12-.02 2.18.76 2.84.76.66 0 1.9-.94 3.2-.8.54.02 2.06.22 3.04 1.67-.08.05-1.81 1.06-1.79 3.22z" />
+            <path d="M14.6 2.6c.63.8 1.04 1.92.93 3.04-1.02.04-2.25-.67-2.98-1.47-.65-.7-1.22-1.84-1.07-2.93 1.14-.09 2.34.61 3.12 1.36z" />
+          </svg>
+          <span>Bắt đầu trên iPhone</span>
+        </a>
+        <a
+          href={androidHref}
+          target={androidHref.startsWith('http') ? '_blank' : undefined}
+          rel={androidHref.startsWith('http') ? 'noopener noreferrer' : undefined}
+          class="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-background px-8 py-3 text-base font-semibold text-foreground transition hover:border-primary/25 hover:bg-muted"
+        >
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.6 9.5c-.1 0-.2 0-.3-.1l1.1-2c.1-.2.4-.3.6-.1.2.1.3.4.1.6l-1.2 2c-.1.1-.2.2-.3.2zM6.7 9.5c-.1 0-.3-.1-.3-.2l-1.2-2c-.1-.2 0-.5.1-.6.2-.1.5 0 .6.1l1.1 2c.1.2 0 .5-.2.6-.1.1-.1.1-.1.1z" />
+            <path d="M8.1 7.6c0-1 .9-1.9 1.9-1.9h4c1 0 1.9.9 1.9 1.9v.5H8.1v-.5z" />
+            <path d="M6.6 9.1c-1 0-1.9.9-1.9 1.9v6.3c0 1 .9 1.9 1.9 1.9h.6v1.4c0 .5.4.9.9.9s.9-.4.9-.9v-1.4h6.8v1.4c0 .5.4.9.9.9s.9-.4.9-.9v-1.4h.6c1 0 1.9-.9 1.9-1.9V11c0-1-.9-1.9-1.9-1.9H6.6zm2.2 8.6H7.1v-5.8h1.7v5.8zm8.1 0h-1.7v-5.8h1.7v5.8z" />
+          </svg>
+          <span>Bắt đầu trên Android</span>
+        </a>
+      </div>
 
-    <!-- Trust badges -->
-    <div class="mt-12 pt-8 border-t border-border/40 text-sm text-muted-foreground">
-      <p>✨ Có sẵn trên iOS và Android</p>
+      <div class="mt-7 border-t border-border/70 pt-5 text-sm text-muted-foreground">
+        <p>iOS và Android • riêng tư • có ích ngay cả khi bạn chưa ghép đôi</p>
+      </div>
     </div>
   </div>
 </section>

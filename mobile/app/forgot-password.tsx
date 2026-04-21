@@ -7,7 +7,7 @@ import { ForgotPasswordLoginFooter } from "@/src/features/auth/components/Forgot
 
 export default function ForgotPasswordScreen() {
   return (
-    <AuthGridScreenShell centerContent>
+    <AuthGridScreenShell centerContent compact>
       <ForgotPasswordHeroSection />
       <ForgotPasswordAuthForm />
       <ForgotPasswordLoginFooter />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import {
   Pressable,
@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 
 import { Text } from "@/src/components/atoms/Text";
@@ -17,7 +16,7 @@ import { isLiquidGlassSupported } from "@/src/components/glass/LiquidGlassView";
 import { toDisplayError, verifyOTP } from "@/src/api";
 import { useSession } from "@/src/session-context";
 import { useToast } from "@/src/toast-context";
-import { useThemeColors, useThemeMode } from "@/src/theme";
+import { useThemeColors } from "@/src/theme";
 import {
   authGlassBlurIntensity,
   authSoftFieldSurface,
@@ -36,7 +35,6 @@ export type VerifyOtpFormProps = {
 export function VerifyOtpForm({ email }: VerifyOtpFormProps) {
   const router = useRouter();
   const colors = useThemeColors();
-  const { isDark } = useThemeMode();
   const { setSession } = useSession();
   const { showToast } = useToast();
   const reducedMotion = useReducedMotion();
@@ -47,14 +45,22 @@ export function VerifyOtpForm({ email }: VerifyOtpFormProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(true);
   const inputRef = useRef<TextInput>(null);
+  const submitLockRef = useRef(false);
+  const navigationLockRef = useRef(false);
 
   const verifyMutation = useMutation({
     mutationFn: verifyOTP,
     onSuccess: (session) => {
+      if (navigationLockRef.current) {
+        return;
+      }
+      navigationLockRef.current = true;
       setSession(session);
-      router.replace(!!session?.user?.coupleId ? "/(tabs)/home" : "/pairing");
+      router.replace("/(tabs)/home");
     },
     onError: (err) => {
+      submitLockRef.current = false;
+      navigationLockRef.current = false;
       showToast(toDisplayError(err), "error");
     },
   });
@@ -66,19 +72,30 @@ export function VerifyOtpForm({ email }: VerifyOtpFormProps) {
     return () => clearInterval(interval);
   }, []);
 
+  const submitOtp = useCallback((value: string) => {
+    const cleaned = value.replace(/[^0-9]/g, "").slice(0, 6);
+    if (cleaned.length !== 6 || submitLockRef.current || verifyMutation.isPending) {
+      return;
+    }
+
+    submitLockRef.current = true;
+    Keyboard.dismiss();
+    verifyMutation.mutate({ email, otp: cleaned });
+  }, [email, verifyMutation]);
+
   const handleOtpChange = (val: string) => {
     const cleaned = val.replace(/[^0-9]/g, "").slice(0, 6);
     setOtpValue(cleaned);
-    if (cleaned.length === 6) {
-      verifyMutation.mutate({ email, otp: cleaned });
+    if (cleaned.length < 6) {
+      submitLockRef.current = false;
+      navigationLockRef.current = false;
+      return;
     }
+    submitOtp(cleaned);
   };
 
   const handleOtpSubmit = () => {
-    Keyboard.dismiss();
-    if (otpValue.length === 6) {
-      verifyMutation.mutate({ email, otp: otpValue });
-    }
+    submitOtp(otpValue);
   };
 
   const handleResendOtp = () => {
@@ -118,20 +135,18 @@ export function VerifyOtpForm({ email }: VerifyOtpFormProps) {
     ? FadeIn.duration(0)
     : FadeInDown.delay(120).springify().damping(22).stiffness(180);
 
-  const loginSoft = isDark
-    ? authSoftFieldSurface.dark
-    : authSoftFieldSurface.light;
-  const otpCellRadius = !isDark ? loginFigmaLight.inputPillRadius : 16;
+  const loginSoft = authSoftFieldSurface.light;
+  const otpCellRadius = loginFigmaLight.inputPillRadius;
 
   const activeCellShadow = useMemo(
     () => ({
       shadowColor: colors.brand.default,
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: isDark ? 0.25 : 0.12,
+      shadowOpacity: 0.12,
       shadowRadius: 6,
       elevation: 2,
     }),
-    [colors.brand.default, isDark],
+    [colors.brand.default],
   );
 
   const pending = verifyMutation.isPending;
@@ -142,12 +157,11 @@ export function VerifyOtpForm({ email }: VerifyOtpFormProps) {
       style={[shellStyles.formOuter, styles.formOuterSpacing]}
     >
       <GlassCard
-        intensity={
-          isDark ? authGlassBlurIntensity.dark : authGlassBlurIntensity.light
-        }
-        tint={isDark ? "dark" : "light"}
-        isLiquid={isLiquidGlassSupported}
+        intensity={authGlassBlurIntensity.light}
+        tint="light"
+        isLiquid={false && isLiquidGlassSupported}
         style={shellStyles.glassCard}
+        contentStyle={shellStyles.glassCardContent}
       >
         <View style={shellStyles.formInner}>
           <View style={styles.otpOuterContainer}>
@@ -183,10 +197,10 @@ export function VerifyOtpForm({ email }: VerifyOtpFormProps) {
                           ? colors.brand.default
                           : isFilled
                             ? colors.brand.subtle
-                            : loginSoft.borderColor,
+                            : colors.border.default,
                         backgroundColor: isCurrent
                           ? colors.surface.default
-                          : loginSoft.backgroundColor,
+                          : colors.surface.raised,
                       },
                       isCurrent && activeCellShadow,
                     ]}
@@ -224,21 +238,18 @@ export function VerifyOtpForm({ email }: VerifyOtpFormProps) {
             accessibilityHint="Gửi mã 6 số để xác nhận"
           >
             <Animated.View style={[shellStyles.ctaClip, ctaPress.animatedStyle]}>
-              <LinearGradient
-                colors={
-                  isDark ? ["#FF8FA3", "#8E7CFF"] : ["#FF6B81", "#7B61FF"]
-                }
-                locations={[0, 1]}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={shellStyles.ctaGradient}
+              <View
+                style={[
+                  shellStyles.ctaGradient,
+                  { backgroundColor: colors.brand.default },
+                ]}
               >
                 {pending ? (
                   <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
                   <Text style={shellStyles.ctaLabel}>Tiếp tục</Text>
                 )}
-              </LinearGradient>
+              </View>
             </Animated.View>
           </Pressable>
 

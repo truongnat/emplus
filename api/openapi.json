@@ -288,10 +288,10 @@
           "status": {
             "type": "string",
             "enum": [
-              "CHO_GHEP_DOI",
-              "DANG_YEU",
-              "DA_CUOI",
-              "DA_CHIA_TAY"
+              "PENDING",
+              "DATING",
+              "MARRIED",
+              "SEPARATED"
             ]
           },
           "inviteCode": {

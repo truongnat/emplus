@@ -10,7 +10,6 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
-  withRepeat,
   withSequence,
   Easing,
   cancelAnimation,
@@ -128,23 +127,12 @@ export const NumberTicker = React.memo(function NumberTicker({
 
 function ClockColon({ tone }: { tone: ClockTickerTone }) {
   const colors = useThemeColors();
-  const opacity = useSharedValue(1);
+  const opacity = useSharedValue(0);
   const baseColor =
     tone === "onHero" ? colors.text.secondary : colors.text.primary;
 
   useEffect(() => {
-    opacity.value = withRepeat(
-      withSequence(
-        withTiming(0.35, { duration: 500, easing: Easing.inOut(Easing.ease) }),
-        withTiming(1, { duration: 500, easing: Easing.inOut(Easing.ease) }),
-      ),
-      -1,
-      false,
-    );
-
-    return () => {
-      cancelAnimation(opacity);
-    };
+    opacity.value = withTiming(1, { duration: 300, easing: Easing.out(Easing.quad) });
   }, [opacity]);
 
   const animatedStyle = useAnimatedStyle(() => ({

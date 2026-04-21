@@ -4,48 +4,26 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 6% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 6% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 6% 10%;
-    --primary: 353 100% 71%;
+    --background: 21 56% 97%;
+    --foreground: 22 18% 14%;
+    --card: 20 44% 98%;
+    --card-foreground: 22 18% 14%;
+    --popover: 20 44% 98%;
+    --popover-foreground: 22 18% 14%;
+    --primary: 20 44% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 255 100% 69%;
+    --secondary: 25 27% 44%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-    --accent: 174 43% 55%;
+    --muted: 23 36% 93%;
+    --muted-foreground: 22 14% 36%;
+    --accent: 95 18% 46%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 353 100% 71%;
+    --border: 22 28% 84%;
+    --input: 22 28% 84%;
+    --ring: 25 27% 44%;
     --radius: 0.625rem;
-  }
-
-  .dark {
-    --background: 340 12% 9%;
-    --foreground: 240 5% 96%;
-    --card: 340 15% 13%;
-    --card-foreground: 240 5% 96%;
-    --popover: 340 15% 13%;
-    --popover-foreground: 240 5% 96%;
-    --primary: 353 100% 71%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 255 100% 69%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 340 15% 13%;
-    --muted-foreground: 240 4% 64%;
-    --accent: 174 43% 55%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 340 13% 19%;
-    --input: 340 13% 19%;
-    --ring: 353 100% 71%;
   }
 
   html {
@@ -53,7 +31,11 @@
   }
 
   body {
-    @apply min-h-screen bg-background font-sans text-foreground antialiased;
+    @apply min-h-screen font-sans text-foreground antialiased;
+    background:
+      radial-gradient(circle at top left, hsl(var(--primary) / 0.045), transparent 28%),
+      radial-gradient(circle at top right, hsl(var(--secondary) / 0.035), transparent 24%),
+      hsl(var(--background));
   }
 }
 
@@ -127,10 +109,10 @@
     height: 32rem;
     z-index: -1;
     background:
-      radial-gradient(60% 60% at 20% 10%, hsl(var(--primary) / 0.28), transparent 60%),
-      radial-gradient(55% 55% at 80% 0%, hsl(var(--secondary) / 0.22), transparent 58%),
-      radial-gradient(55% 55% at 60% 55%, hsl(var(--accent) / 0.16), transparent 62%);
-    filter: blur(10px);
+      radial-gradient(60% 60% at 20% 10%, hsl(var(--primary) / 0.16), transparent 60%),
+      radial-gradient(55% 55% at 80% 0%, hsl(var(--secondary) / 0.10), transparent 58%),
+      radial-gradient(55% 55% at 60% 55%, hsl(var(--accent) / 0.08), transparent 62%);
+    filter: blur(8px);
     pointer-events: none;
   }
 
@@ -163,7 +145,7 @@
   }
 
   .blog-card:hover {
-    @apply -translate-y-0.5 border-primary/30 shadow-lg shadow-primary/10;
+    @apply -translate-y-0.5 border-primary/25 shadow-md shadow-primary/10;
   }
 
   .blog-card:hover::before {
@@ -183,7 +165,7 @@
   }
 
   .prose-emplus {
-    @apply prose prose-zinc max-w-none dark:prose-invert;
+    @apply prose prose-zinc max-w-none;
   }
 
   .prose-emplus :where(a):not(:where([class~='not-prose'], [class~='not-prose'] *)) {

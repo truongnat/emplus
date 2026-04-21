@@ -94,7 +94,7 @@ bun run dev:api
 # Health check
 curl http://localhost:3000/health
 
-# Expected: {"status":"hoat_dong"}
+# Expected: {"status":"active"}
 ```
 
 ## 🚀 Scripts Available

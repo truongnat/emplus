@@ -29,10 +29,10 @@ export const MAX_PAGE_SIZE = 50;
 
 // Couple statuses
 export const COUPLE_STATUS = {
-  PENDING: "CHO_GHEP_DOI",
-  DATING: "DANG_YEU",
-  MARRIED: "DA_CUOI",
-  BROKEN_UP: "DA_CHIA_TAY",
+  PENDING: "PENDING",
+  DATING: "DATING",
+  MARRIED: "MARRIED",
+  SEPARATED: "SEPARATED",
 } as const;
 
 // Budget statuses
@@ -52,7 +52,7 @@ export const BUDGET_STATUS_DISPLAY: Record<string, string> = {
 };
 
 // Gender values
-export const GENDER_VALUES = ["NAM", "NU", "KHAC", "KHONG_TIET_LO"] as const;
+export const GENDER_VALUES = ["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"] as const;
 
 // Auth providers
 export const AUTH_PROVIDER = {

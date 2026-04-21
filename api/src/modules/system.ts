@@ -2,8 +2,9 @@ import { Hono } from "hono";
 import type { AppEnv } from "../app-env.ts";
 import { env } from "../config/env.ts";
 import { getDependencyReport } from "../services/dependencies.ts";
+import { dispatchCoreReminders } from "../services/reminder.service.ts";
 import { success } from "../utils/http.ts";
-import { hienThiTrangThaiPhuThuoc } from "../utils/presentation.ts";
+import { displayDependencyStatus } from "../utils/presentation.ts";
 import { requireAuth } from "../middleware/auth.ts";
 import { isEncryptionEnabled } from "../services/crypto.ts";
 
@@ -15,26 +16,26 @@ systemRoutes.use("/*", requireAuth);
 systemRoutes.get("/dependencies", async (context) => {
   const dependencies = await getDependencyReport();
   const hasDownService = Object.values(dependencies).some((entry) => entry.status === "down");
-  const dependenciesHienThi = {
+  const dependenciesDisplay = {
     database: {
       ...dependencies.database,
-      status: hienThiTrangThaiPhuThuoc(dependencies.database.status),
+      status: displayDependencyStatus(dependencies.database.status),
     },
     readDatabase: {
       ...dependencies.readDatabase,
-      status: hienThiTrangThaiPhuThuoc(dependencies.readDatabase.status),
+      status: displayDependencyStatus(dependencies.readDatabase.status),
     },
     redis: {
       ...dependencies.redis,
-      status: hienThiTrangThaiPhuThuoc(dependencies.redis.status),
+      status: displayDependencyStatus(dependencies.redis.status),
     },
     mail: {
       ...dependencies.mail,
-      status: hienThiTrangThaiPhuThuoc(dependencies.mail.status),
+      status: displayDependencyStatus(dependencies.mail.status),
     },
     minio: {
       ...dependencies.minio,
-      status: hienThiTrangThaiPhuThuoc(dependencies.minio.status),
+      status: displayDependencyStatus(dependencies.minio.status),
     },
   };
 
@@ -54,8 +55,13 @@ systemRoutes.get("/dependencies", async (context) => {
         swaggerEnabled: env.swaggerEnabled,
         encryptionEnabled: isEncryptionEnabled(),
       },
-      dependencies: dependenciesHienThi,
+      dependencies: dependenciesDisplay,
     },
     hasDownService ? 503 : 200,
   );
+});
+
+systemRoutes.post("/dispatch-reminders", async (context) => {
+  const result = await dispatchCoreReminders();
+  return success(context, result);
 });

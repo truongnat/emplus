@@ -1,6 +1,6 @@
-export type Gender = "NAM" | "NU" | "KHAC" | "KHONG_TIET_LO";
+export type Gender = "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY";
 export type AuthProvider = "LOCAL" | "GOOGLE" | "APPLE";
-export type CoupleStatus = "CHO_GHEP_DOI" | "DANG_YEU" | "DA_CUOI" | "DA_CHIA_TAY";
+export type CoupleStatus = "PENDING" | "DATING" | "MARRIED" | "SEPARATED";
 export type AnniversaryCategory = "LOVE" | "BIRTHDAY" | "CUSTOM" | "HOLIDAY";
 
 export interface User {
@@ -62,6 +62,17 @@ export interface MemoryItem {
   mediaUrls: string[];
   tags: string[];
   createdAt: string;
+}
+
+export interface PartnerNote {
+  id: string;
+  userId: string;
+  coupleId?: string;
+  title: string;
+  content: string;
+  category?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Anniversary {

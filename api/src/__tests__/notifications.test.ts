@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach } from "bun:test";
 import { app } from "../app";
+import type { Couple, User } from "../types.ts";
+import { hashPassword } from "../utils/password.ts";
 
 describe("Notifications (in-app)", () => {
   let accessToken: string;
@@ -72,5 +74,72 @@ describe("Notifications (in-app)", () => {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     expect(readAll.status).toBe(200);
+  });
+
+  it("dispatches core reminders idempotently for upcoming system milestones", async () => {
+    const { store } = await import("../store.ts");
+    const now = new Date();
+    const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const loveStartDate = new Date(today);
+    loveStartDate.setUTCDate(loveStartDate.getUTCDate() - 26);
+    const partnerId = crypto.randomUUID();
+    const partnerEmail = `partner-${Date.now()}@example.com`;
+    const isoNow = new Date().toISOString();
+
+    const partner: User = {
+      id: partnerId,
+      email: partnerEmail,
+      fullName: "Partner Reminder",
+      gender: "MALE",
+      authProvider: "LOCAL",
+      authId: partnerEmail,
+      passwordHash: hashPassword("password123"),
+      timezone: "Asia/Ho_Chi_Minh",
+      emailNotificationsEnabled: true,
+      profilePrivate: false,
+      showOnlineStatus: true,
+      isActive: true,
+      createdAt: isoNow,
+      updatedAt: isoNow,
+    };
+    await store.saveUser(partner);
+
+    const couple: Couple = {
+      id: crypto.randomUUID(),
+      partner1Id: userId,
+      partner2Id: partnerId,
+      loveStartDate: loveStartDate.toISOString().slice(0, 10),
+      status: "DATING",
+      settings: {},
+      createdAt: isoNow,
+    };
+    await store.saveCouple(couple);
+
+    const firstDispatch = await app.request("/v1/system/dispatch-reminders", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(firstDispatch.status).toBe(200);
+    const firstPayload = await firstDispatch.json();
+    expect(firstPayload.data.remindersSent).toBeGreaterThan(0);
+
+    const listAfterFirst = await app.request("/v1/notifications", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const firstListPayload = await listAfterFirst.json();
+    expect(firstListPayload.data.items.length).toBe(1);
+    expect(firstListPayload.data.items[0].type).toBe("reminder");
+
+    const secondDispatch = await app.request("/v1/system/dispatch-reminders", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(secondDispatch.status).toBe(200);
+
+    const listAfterSecond = await app.request("/v1/notifications", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const secondListPayload = await listAfterSecond.json();
+    expect(secondListPayload.data.items.length).toBe(1);
   });
 });

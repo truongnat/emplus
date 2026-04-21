@@ -17,8 +17,8 @@ export function LoginBrandGradientTitle() {
       }
     >
       <LinearGradient
-        colors={["#FF6B81", "#C084FC", "#7B61FF"]}
-        locations={[0, 0.45, 1]}
+        colors={["#A95E40", "#8F6A52"]}
+        locations={[0, 1]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0.6 }}
         style={styles.gradient}
@@ -38,10 +38,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   maskText: {
-    fontFamily: "BeVietnamPro_800ExtraBold",
-    fontSize: 32,
+    fontFamily: "BeVietnamPro_600SemiBold",
+    fontSize: 30,
     fontWeight: "normal",
-    letterSpacing: -0.5,
+    letterSpacing: -0.3,
     color: "#000000",
     backgroundColor: "transparent",
     ...Platform.select({

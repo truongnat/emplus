@@ -37,6 +37,10 @@
     "ai:feature": "bash ./scripts/ai-workflow.sh feature",
     "ai:bugfix": "bash ./scripts/ai-workflow.sh bugfix",
     "ai:review": "bash ./scripts/ai-workflow.sh review",
+    "gsd:doctor": "bash ./scripts/gsd.sh doctor",
+    "gsd:status": "bash ./scripts/gsd.sh status",
+    "gsd:paths": "bash ./scripts/gsd.sh paths",
+    "gsd:guide": "bash ./scripts/gsd.sh guide",
     "api:sync": "cd api && bun run scripts/export-openapi.ts && cd ../mobile && bun run scripts/sync-api.ts"
   },
   "dependencies": {

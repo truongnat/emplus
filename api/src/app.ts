@@ -15,6 +15,7 @@ import {
   liveRoutes,
   mediaRoutes,
   notificationRoutes,
+  partnerNotesRoutes,
   systemRoutes,
   timelineRoutes,
   userRoutes,
@@ -49,7 +50,7 @@ app.use("*", async (context, next) => {
 });
 
 // Health check
-app.get("/health", (context) => success(context, { status: "hoat_dong" }));
+app.get("/health", (context) => success(context, { status: "active" }));
 
 // Swagger/OpenAPI (only in non-production when enabled)
 if (env.swaggerEnabled) {
@@ -77,6 +78,7 @@ app.route("/v1/dashboard", dashboardRoutes);
 app.route("/v1/timeline", timelineRoutes);
 app.route("/v1/media", mediaRoutes);
 app.route("/v1/care", careRoutes);
+app.route("/v1/partner-notes", partnerNotesRoutes);
 app.route("/v1/system", systemRoutes);
 app.route("/v1/budget", budgetRoutes);
 app.route("/v1/live", liveRoutes);

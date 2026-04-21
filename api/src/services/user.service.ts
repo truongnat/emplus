@@ -4,7 +4,7 @@
 
 import { store } from "../store.ts";
 import type { User, Gender } from "../types.ts";
-import { chuanHoaGioiTinhDauVao } from "../utils/presentation.ts";
+import { normalizeGenderInput } from "../utils/presentation.ts";
 import { AppError } from "../utils/http.ts";
 
 export interface UserProfile {
@@ -102,7 +102,7 @@ export async function updateUserProfile(
         : data.profileBackgroundUrl === ""
           ? undefined
           : data.profileBackgroundUrl.trim(),
-    gender: data.gender ? chuanHoaGioiTinhDauVao(data.gender) : user.gender,
+    gender: data.gender ? normalizeGenderInput(data.gender) : user.gender,
     dob: data.dob ?? user.dob,
     birthTime: data.birthTime !== undefined ? (data.birthTime?.trim() || undefined) : user.birthTime,
     timezone: data.timezone ?? user.timezone,

@@ -12,7 +12,7 @@ adminRoutes.get("/stats", requireAuth, requireAdmin, async (c) => {
   const users = (await store.listAllUsers?.()) ?? [];
   const couples = (await store.listAllCouples?.()) ?? [];
 
-  const activeStatuses = new Set(["DANG_YEU", "DA_CUOI"]);
+  const activeStatuses = new Set(["DATING", "MARRIED"]);
 
   const stats = {
     totalUsers: users.length,

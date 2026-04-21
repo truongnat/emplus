@@ -8,7 +8,7 @@ describe("Anniversary Engine", () => {
     id: "test-couple",
     partner1Id: "user-1",
     partner2Id: "user-2",
-    status: "DANG_YEU",
+    status: "DATING",
     settings: {},
     createdAt: "2024-01-01T00:00:00Z",
   };

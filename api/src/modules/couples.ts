@@ -5,7 +5,7 @@ import { generateInvite, joinCouple } from "../services/couple.service.ts";
 import { validateJoinCoupleInput } from "../dto/couples.dto.ts";
 import { readJson, success } from "../utils/http.ts";
 import { store } from "../store.ts";
-import { hienThiGioiTinh } from "../utils/presentation.ts";
+import { displayGender } from "../utils/presentation.ts";
 
 export const couplesRoutes = new Hono<AppEnv>();
 
@@ -41,7 +41,7 @@ couplesRoutes.get("/status", async (context) => {
     paired: true,
     coupleId: couple.id,
     partner: partner
-      ? { id: partner.id, fullName: partner.fullName, gender: hienThiGioiTinh(partner.gender) }
+      ? { id: partner.id, fullName: partner.fullName, gender: displayGender(partner.gender) }
       : undefined,
   });
 });

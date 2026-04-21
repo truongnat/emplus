@@ -7,6 +7,7 @@ export interface LoginFooterSlotProps {
   /** Slot phía trên — sau này gắn animation vườn hoa */
   gardenSlot?: ReactNode;
   style?: ViewStyle;
+  compact?: boolean;
 }
 
 /**
@@ -16,15 +17,21 @@ export function LoginFooterSlot({
   children,
   gardenSlot,
   style,
+  compact = false,
 }: LoginFooterSlotProps) {
   return (
     <View style={[styles.wrap, style]}>
       <View
-        style={styles.gardenPlaceholder}
+        style={[
+          styles.gardenPlaceholder,
+          compact ? styles.gardenPlaceholderCompact : null,
+        ]}
         accessibilityElementsHidden={!gardenSlot}
         importantForAccessibility={gardenSlot ? "yes" : "no-hide-descendants"}
       >
-        {gardenSlot ?? <View style={styles.gardenSpacer} />}
+        {gardenSlot ?? (
+          <View style={compact ? styles.gardenSpacerCompact : styles.gardenSpacer} />
+        )}
       </View>
       <View style={styles.actions}>{children}</View>
     </View>
@@ -45,8 +52,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  gardenPlaceholderCompact: {
+    minHeight: 8,
+  },
   gardenSpacer: {
     height: 20,
+  },
+  gardenSpacerCompact: {
+    height: 4,
   },
   actions: {
     width: "100%",

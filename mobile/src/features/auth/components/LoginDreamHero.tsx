@@ -8,8 +8,6 @@ import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
-  withRepeat,
-  withSequence,
   withTiming,
 } from "react-native-reanimated";
 import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
@@ -27,25 +25,14 @@ export function LoginDreamHero({
     ? "rgba(255, 200, 210, 0.38)"
     : "rgba(255, 107, 129, 0.45)";
 
-  const breath = useSharedValue(1);
+  const breath = useSharedValue(0);
 
   useEffect(() => {
-    if (reduced) {
-      breath.value = 1;
-      return;
-    }
-    breath.value = withRepeat(
-      withSequence(
-        withTiming(1.03, { duration: 2400, easing: Easing.inOut(Easing.sin) }),
-        withTiming(1, { duration: 2400, easing: Easing.inOut(Easing.sin) }),
-      ),
-      -1,
-      false,
-    );
-  }, [breath, reduced]);
+    breath.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.quad) });
+  }, [breath]);
 
   const wrapStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: breath.value }],
+    opacity: breath.value,
   }));
 
   return (

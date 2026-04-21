@@ -26,6 +26,8 @@ import Reanimated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  withTiming,
+  Easing,
 } from "react-native-reanimated";
 import { TabBarGridAnimatedBackground } from "@/src/components/molecules/TabBarGridAnimatedBackground";
 
@@ -100,11 +102,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     );
     if (idx === -1) return;
     const target = PILL_PADDING + idx * itemWidth;
-    slideX.value = withSpring(target, {
-      damping: 18,
-      stiffness: 200,
-      mass: 0.9,
-    });
+    slideX.value = withTiming(target, { duration: 300, easing: Easing.linear });
   }, [state.index, state.routes, itemWidth]);
 
   const indicatorStyle = useAnimatedStyle(() => ({
@@ -219,7 +217,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             key={route.key}
             onPress={() => handlePress(route, routeIndex)}
             style={styles.tabItem}
-            activeOpacity={0.8}
+            activeOpacity={1}
             accessibilityRole="tab"
             accessibilityState={{ selected: isFocused }}
             accessibilityLabel={label}
@@ -332,8 +330,7 @@ export default function TabsLayout() {
   const { isDark } = useThemeMeta();
 
   if (!hydrated) return null;
-  if (!isAuthenticated || !session?.user.coupleId)
-    return <Redirect href="/login" />;
+  if (!isAuthenticated) return <Redirect href="/login" />;
 
   return (
     <LiveChannelProvider>

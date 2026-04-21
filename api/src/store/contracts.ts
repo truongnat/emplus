@@ -8,6 +8,7 @@ import type {
   InAppNotification,
   Invite,
   MemoryItem,
+  PartnerNote,
   User,
 } from "../types.ts";
 
@@ -41,6 +42,11 @@ export interface DataStore {
   updateMemory(memory: MemoryItem): Promise<void>;
   getMemoryByCouple(coupleId: string, memoryId: string): Promise<MemoryItem | undefined>;
   deleteMemory(coupleId: string, memoryId: string): Promise<boolean>;
+  listPartnerNotesByUser(userId: string): Promise<PartnerNote[]>;
+  getPartnerNoteByUser(userId: string, noteId: string): Promise<PartnerNote | undefined>;
+  savePartnerNote(note: PartnerNote): Promise<void>;
+  updatePartnerNote(note: PartnerNote): Promise<void>;
+  deletePartnerNote(userId: string, noteId: string): Promise<boolean>;
   listBudgetItemsByCouple(coupleId: string): Promise<BudgetItem[]>;
   getBudgetItem(id: string): Promise<BudgetItem | undefined>;
   saveBudgetItem(item: BudgetItem): Promise<void>;
@@ -72,7 +78,7 @@ export interface DataStore {
 
   // Admin methods
   listAllUsers?(): Promise<User[]>;
-  listAllCouples?(): Promise<Couple[]>;
+  listAllCouples(): Promise<Couple[]>;
   countMemories?(): Promise<number>;
 
   listNotificationsForUser(

@@ -281,7 +281,7 @@ Set `PUBLIC_SITE_URL` theo môi trường deploy (không có dấu `/` cuối):
 
 ## 6. Biến môi trường production
 
-Tạo file `api/.env.production` (KHÔNG commit file này):
+Tạo file `api/.env.production` (KHÔNG commit file này). Mẫu đầy đủ từng biến (an toàn để commit): `api/.env.production.example`.
 
 ```bash
 # === REQUIRED ===

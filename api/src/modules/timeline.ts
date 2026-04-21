@@ -1,7 +1,11 @@
 import { Hono } from "hono";
 import type { AppEnv } from "../app-env.ts";
 import { env } from "../config/env.ts";
-import { parseTimelineQueryParams, validateCreateMemoryInput } from "../dto/timeline.dto.ts";
+import {
+  parseTimelineQueryParams,
+  validateCreateMemoryInput,
+  validateUpdateMemoryInput,
+} from "../dto/timeline.dto.ts";
 import { requireAuth } from "../middleware/auth.ts";
 import {
   ensureDemoTimelineMemories,
@@ -38,6 +42,34 @@ timelineRoutes.delete("/memories/:id", async (context) => {
   }
   await store.invalidateHomeCache(coupleId);
   return success(context, { ok: true });
+});
+
+timelineRoutes.put("/memories/:id", async (context) => {
+  const user = context.get("user");
+  const coupleId = await resolveActiveCoupleIdAsync(user.id);
+  const id = context.req.param("id");
+  const existing = await store.getMemoryByCouple(coupleId, id);
+
+  if (!existing) {
+    throw new AppError(404, "NOT_FOUND", "Không tìm thấy mục.");
+  }
+
+  const body = await readJson<Record<string, unknown>>(context);
+  const input = validateUpdateMemoryInput(body);
+
+  const memory: MemoryItem = {
+    ...existing,
+    title: input.title,
+    description: input.description,
+    memoryDate: input.memoryDate,
+    mediaUrls: input.mediaUrls,
+    tags: input.tags,
+  };
+
+  await store.updateMemory(memory);
+  await store.invalidateHomeCache(coupleId);
+
+  return success(context, memory);
 });
 
 timelineRoutes.get("/memories", async (context) => {

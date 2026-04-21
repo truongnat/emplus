@@ -3,7 +3,7 @@ import { TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-import { useThemeColors, useThemeMode } from "@/src/theme";
+import { useThemeColors } from "@/src/theme";
 import { LoginBrandGradientTitle } from "./LoginBrandGradientTitle";
 import { registerScreenStyles as regStyles } from "../registerScreen.styles";
 
@@ -27,21 +27,14 @@ export function RegisterTopBar({
   accessibilityLabel = "Quay lại",
 }: RegisterTopBarProps) {
   const router = useRouter();
-  const { isDark } = useThemeMode();
   const colors = useThemeColors();
 
   const backSurface = useMemo(
-    () =>
-      isDark
-        ? {
-            backgroundColor: "rgba(255,255,255,0.08)",
-            borderColor: "rgba(255,255,255,0.14)",
-          }
-        : {
-            backgroundColor: "rgba(255,255,255,0.45)",
-            borderColor: "rgba(255,255,255,0.5)",
-          },
-    [isDark],
+    () => ({
+      backgroundColor: "rgba(255,255,255,0.45)",
+      borderColor: "rgba(255,255,255,0.5)",
+    }),
+    [],
   );
 
   return (

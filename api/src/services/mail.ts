@@ -76,3 +76,47 @@ export async function sendOtpMail(email: string, otp: string) {
         }
     }
 }
+
+export async function sendNewSignupAlertMail(input: {
+    userEmail: string;
+    fullName: string;
+    source: "register" | "otp";
+}): Promise<void> {
+    if (env.signupAlertEmails.length === 0) {
+        if (env.nodeEnv !== "production") {
+            console.log(
+                `[Mail] Bỏ qua signup alert vì chưa cấu hình SIGNUP_ALERT_EMAILS cho ${input.userEmail}`,
+            );
+        }
+        return;
+    }
+
+    const sourceLabel =
+        input.source === "register" ? "Đăng ký trực tiếp" : "Tạo tài khoản sau OTP";
+
+    const mailOptions = {
+        from: `"Em+" <${env.smtpFrom}>`,
+        to: env.signupAlertEmails.join(", "),
+        subject: `Em+: Có account mới ${input.userEmail}`,
+        html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+        <h2 style="color: #FF4D67; text-align: center;">Có tài khoản Em+ mới</h2>
+        <p><strong>Email:</strong> ${input.userEmail}</p>
+        <p><strong>Tên hiển thị:</strong> ${input.fullName}</p>
+        <p><strong>Nguồn tạo tài khoản:</strong> ${sourceLabel}</p>
+        <p><strong>Thời gian:</strong> ${new Date().toISOString()}</p>
+      </div>
+    `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        if (env.nodeEnv !== "production") {
+            console.log(
+                `[Mail] Đã gửi signup alert cho ${input.userEmail} đến ${env.signupAlertEmails.join(", ")}`,
+            );
+        }
+    } catch (error) {
+        console.error("[Mail] Lỗi gửi signup alert:", error);
+    }
+}

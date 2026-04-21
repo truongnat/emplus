@@ -2,6 +2,10 @@
 
 > **Comprehensive spec:** See [`VISUAL_DESIGN_GUIDE.md`](VISUAL_DESIGN_GUIDE.md) for the full design system (tokens, semantic mapping, motion, glass rules, emotional UX, IA).
 >
+> **Current direction for user-facing surfaces:** See [`10_calm_care_ui_direction.md`](10_calm_care_ui_direction.md) for the "calm romantic utility" shift now being applied to landing, onboarding, and home.
+>
+> **Mobile-first implementation checklist:** See [`11_mobile_calm_care_refactor.md`](11_mobile_calm_care_refactor.md) for the next mobile refactor slice and screen-level priorities.
+>
 > **Canonical token values** live in `mobile/src/theme/tokens/palette.ts` and semantic theme files. Do not duplicate hex in new docs.
 
 ## 1. Design principles

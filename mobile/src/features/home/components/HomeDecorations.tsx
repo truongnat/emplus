@@ -3,9 +3,7 @@ import { View, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withRepeat,
   withTiming,
-  withSequence,
   withDelay,
   Easing,
   useAnimatedReaction,
@@ -35,46 +33,19 @@ export function PulseStar({
   bottom,
   icon = "star",
 }: PulseStarProps) {
-  const opacity = useSharedValue(0.4);
-  const scale = useSharedValue(0.8);
+  const opacity = useSharedValue(0);
+  const scale = useSharedValue(1);
 
   useEffect(() => {
-    // Start with delay
     const timeout = setTimeout(() => {
-      opacity.value = withRepeat(
-        withSequence(
-          withTiming(1, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
-          withTiming(0.4, {
-            duration: 1200,
-            easing: Easing.inOut(Easing.ease),
-          }),
-        ),
-        -1,
-        false,
-      );
-
-      scale.value = withRepeat(
-        withSequence(
-          withTiming(1.25, {
-            duration: 1200,
-            easing: Easing.inOut(Easing.ease),
-          }),
-          withTiming(0.8, {
-            duration: 1200,
-            easing: Easing.inOut(Easing.ease),
-          }),
-        ),
-        -1,
-        false,
-      );
+      opacity.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.quad) });
+      scale.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.quad) });
     }, delay);
 
     return () => {
       clearTimeout(timeout);
-      cancelAnimation(opacity);
-      cancelAnimation(scale);
     };
-  }, [delay, opacity, scale]);
+  }, [delay]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -103,37 +74,15 @@ export function PulseStar({
 
 export function RingingBell() {
   const colors = useThemeColors();
-  const rotation = useSharedValue(0);
+  const opacity = useSharedValue(0);
 
   useEffect(() => {
-    const ring = () => {
-      rotation.value = withSequence(
-        withTiming(1, { duration: 60, easing: Easing.linear }),
-        withTiming(-1, { duration: 60, easing: Easing.linear }),
-        withTiming(1, { duration: 60, easing: Easing.linear }),
-        withTiming(-1, { duration: 60, easing: Easing.linear }),
-        withTiming(0, { duration: 60, easing: Easing.linear }),
-      );
-    };
+    opacity.value = withTiming(1, { duration: 300, easing: Easing.out(Easing.quad) });
+  }, [opacity]);
 
-    // Ring immediately
-    ring();
-
-    // Then every 3 seconds
-    const interval = setInterval(ring, 3000);
-
-    return () => {
-      clearInterval(interval);
-      cancelAnimation(rotation);
-    };
-  }, [rotation]);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    const rotate = rotation.value * 15;
-    return {
-      transform: [{ rotate: `${rotate}deg` }],
-    };
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
 
   return (
     <Animated.View style={animatedStyle}>

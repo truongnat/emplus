@@ -10,8 +10,12 @@ export default function TimelineScreen() {
   const { isAuthenticated, session } = useSession();
   const isPaired = Boolean(session?.user?.coupleId);
 
-  if (!isAuthenticated || !isPaired) {
-    return <TimelineAuthGate isAuthenticated={isAuthenticated} />;
+  if (!isAuthenticated) {
+    return <TimelineAuthGate isAuthenticated={false} isPaired={false} />;
+  }
+
+  if (!isPaired) {
+    return <TimelineAuthGate isAuthenticated isPaired={false} />;
   }
 
   return <TimelineAuthenticatedBody />;

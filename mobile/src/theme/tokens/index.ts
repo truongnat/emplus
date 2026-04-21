@@ -192,8 +192,8 @@ export const spring = {
   smooth: { damping: 28, stiffness: 350, mass: 0.9 },
   // For large components (bottom sheet close)
   gentle: { damping: 32, stiffness: 280, mass: 1.0 },
-  // For micro-interactions (checkmark, success)
-  bouncy: { damping: 12, stiffness: 500, mass: 0.7 },
+  // For micro-interactions (checkmark, success) - smooth without bounce
+  bouncy: { damping: 25, stiffness: 300, mass: 0.9 },
   // No bounce (strict)
   stiff: { damping: 50, stiffness: 400, mass: 1.0 },
 } as const;

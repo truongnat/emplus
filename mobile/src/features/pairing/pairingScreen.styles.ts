@@ -1,14 +1,13 @@
 import { Platform, StyleSheet } from "react-native";
 
 /**
- * Pairing — readable QR, comfortable tap targets, vertical balance:
- * upper cluster (title + hero + card) vs lower cluster (OR + form) via space-between.
+ * Pairing — keep the screen compact and obvious on small devices:
+ * one short promise, one primary QR action, one secondary code-entry path.
  */
 export const pairingScreenStyles = StyleSheet.create({
   screenColumn: {
-    flex: 1,
     width: "100%",
-    justifyContent: "space-between",
+    gap: 10,
   },
   upperBlock: {
     width: "100%",
@@ -16,77 +15,73 @@ export const pairingScreenStyles = StyleSheet.create({
   },
   lowerBlock: {
     width: "100%",
-    paddingTop: 4,
+    paddingTop: 2,
   },
   header: {
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 8,
   },
-  /** Wrapper cho `PairingGradientTitle` (MaskedView không nhận margin Text cũ). */
-  titleWrap: {
+  title: {
+    fontFamily: "BeVietnamPro_500Medium",
+    fontSize: 22,
+    textAlign: "center",
     marginBottom: 4,
-    alignItems: "center",
+    letterSpacing: -0.3,
   },
   subtitle: {
     fontFamily: "BeVietnamPro_400Regular",
-    fontSize: 14,
+    fontSize: 12,
     textAlign: "center",
-    lineHeight: 20,
-    paddingHorizontal: 12,
-  },
-  lottieWrap: {
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  lottieHero: {
-    width: 96,
-    height: 96,
+    lineHeight: 17,
+    paddingHorizontal: 10,
   },
   qrCard: {
     marginBottom: 0,
     padding: 0,
-    borderRadius: 22,
+    borderRadius: 20,
     overflow: "hidden",
     width: "100%",
-    maxWidth: 400,
+    maxWidth: 392,
   },
   qrContent: {
     alignItems: "center",
-    paddingVertical: 14,
+    paddingVertical: 8,
     paddingHorizontal: 12,
-    gap: 10,
+    gap: 5,
+  },
+  sectionTitle: {
+    fontFamily: "BeVietnamPro_500Medium",
+    fontSize: 16,
+    lineHeight: 21,
+    textAlign: "center",
+  },
+  sectionBody: {
+    fontFamily: "BeVietnamPro_400Regular",
+    fontSize: 11,
+    lineHeight: 16,
+    textAlign: "center",
+    paddingHorizontal: 4,
   },
   qrWrapper: {
-    padding: 10,
+    padding: 7,
     backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+    borderRadius: 16,
   },
   qrContainer: {
-    width: 160,
-    height: 160,
+    width: 144,
+    height: 144,
     alignItems: "center",
     justifyContent: "center",
   },
   loaderContainer: {
-    width: 160,
-    height: 160,
+    width: 144,
+    height: 144,
     alignItems: "center",
     justifyContent: "center",
   },
   loaderLottie: {
-    width: 104,
-    height: 104,
+    width: 92,
+    height: 92,
   },
   logoOverlay: {
     position: "absolute",
@@ -96,17 +91,6 @@ export const pairingScreenStyles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 4,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
   },
   logoImage: {
     width: "100%",
@@ -119,27 +103,32 @@ export const pairingScreenStyles = StyleSheet.create({
   },
   timeText: {
     fontFamily: "BeVietnamPro_400Regular",
-    fontSize: 13,
+    fontSize: 12,
   },
   timeBold: {
-    fontFamily: "BeVietnamPro_700Bold",
-    fontSize: 13,
+    fontFamily: "BeVietnamPro_600SemiBold",
+    fontSize: 12,
   },
   /** Một hàng hai thao tác — ít “khối nút” hơn so với hai pill full-width chồng nhau. */
   toolbarRow: {
     flexDirection: "row",
-    gap: 10,
-    width: "92%",
-    maxWidth: 380,
+    gap: 8,
+    width: "90%",
+    maxWidth: 360,
     alignSelf: "center",
   },
   toolbarBtn: {
-    flex: 1,
-    minHeight: 46,
+    minHeight: 42,
     borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
+  },
+  toolbarBtnPrimary: {
+    flex: 1.45,
+  },
+  toolbarBtnSecondary: {
+    flex: 0.95,
   },
   toolbarBtnOutline: {
     borderWidth: 1.5,
@@ -151,11 +140,11 @@ export const pairingScreenStyles = StyleSheet.create({
     justifyContent: "center",
     gap: 6,
     paddingHorizontal: 6,
-    paddingVertical: 11,
+    paddingVertical: 9,
   },
   toolbarLabel: {
-    fontFamily: "BeVietnamPro_700Bold",
-    fontSize: 13,
+    fontFamily: "BeVietnamPro_500Medium",
+    fontSize: 12,
     flexShrink: 1,
   },
   dividerRow: {
@@ -163,8 +152,8 @@ export const pairingScreenStyles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    marginBottom: 10,
-    marginTop: 2,
+    marginBottom: 4,
+    marginTop: 0,
   },
   dividerLine: {
     flex: 1,
@@ -172,47 +161,58 @@ export const pairingScreenStyles = StyleSheet.create({
     opacity: 0.35,
   },
   dividerText: {
-    fontFamily: "BeVietnamPro_600SemiBold",
+    fontFamily: "BeVietnamPro_500Medium",
     fontSize: 11,
-    letterSpacing: 1.2,
+    letterSpacing: 1,
     textTransform: "lowercase",
   },
   inputSection: {
-    gap: 10,
+    gap: 7,
     width: "100%",
-    maxWidth: 440,
+    maxWidth: 420,
     alignSelf: "center",
   },
   inputLabel: {
     fontFamily: "BeVietnamPro_500Medium",
-    fontSize: 12,
+    fontSize: 11,
     textAlign: "center",
-    paddingHorizontal: 8,
-    lineHeight: 17,
+    paddingHorizontal: 4,
+    lineHeight: 15,
     opacity: 0.92,
   },
   ctaPressable: {
     width: "100%",
     marginTop: 0,
   },
+  secondaryCtaWrap: {
+    marginTop: 2,
+  },
   ctaClip: {
     borderRadius: 999,
     overflow: "hidden",
   },
   ctaGradient: {
-    paddingVertical: 13,
+    paddingVertical: 12,
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 48,
+    minHeight: 46,
   },
   ctaLabel: {
-    fontFamily: "BeVietnamPro_700Bold",
-    fontSize: 16,
+    fontFamily: "BeVietnamPro_500Medium",
+    fontSize: 15,
     color: "#FFFFFF",
-    letterSpacing: 0.25,
+    letterSpacing: 0.2,
   },
   ctaDisabled: {
     opacity: 0.72,
+  },
+  footnote: {
+    fontFamily: "BeVietnamPro_400Regular",
+    fontSize: 10,
+    textAlign: "center",
+    lineHeight: 14,
+    paddingHorizontal: 4,
+    marginTop: 2,
   },
   loadingWrap: {
     flex: 1,

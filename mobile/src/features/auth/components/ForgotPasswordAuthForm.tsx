@@ -3,7 +3,6 @@ import { View, Keyboard, ActivityIndicator, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -15,8 +14,12 @@ import { isLiquidGlassSupported } from "@/src/components/glass/LiquidGlassView";
 import { ForgotPasswordFields, ForgotPasswordSchema } from "@/src/forms";
 import { useForgotPasswordRequest } from "@/src/presentation/hooks/auth/useForgotPasswordRequest";
 import { useToast } from "@/src/toast-context";
-import { useThemeColors, useThemeMode } from "@/src/theme";
-import { loginFigmaLight } from "@/src/theme/emplus-design-tokens";
+import { useThemeColors } from "@/src/theme";
+import {
+  authGlassBlurIntensity,
+  authSoftFieldSurface,
+  loginFigmaLight,
+} from "@/src/theme/emplus-design-tokens";
 import { useReducedMotion } from "@/src/hooks/use-reduced-motion";
 import { usePressAnimation } from "@/src/animations/presets";
 import { toDisplayError } from "@/src/core/api/to-display-error";
@@ -26,7 +29,6 @@ import { loginScreenStyles as shellStyles } from "../loginScreen.styles";
 export function ForgotPasswordAuthForm() {
   const router = useRouter();
   const { showToast } = useToast();
-  const { isDark } = useThemeMode();
   const colors = useThemeColors();
   const reducedMotion = useReducedMotion();
   const ctaPress = usePressAnimation();
@@ -60,18 +62,10 @@ export function ForgotPasswordAuthForm() {
   );
 
   const placeholderColor = colors.text.secondary;
-  const loginPlaceholder = isDark ? placeholderColor : loginFigmaLight.subtitle;
-  const loginLabelColor = isDark ? undefined : loginFigmaLight.titleDark;
-  const loginSoft = !isDark
-    ? {
-        backgroundColor: "rgba(255,255,255,0.55)",
-        borderColor: "rgba(255,107,129,0.22)",
-      }
-    : {
-        backgroundColor: "rgba(255,255,255,0.06)",
-        borderColor: "rgba(255,255,255,0.12)",
-      };
-  const loginInputRadius = !isDark ? loginFigmaLight.inputPillRadius : 16;
+  const loginPlaceholder = loginFigmaLight.subtitle;
+  const loginLabelColor = loginFigmaLight.titleDark;
+  const loginSoft = authSoftFieldSurface.light;
+  const loginInputRadius = loginFigmaLight.inputPillRadius;
 
   const enteringForm = reducedMotion
     ? FadeIn.duration(0)
@@ -82,10 +76,11 @@ export function ForgotPasswordAuthForm() {
   return (
     <Animated.View entering={enteringForm} style={shellStyles.formOuter}>
       <GlassCard
-        intensity={isDark ? 30 : 26}
-        tint={isDark ? "dark" : "light"}
-        isLiquid={isLiquidGlassSupported}
+        intensity={authGlassBlurIntensity.light}
+        tint="light"
+        isLiquid={false && isLiquidGlassSupported}
         style={shellStyles.glassCard}
+        contentStyle={shellStyles.glassCardContent}
       >
         <View style={shellStyles.formInner}>
           <Controller
@@ -144,21 +139,18 @@ export function ForgotPasswordAuthForm() {
             <Animated.View
               style={[shellStyles.ctaClip, ctaPress.animatedStyle]}
             >
-              <LinearGradient
-                colors={
-                  isDark ? ["#FF8FA3", "#8E7CFF"] : ["#FF6B81", "#7B61FF"]
-                }
-                locations={[0, 1]}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={shellStyles.ctaGradient}
+              <View
+                style={[
+                  shellStyles.ctaGradient,
+                  { backgroundColor: colors.brand.default },
+                ]}
               >
                 {pending ? (
                   <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
                   <Text style={shellStyles.ctaLabel}>Gửi mã xác thực</Text>
                 )}
-              </LinearGradient>
+              </View>
             </Animated.View>
           </Pressable>
         </View>

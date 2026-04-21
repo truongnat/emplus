@@ -4,16 +4,22 @@ export const registerScreenStyles = StyleSheet.create({
   /** Compact hero vs login (smaller Lottie + tighter vertical rhythm). */
   registerHeader: {
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: 2,
     width: "100%",
   },
-  registerLogoMark: {
-    alignItems: "center",
-    justifyContent: "center",
+  registerEyebrow: {
+    fontFamily: "BeVietnamPro_500Medium",
+    fontSize: 11,
+    letterSpacing: 0.2,
+    textTransform: "uppercase",
+    marginBottom: 4,
   },
-  registerLogoLottie: {
-    width: 128,
-    height: 80,
+  registerTitle: {
+    fontFamily: "BeVietnamPro_500Medium",
+    fontSize: 22,
+    textAlign: "center",
+    letterSpacing: -0.2,
+    marginBottom: 2,
   },
   /**
    * Register: stack from top — avoids `justifyContent: "center"` gap
@@ -22,12 +28,15 @@ export const registerScreenStyles = StyleSheet.create({
   registerScrollContent: {
     flexGrow: 1,
     justifyContent: "flex-start",
-    paddingHorizontal: 22,
+    paddingHorizontal: 20,
   },
   /** Single scroll child — avoids Fabric edge cases with multiple roots in KASV. */
   registerScrollInner: {
     flexGrow: 1,
     justifyContent: "flex-start",
+    gap: 2,
+  },
+  registerScrollInnerCompact: {
     gap: 0,
   },
   backButton: {
@@ -52,57 +61,82 @@ export const registerScreenStyles = StyleSheet.create({
     gap: 8,
   },
   genderBlock: {
-    gap: 8,
+    gap: 4,
     width: "100%",
   },
   genderLabel: {
     fontFamily: "BeVietnamPro_500Medium",
-    fontSize: 14,
+    fontSize: 13,
+    letterSpacing: 0.1,
   },
   genderRow: {
+    width: "100%",
+  },
+  genderSummary: {
+    minHeight: 44,
+    borderRadius: 16,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  genderSummaryText: {
+    fontFamily: "BeVietnamPro_400Regular",
+    fontSize: 14,
+  },
+  genderOptions: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: 6,
   },
   genderChip: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 9,
+    paddingHorizontal: 10,
     borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth * 2,
-    minWidth: "22%",
+    borderWidth: StyleSheet.hairlineWidth,
+    minWidth: "23%",
     flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
   },
   genderChipText: {
     fontFamily: "BeVietnamPro_500Medium",
-    fontSize: 13,
+    fontSize: 12,
   },
   policyContainer: {
-    marginTop: 2,
-    gap: 6,
+    marginTop: 0,
+    gap: 4,
   },
   policyRow: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 12,
+    gap: 10,
   },
   policyTextWrap: {
     flex: 1,
-    paddingTop: 2,
+    paddingTop: 1,
   },
   policyLabel: {
     fontFamily: "BeVietnamPro_400Regular",
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 13,
+    lineHeight: 18,
   },
   policyLink: {
-    fontFamily: "BeVietnamPro_600SemiBold",
+    fontFamily: "BeVietnamPro_500Medium",
     textDecorationLine: "underline",
   },
   policyError: {
     fontFamily: "BeVietnamPro_400Regular",
     fontSize: 12,
     marginLeft: 36,
+  },
+  registerTrustNote: {
+    fontFamily: "BeVietnamPro_400Regular",
+    fontSize: 11,
+    lineHeight: 15,
+    textAlign: "center",
+    paddingHorizontal: 12,
+    marginTop: 2,
   },
 });

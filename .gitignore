@@ -6,6 +6,7 @@ mobile/.expo
 
 api/node_modules
 api/.env
+api/.env.production
 
 web/node_modules
 web/.env

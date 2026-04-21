@@ -1,4 +1,4 @@
-name: Deploy API (k3s on VPS)
+name: Deploy Backend (API) — k3s on VPS
 
 on:
   workflow_dispatch:

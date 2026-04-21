@@ -1,6 +1,6 @@
 export const siteName = 'Em+';
 export const siteDescription =
-  'Ứng dụng cho cặp đôi: ghép đôi, timeline, ngân sách, chăm sóc và thông báo.';
+  'Giúp bạn nhớ đúng lúc và quan tâm đúng cách, kể cả khi bắt đầu một mình.';
 
 export function siteUrl(): URL {
   const raw =

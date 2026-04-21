@@ -26,6 +26,8 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  withTiming,
+  Easing,
   useAnimatedScrollHandler,
   useAnimatedRef,
   SharedValue,
@@ -198,7 +200,7 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(
         const kh = e.endCoordinates.height;
         keyboardHeight.value = kh;
         const targetY = SCREEN_H - resolved[activeSnapIdx.value] - kh;
-        translateY.value = withSpring(Math.max(0, targetY), SPRING_CONFIG);
+        translateY.value = withTiming(Math.max(0, targetY), { duration: 300, easing: Easing.out(Easing.quad) });
       };
       const hide = () => {
         keyboardHeight.value = 0;
@@ -230,18 +232,18 @@ export const BottomSheet = forwardRef<BottomSheetHandle, BottomSheetProps>(
       (index: number) => {
         const clampedIdx = Math.max(0, Math.min(index, resolved.length - 1));
         const targetY = SCREEN_H - resolved[clampedIdx] - keyboardHeight.value;
-        translateY.value = withSpring(targetY, SPRING_CONFIG);
+        translateY.value = withTiming(targetY, { duration: 300, easing: Easing.out(Easing.quad) });
         activeSnapIdx.value = clampedIdx;
         onSnapChange?.(clampedIdx);
       },
-      [resolved, onSnapChange, theme.spring.smooth],
+      [resolved, keyboardHeight, onSnapChange],
     );
 
     const dismissSheet = useCallback(() => {
-      translateY.value = withSpring(SCREEN_H, CLOSE_SPRING, (finished) => {
+      translateY.value = withTiming(SCREEN_H, { duration: 300, easing: Easing.in(Easing.quad) }, (finished) => {
         if (finished && onClose) scheduleOnRN(onClose);
       });
-    }, [onClose, theme.spring.gentle]);
+    }, [onClose]);
 
     useImperativeHandle(
       ref,

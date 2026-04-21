@@ -1,73 +1,231 @@
-# UI/UX Screen Flows & Component Architecture (Detail)
+# UI/UX Screen Flows & Component Architecture
 
-Đây là tài liệu phân rã màn hình cực kỳ chi tiết dành cho team UI/UX Designer (Figma) và Mobile Developer (React Native / Expo).
+This document describes the intended screen behavior for Em+ after the shift toward the Calm Care direction.
 
----
+It is written for:
 
-## 1. DESIGN SYSTEM FOUNDATION (Mobile & Web)
+- product design
+- Figma exploration
+- mobile implementation in React Native / Expo
 
-Thừa kế triết lý "Liquid Glass Morphism" từ thư mục Ý Tưởng. 
-Component Tree trong mã nguồn React Native sẽ được xây theo `Atomic Design`.
+Use it with:
 
-### 1.1 Atoms (Hạt nhân UI)
-- `GlassContainer`: View bọc bằng thư viện `@react-native-community/blur`, `blurAmount=15`, background: `rgba(255, 255, 255, 0.15)`. Border 1px solid trắng (độ trong suốt 20%).
-- `TextSF`: Font mặc định là San Francisco Rounded (iOS) / Inter Rounded (Android).
-- `SoftButton`: Nút bấm có hiệu ứng Scale từ từ.
-- `AvatarPulse`: Avatar có vòng tròn lan tỏa mờ nhạt (nhịp tim).
-
-### 1.2 Molecules (Component Bậc 2)
-- `MemoryCard`: Tổ hợp: Image (S3 URL) + Dark Gradient Overlay + Title (Text) + Thả tim (Icon Heart).
-- `UpcomingEventBadge`: Hình chữ nhật ngang nhỏ gắn góc.
+- [`05_ui_ux_guidelines.md`](./05_ui_ux_guidelines.md)
+- [`10_calm_care_ui_direction.md`](./10_calm_care_ui_direction.md)
+- [`11_mobile_calm_care_refactor.md`](./11_mobile_calm_care_refactor.md)
 
 ---
 
-## 2. STATE MACHINE THEO TỪNG MÀN HÌNH (SCREEN BY SCREEN)
+## 1. Foundation
 
-### 2.1 Màn Hình Khởi Động (Splash & Auth Screen)
-- **State: Initializing** -> Kiểm tra Access Token. Nếu có, bay thẳng Home.
-- **State: Unauthenticated** -> View có Video nền Loop nhẹ nhàng (Hoa trôi nổi / Mặt nước lăn tăn / Bầu trời đêm).
-- **Phím chức năng:** `Đăng nhập với Google`, `Tiếp tục với Apple`.
+Em+ should no longer treat "liquid glass" as the default visual system.
 
-### 2.2 Luồng Ghép Đôi (Pairing Screen Flow - Quan trọng nhất)
-- **Screen: Select Role** (Sau đăng nhập lần đầu).
-  - Chọn Giới tính. (Hiển thị mờ, focus sáng khi chọn).
-- **Screen: Connection** 
-  - Giao diện chia 2 nửa chéo màn hình.
-  - Nửa trên: "Mã của bạn" -> Generate Code.
-  - Nửa dưới: "Nhập mã người ấy" -> Focus mở Keyboard Number.
-- **Loading State:** Avatar của người dùng nằm bên trái màn hình. Bên phải là dấu hỏi. Khi Join thành công (Socket bóp cò), Avatar bên phải xuất hiện -> Cú va chạm nhẹ kèm Rung điện thoại haptic feedback.
+The new baseline is:
 
-### 2.3 Tab 1 (Home/Dashboard)
-Đây là màn hình Landing khi mở app hàng ngày.
-- **Header:** Lời chào tùy khung giờ theo Template "Chào buổi sáng Tên_Couple,".
-- **Hero Banner:** Mỏ neo chính đếm tuổi tình yêu. "Yêu nhau 580 Ngày".
-  - *Micro-interaction:* Chạm tay vào con số, các ngôi sao nhỏ bay quanh 3s.
-- **Middle Horizontal Scroll:** "Sắp đến". Card nằm ngang (Width: 80% screen width), vuốt qua vuốt lại xem 3 sự kiện gần nhất (Valentine, Sinh nhật, 2 năm ngày yêu).
-- **Floating Button (+):** Nổi ở góc phải dưới dùng để Add Story lên Timeline.
-- **Feed (Bên dưới):** Danh sách Memories kéo vô hạn.
+- matte surfaces
+- readable contrast
+- large radii
+- soft borders
+- restrained warmth
 
-### 2.4 Tab 2 (Care/Quan Tâm) - Cần UX Tế Nhị
-- **View của Nữ:**
-  - Header: Lịch ngang (Nằm gọn ở đỉnh màn hình, chỉ thấy 7 ngày). 
-  - Body: 1 Nút tròn lớn "Báo Chu Kỳ".
-  - Alert Setting: "Chia sẻ trạng thái này cho <Tên đối tác>".
-- **View của Nam:**
-  - Tuyệt đối không có lịch hay số máu. 
-  - Card chính giữa màn hình (GlassMorphism siêu mờ): Thể hiện Text (VD: Phase Dễ Tủi Thân).
-  - Component bên dưới: **"Đề xuất cho bạn" (Affiliate Links)**. Mua đồ ăn, tặng sách.
+Atomic design is still valid, but the visual direction changes.
 
-### 2.5 Tab 3 (Trải Nghiệm - Experience map)
-- Giao diện giống Google Maps nhưng Custom Map Style cực kỳ sạch (Dark Mode thì nền đen, Light Mode nền kem).
-- Các Pin thả trên bản đồ không phải icon Mặc định, mà là Icon Hình Cafe, Workshop, Rạp Phim.
-- Tap vào: Xổ ra Bottom Sheet mô tả ngắn.
+### 1.1 Atoms
+
+- `AppText`: semantic typography roles, not decorative headline usage by default
+- `AppButton`: one dominant action style, one calmer secondary style
+- `IconBadge`: contextual timing / priority marker, not sticker decoration
+- `SurfaceCard`: matte card with visible border and short shadow
+
+### 1.2 Molecules
+
+- `ReminderSummaryCard`: next important date + action
+- `SuggestionCard`: one lightweight action for today
+- `MemoryListItem`: title + date + optional media, optimized for scanning
+- `PairingCodePanel`: share / enter code with minimal ambiguity
 
 ---
 
-## 3. ERROR & EDGE CASES STATES (Luồng Rủi ro)
-Một UX hoàn hảo nằm ở luồng lỗi.
-- **Lỗi Mạng (No Internet):** 
-  - UI: Dùng icon 2 bàn tay bị buông ra. "Đường truyền đang gián đoạn, nhưng tình cảm thì không. Vui lòng thử lại".
-- **Empty States (Chưa có Kỉ Niệm Mới):** 
-  - UI tab Home (Timeline mảng dưới trống): Hộp quà mờ ảo. "Hành trình nghìn dặm bắt đầu từ bước chân đầu tiên. Hãy lưu giữ bức ảnh hôm nay nhé".
-- **Chưa Pairing xong mà đã thoát App:** 
-  - Lần sau mở App -> Trả lại màn hình Đợi Đối tác nhập Code.
+## 2. Screen-by-Screen Flows
+
+## 2.1 Splash & Auth
+
+### Goal
+
+- move the user to the next useful state quickly
+
+### States
+
+- `Initializing`: check session, preload essentials, route onward
+- `Unauthenticated`: calm auth shell with one headline, one reassurance, and primary sign-in path
+
+### Rules
+
+- no cinematic background needed by default
+- trust matters more than atmosphere
+- auth copy should feel private and low-pressure
+
+## 2.2 Onboarding
+
+### Goal
+
+- explain the first believable wedge, then get out of the way
+
+### Recommended sequence
+
+1. Em+ helps you remember important things
+2. Em+ helps you act at the right time
+3. Em+ works best when both people are connected
+
+### Rules
+
+- maximum 3 steps before action
+- each screen should communicate one idea only
+- avoid showing the full platform breadth here
+
+## 2.3 Pairing
+
+### Goal
+
+- make account connection feel simple, immediate, and emotionally positive
+
+### Primary questions
+
+- what do I do first?
+- where is my code?
+- how do I enter the other person's code?
+
+### States
+
+- `WaitingToStart`
+- `ShowingMyCode`
+- `EnteringPartnerCode`
+- `Connecting`
+- `Connected`
+- `Error`
+
+### Rules
+
+- keep both paths visible, but only one should be dominant at a time
+- code entry must be obvious in the first viewport
+- success feedback can be warm, but should remain brief and clear
+
+## 2.4 Home
+
+### Goal
+
+- help the user answer three questions immediately
+
+Questions:
+
+- what matters now?
+- what should I do today?
+- what should I not forget?
+
+### Required order
+
+1. greeting / context
+2. relationship status or important upcoming item
+3. one suggested action
+4. quick path to reminders / memory / timeline
+5. upcoming dates
+
+### Rules
+
+- one hero message only
+- reduce dashboard feeling
+- no ornamental sections between useful sections
+- every visible card must support action, recall, or reassurance
+
+## 2.5 Care
+
+### Goal
+
+- turn emotional support into something usable, not theatrical
+
+### Female-facing states
+
+- log a cycle-related state
+- decide whether to share a simplified signal
+- review lightweight history
+
+### Partner-facing states
+
+- see simplified guidance
+- understand what tone or support is useful
+- act on one concrete suggestion
+
+### Rules
+
+- never overload the partner view with medical detail
+- keep the guidance respectful, specific, and calm
+- one recommendation should be easier to act on than ignoring it
+
+## 2.6 Timeline
+
+### Goal
+
+- help users revisit memories and prepare for upcoming dates
+
+### Rules
+
+- list must be scannable before it is emotional
+- future important dates should be easy to distinguish from past memories
+- cards should prioritize title, date, and context
+
+## 2.7 Reminders
+
+### Goal
+
+- make upcoming importance visible without becoming a complex planner
+
+### Rules
+
+- highlight the next relevant reminder first
+- default sort should match urgency, not database order
+- empty state should clearly explain how to create the first useful reminder
+
+---
+
+## 3. Error, Empty, and Edge States
+
+Good product tone appears most clearly in edge states.
+
+### 3.1 No internet
+
+Use:
+
+- simple explanation
+- calm reassurance
+- one recovery action
+
+Avoid:
+
+- overly poetic sadness
+- decorative empty illustrations without guidance
+
+### 3.2 Empty home / timeline
+
+Use copy like:
+
+- "Chưa có ngày nào gần kề"
+- "Thêm điều quan trọng để Em+ bắt đầu nhắc đúng lúc"
+
+### 3.3 Incomplete pairing
+
+When the user returns mid-flow:
+
+- restore the pairing state directly
+- do not force them through unrelated screens
+
+---
+
+## 4. Mobile Component Architecture Notes
+
+When implementing new mobile surfaces:
+
+- prefer composable semantic components over one-off visual wrappers
+- avoid introducing glass-heavy container abstractions as the default pattern
+- encode hierarchy through spacing, typography, and action contrast first
+
+The design system should make the calm version of the UI easy to build repeatedly.

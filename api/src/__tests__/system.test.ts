@@ -10,7 +10,7 @@ describe('System Health', () => {
 
       const data = await res.json();
       expect(data.success).toBe(true);
-      expect(data.data.status).toBe('hoat_dong');
+      expect(data.data.status).toBe('active');
     });
   });
 

@@ -46,6 +46,7 @@ export interface EnvConfig {
   smtpUser?: string;
   smtpPass?: string;
   smtpFrom: string;
+  signupAlertEmails: string[];
   minioEndpoint?: string;
   minioRegion: string;
   minioAccessKey?: string;
@@ -94,6 +95,7 @@ export const env: EnvConfig = {
   smtpUser: process.env.MAIL_USER,
   smtpPass: process.env.MAIL_PASS,
   smtpFrom: process.env.MAIL_FROM ?? "no-reply@emplus.local",
+  signupAlertEmails: listFromEnv(process.env.SIGNUP_ALERT_EMAILS),
   minioEndpoint: process.env.MINIO_ENDPOINT,
   minioRegion: process.env.MINIO_REGION ?? "us-east-1",
   minioAccessKey: process.env.MINIO_ACCESS_KEY,

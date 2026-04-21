@@ -10,6 +10,7 @@ import type {
   InAppNotification,
   Invite,
   MemoryItem,
+  PartnerNote,
   User,
   UserMoodState,
 } from "../types.ts";
@@ -90,6 +91,17 @@ type MemoryRow = {
   mediaUrls: string[];
   tags: string[] | null;
   createdAt: string | Date;
+};
+
+type PartnerNoteRow = {
+  id: string;
+  userId: string;
+  coupleId: string | null;
+  title: string;
+  content: string;
+  category: string | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 };
 
 type CycleRow = {
@@ -210,6 +222,19 @@ function fromMemoryRow(row: MemoryRow): MemoryItem {
   };
 }
 
+function fromPartnerNoteRow(row: PartnerNoteRow): PartnerNote {
+  return {
+    id: row.id,
+    userId: row.userId,
+    coupleId: row.coupleId ?? undefined,
+    title: row.title,
+    content: row.content,
+    category: row.category ?? undefined,
+    createdAt: asIso(row.createdAt) ?? new Date().toISOString(),
+    updatedAt: asIso(row.updatedAt) ?? new Date().toISOString(),
+  };
+}
+
 function fromCycleRow(row: CycleRow): EmotionalCycle {
   return {
     id: row.id,
@@ -296,6 +321,7 @@ function fromInAppNotificationRow(row: InAppNotificationRow): InAppNotification 
 
 export class PostgresStore implements DataStore {
   private redisFallbackLogged = false;
+  private partnerNotesTableEnsured = false;
 
   constructor(
     private readonly sql: Sql,
@@ -332,6 +358,31 @@ export class PostgresStore implements DataStore {
 
   private rateLimitKey(key: string): string {
     return `ratelimit:${key}`;
+  }
+
+  private async ensurePartnerNotesTable(): Promise<void> {
+    if (this.partnerNotesTableEnsured) {
+      return;
+    }
+
+    await this.sql`
+      CREATE TABLE IF NOT EXISTS partner_notes (
+        id UUID PRIMARY KEY,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        couple_id UUID REFERENCES couples(id) ON DELETE SET NULL,
+        title VARCHAR(140) NOT NULL,
+        content TEXT NOT NULL,
+        category VARCHAR(50),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+    await this.sql`
+      CREATE INDEX IF NOT EXISTS idx_partner_notes_user_updated
+      ON partner_notes(user_id, updated_at DESC)
+    `;
+
+    this.partnerNotesTableEnsured = true;
   }
 
   private disableRedis(): void {
@@ -628,7 +679,7 @@ export class PostgresStore implements DataStore {
              created_at AS "createdAt"
       FROM couples
       WHERE (partner_1_id = ${userId} OR partner_2_id = ${userId})
-        AND status IN ('DANG_YEU', 'DA_CUOI')
+        AND status IN ('DATING', 'MARRIED')
       LIMIT 1
     `;
 
@@ -661,7 +712,7 @@ export class PostgresStore implements DataStore {
     const couple: Couple = {
       id: crypto.randomUUID(),
       partner1Id: creatorId,
-      status: "CHO_GHEP_DOI",
+      status: "PENDING",
       settings: {},
       createdAt: new Date().toISOString(),
     };
@@ -828,7 +879,7 @@ export class PostgresStore implements DataStore {
         SELECT 1
         FROM couples
         WHERE (partner_1_id = ${userId} OR partner_2_id = ${userId})
-          AND status IN ('DANG_YEU', 'DA_CUOI')
+          AND status IN ('DATING', 'MARRIED')
       ) AS found
     `;
 
@@ -841,7 +892,7 @@ export class PostgresStore implements DataStore {
         SELECT 1
         FROM couples
         WHERE id <> ${excludeCoupleId}
-          AND status IN ('DANG_YEU', 'DA_CUOI')
+          AND status IN ('DATING', 'MARRIED')
           AND (partner_1_id = ${inviterId} OR partner_2_id = ${inviterId})
       ) AS found
     `;
@@ -964,6 +1015,94 @@ export class PostgresStore implements DataStore {
       WHERE id = ${memoryId} AND couple_id = ${coupleId}
       RETURNING id
     `;
+    return rows.length > 0;
+  }
+
+  async listPartnerNotesByUser(userId: string): Promise<PartnerNote[]> {
+    await this.ensurePartnerNotesTable();
+    const rows = await this.sql<PartnerNoteRow[]>`
+      SELECT id,
+             user_id AS "userId",
+             couple_id AS "coupleId",
+             title,
+             content,
+             category,
+             created_at AS "createdAt",
+             updated_at AS "updatedAt"
+      FROM partner_notes
+      WHERE user_id = ${userId}
+      ORDER BY updated_at DESC, created_at DESC
+    `;
+
+    return rows.map(fromPartnerNoteRow);
+  }
+
+  async getPartnerNoteByUser(userId: string, noteId: string): Promise<PartnerNote | undefined> {
+    await this.ensurePartnerNotesTable();
+    const rows = await this.sql<PartnerNoteRow[]>`
+      SELECT id,
+             user_id AS "userId",
+             couple_id AS "coupleId",
+             title,
+             content,
+             category,
+             created_at AS "createdAt",
+             updated_at AS "updatedAt"
+      FROM partner_notes
+      WHERE id = ${noteId} AND user_id = ${userId}
+      LIMIT 1
+    `;
+
+    const row = rows[0];
+    return row ? fromPartnerNoteRow(row) : undefined;
+  }
+
+  async savePartnerNote(note: PartnerNote): Promise<void> {
+    await this.ensurePartnerNotesTable();
+    await this.sql`
+      INSERT INTO partner_notes (
+        id,
+        user_id,
+        couple_id,
+        title,
+        content,
+        category,
+        created_at,
+        updated_at
+      ) VALUES (
+        ${note.id},
+        ${note.userId},
+        ${note.coupleId ?? null},
+        ${note.title},
+        ${note.content},
+        ${note.category ?? null},
+        ${note.createdAt},
+        ${note.updatedAt}
+      )
+    `;
+  }
+
+  async updatePartnerNote(note: PartnerNote): Promise<void> {
+    await this.ensurePartnerNotesTable();
+    await this.sql`
+      UPDATE partner_notes
+      SET couple_id = ${note.coupleId ?? null},
+          title = ${note.title},
+          content = ${note.content},
+          category = ${note.category ?? null},
+          updated_at = ${note.updatedAt}
+      WHERE id = ${note.id} AND user_id = ${note.userId}
+    `;
+  }
+
+  async deletePartnerNote(userId: string, noteId: string): Promise<boolean> {
+    await this.ensurePartnerNotesTable();
+    const rows = await this.sql<{ id: string }[]>`
+      DELETE FROM partner_notes
+      WHERE id = ${noteId} AND user_id = ${userId}
+      RETURNING id
+    `;
+
     return rows.length > 0;
   }
 
@@ -1593,6 +1732,7 @@ export class PostgresStore implements DataStore {
         ${input.readAt ?? null},
         ${input.createdAt ? input.createdAt : this.sql`now()`}
       )
+      ON CONFLICT (id) DO NOTHING
     `;
     const created = await this.getNotificationForUser(input.userId, id);
     if (!created) {

@@ -21,7 +21,7 @@ const fullTitle = title === siteName ? siteName : `${title} · ${siteName}`;
 ---
 
 <!doctype html>
-<html lang="vi" class="dark">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -52,22 +52,6 @@ const fullTitle = title === siteName ? siteName : `${title} · ${siteName}`;
         />
       ) : null
     }
-    <script is:inline>
-      (function () {
-        try {
-          var d = document.documentElement;
-          var stored = localStorage.getItem('emplus-theme');
-          var prefersDark = window.matchMedia(
-            '(prefers-color-scheme: dark)',
-          ).matches;
-          if (stored === 'light' || (!stored && !prefersDark)) {
-            d.classList.remove('dark');
-          } else {
-            d.classList.add('dark');
-          }
-        } catch (_) {}
-      })();
-    </script>
   </head>
   <body class="min-h-screen flex flex-col">
     <!-- Skip to main content link -->
@@ -78,7 +62,7 @@ const fullTitle = title === siteName ? siteName : `${title} · ${siteName}`;
     >
 
     <!-- Header -->
-    <header class="sticky top-0 z-50 border-b border-border/40 bg-card/40 backdrop-blur supports-[backdrop-filter]:bg-card/30">
+    <header class="sticky top-0 z-50 border-b border-border/70 bg-background/88 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div class="container flex flex-wrap items-center justify-between gap-4 py-4">
         <!-- Logo -->
         <a href="/" class="text-lg font-bold text-foreground flex items-center gap-2">
@@ -95,21 +79,11 @@ const fullTitle = title === siteName ? siteName : `${title} · ${siteName}`;
           <a href="/rss.xml" class="transition hover:text-foreground">RSS</a>
         </nav>
 
-        <!-- Theme Toggle + Mobile Menu -->
+        <!-- Mobile Menu -->
         <div class="flex items-center gap-2">
           <button
-            type="button"
-            id="theme-toggle"
-            class="rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-muted"
-            aria-label="Đổi giao diện sáng/tối"
-          >
-            🌙
-          </button>
-
-          <!-- Mobile Menu Button -->
-          <button
             id="mobile-menu-btn"
-            class="md:hidden rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground"
+            class="md:hidden rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground"
             aria-label="Menu"
           >
             ☰
@@ -120,7 +94,7 @@ const fullTitle = title === siteName ? siteName : `${title} · ${siteName}`;
       <!-- Mobile Nav (hidden by default) -->
       <nav
         id="mobile-menu"
-        class="hidden md:hidden border-t border-border/40 bg-card/50 backdrop-blur"
+        class="hidden md:hidden border-t border-border/50 bg-card/85 backdrop-blur"
       >
         <div class="container flex flex-col gap-3 py-4 text-sm text-muted-foreground">
           <a href="/#features" class="transition hover:text-foreground">Tính năng</a>
@@ -138,7 +112,7 @@ const fullTitle = title === siteName ? siteName : `${title} · ${siteName}`;
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-border/40 bg-card/30 backdrop-blur">
+    <footer class="border-t border-border/60 bg-card/70">
       <div class="container py-12 md:py-16">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <!-- Brand column -->
@@ -206,23 +180,6 @@ const fullTitle = title === siteName ? siteName : `${title} · ${siteName}`;
 
     <!-- Scripts -->
     <script is:inline>
-      // Theme toggle
-      var btn = document.getElementById('theme-toggle');
-      if (btn) {
-        btn.addEventListener('click', function () {
-          var d = document.documentElement;
-          var next = d.classList.contains('dark') ? 'light' : 'dark';
-          if (next === 'dark') {
-            d.classList.add('dark');
-          } else {
-            d.classList.remove('dark');
-          }
-          try {
-            localStorage.setItem('emplus-theme', next);
-          } catch (_) {}
-        });
-      }
-
       // Mobile menu toggle
       var menuBtn = document.getElementById('mobile-menu-btn');
       var mobileMenu = document.getElementById('mobile-menu');

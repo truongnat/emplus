@@ -38,6 +38,7 @@ const createMemorySchema = z.object({
 
 export type TimelineQueryDto = z.infer<typeof timelineQuerySchema>;
 export type CreateMemoryDto = z.infer<typeof createMemorySchema>;
+export type UpdateMemoryDto = z.infer<typeof createMemorySchema>;
 
 export function parseTimelineQueryParams(query: Record<string, string | undefined>): TimelineQueryDto {
   return parseWithSchema(timelineQuerySchema, query, {
@@ -48,5 +49,11 @@ export function parseTimelineQueryParams(query: Record<string, string | undefine
 export function validateCreateMemoryInput(input: unknown): CreateMemoryDto {
   return parseWithSchema(createMemorySchema, input, {
     message: "Dữ liệu memory không hợp lệ.",
+  });
+}
+
+export function validateUpdateMemoryInput(input: unknown): UpdateMemoryDto {
+  return parseWithSchema(createMemorySchema, input, {
+    message: "Dữ liệu cập nhật memory không hợp lệ.",
   });
 }

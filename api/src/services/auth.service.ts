@@ -18,8 +18,8 @@ import {
 import { generateTokens } from "../shared/token.ts";
 import { generateNumericCode } from "../shared/code.ts";
 import { hashPassword, verifyPassword } from "../utils/password.ts";
-import { hienThiGioiTinh, chuanHoaGioiTinhDauVao } from "../utils/presentation.ts";
-import { sendOtpMail } from "./mail.ts";
+import { displayGender, normalizeGenderInput } from "../utils/presentation.ts";
+import { sendNewSignupAlertMail, sendOtpMail } from "./mail.ts";
 import { AppError } from "../utils/http.ts";
 import { encrypt, decrypt } from "./crypto.ts";
 
@@ -59,7 +59,7 @@ export async function issueAuthPayload(user: User): Promise<AuthPayload> {
       fullName: user.fullName,
       isPaired,
       isAdmin: user.isAdmin || false,
-      gender: hienThiGioiTinh(user.gender),
+      gender: displayGender(user.gender),
     },
     tokens: {
       accessToken,
@@ -84,7 +84,7 @@ export async function createUser(
     id: crypto.randomUUID(),
     email,
     fullName: fullName || email.split("@")[0] || "Người dùng Em+",
-    gender: chuanHoaGioiTinhDauVao(gender),
+    gender: normalizeGenderInput(gender),
     authProvider: "LOCAL",
     authId: email,
     passwordHash: hashPassword(password),
@@ -114,6 +114,11 @@ export async function registerUser(
 
   const user = await createUser(email, password, fullName, gender);
   await store.saveUser(user);
+  void sendNewSignupAlertMail({
+    userEmail: user.email,
+    fullName: user.fullName,
+    source: "register",
+  });
 
   return issueAuthPayload(user);
 }
@@ -199,8 +204,13 @@ export async function verifyOtpAndLogin(email: string, otp: string): Promise<Aut
 
   let user = await store.findUserByEmail(email);
   if (!user) {
-    user = await createUser(email, password, email.split("@")[0], "KHONG_TIET_LO");
+    user = await createUser(email, password, email.split("@")[0], "PREFER_NOT_TO_SAY");
     await store.saveUser(user);
+    void sendNewSignupAlertMail({
+      userEmail: user.email,
+      fullName: user.fullName,
+      source: "otp",
+    });
   }
 
   if (!user) {

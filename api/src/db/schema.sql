@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS couples (
   invite_expires_at TIMESTAMPTZ,
   settings JSONB NOT NULL DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  CONSTRAINT chk_couples_status CHECK (status IN ('CHO_GHEP_DOI', 'DANG_YEU', 'DA_CUOI', 'DA_CHIA_TAY')),
+  CONSTRAINT chk_couples_status CHECK (status IN ('PENDING', 'DATING', 'MARRIED', 'SEPARATED')),
   CONSTRAINT chk_couples_not_self CHECK (partner_1_id IS DISTINCT FROM partner_2_id)
 );
 
@@ -108,6 +108,19 @@ CREATE TABLE IF NOT EXISTS memories (
 );
 
 CREATE INDEX IF NOT EXISTS idx_memories_couple_date ON memories(couple_id, memory_date DESC);
+
+CREATE TABLE IF NOT EXISTS partner_notes (
+  id UUID PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  couple_id UUID REFERENCES couples(id) ON DELETE SET NULL,
+  title VARCHAR(140) NOT NULL,
+  content TEXT NOT NULL,
+  category VARCHAR(50),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_partner_notes_user_updated ON partner_notes(user_id, updated_at DESC);
 
 CREATE TABLE IF NOT EXISTS emotional_cycles (
   id UUID PRIMARY KEY,
