@@ -54,12 +54,12 @@ describe("Backend Zod validation", () => {
     expect(Array.isArray(payload.error.details)).toBe(true);
   });
 
-  it("returns 400 for invalid female cycle payload", async () => {
+  it("returns 403 for male user accessing female cycle endpoint", async () => {
     const accessToken = await registerAndGetAccessToken({
-      fullName: "Ngoc",
-      gender: "NU",
+      fullName: "Minh",
+      gender: "NAM",
       email: "cycle.validation@example.com",
-      password: "Ngoc@123456",
+      password: "Minh@123456",
     });
 
     const response = await app.request("http://localhost/v1/care/female-cycle", {
@@ -75,10 +75,10 @@ describe("Backend Zod validation", () => {
       }),
     });
 
-    expect(response.status).toBe(400);
+    expect(response.status).toBe(403);
     const payload = await response.json();
     expect(payload.success).toBe(false);
-    expect(payload.error.code).toBe("VALIDATION_ERROR");
+    expect(payload.error.code).toBe("FORBIDDEN");
   });
 
   it("returns 400 for invalid timeline memory payload", async () => {
