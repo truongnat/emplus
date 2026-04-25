@@ -22,7 +22,7 @@ debugRoutes.post("/seed-user", async (context) => {
         id: crypto.randomUUID(),
         email,
         fullName: `Test User ${randomId}`,
-        gender: "PREFER_NOT_TO_SAY",
+        gender: "KHONG_TIET_LO",
         authProvider: "LOCAL",
         authId: email,
         passwordHash: hashPassword(password),
@@ -57,7 +57,7 @@ debugRoutes.post("/seed-invite", async (context) => {
         id: crypto.randomUUID(),
         email,
         fullName: `Inviter ${randomId}`,
-        gender: "PREFER_NOT_TO_SAY",
+        gender: "KHONG_TIET_LO",
         authProvider: "LOCAL",
         authId: email,
         passwordHash: hashPassword("password123"),
@@ -97,7 +97,7 @@ debugRoutes.post("/seed-happy-case", requireAuth, async (context) => {
             id: partnerId,
             email: partnerEmail,
             fullName: "Partner",
-            gender: user.gender === "MALE" ? "FEMALE" : "MALE",
+            gender: user.gender === "NAM" ? "NU" : "NAM",
             authProvider: "LOCAL",
             authId: partnerEmail,
             passwordHash: hashPassword("password123"),
@@ -231,7 +231,7 @@ debugRoutes.post("/seed-happy-case", requireAuth, async (context) => {
     }
 
     // Seed cycle for female user (either current user or partner 1)
-    const femaleId = user.gender === "FEMALE" ? user.id : couple.partner1Id === user.id ? couple.partner2Id : couple.partner1Id;
+    const femaleId = user.gender === "NU" ? user.id : couple.partner1Id === user.id ? couple.partner2Id : couple.partner1Id;
     if (femaleId) {
         await store.saveCycle({
             id: crypto.randomUUID(),

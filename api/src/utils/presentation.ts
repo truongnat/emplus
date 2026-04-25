@@ -1,36 +1,36 @@
 import type { CoupleStatus, Gender } from "../types.ts";
 
-export type DisplayGender = "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY";
+export type DisplayGender = Gender;
 export type DisplayCoupleStatus = "PENDING" | "DATING" | "MARRIED" | "SEPARATED";
 export type DisplayDependencyStatus = "ACTIVE" | "ERROR" | "SKIPPED";
 
 /**
- * Normalize gender input - accepts English gender values
+ * Normalize gender input - accepts current Vietnamese values and legacy English values.
  */
 export function normalizeGenderInput(value: string | undefined): Gender {
   const normalized = (value ?? "").trim().toUpperCase();
 
-  if (normalized === "MALE") {
-    return "MALE";
+  if (normalized === "NAM" || normalized === "MALE") {
+    return "NAM";
   }
 
-  if (normalized === "FEMALE") {
-    return "FEMALE";
+  if (normalized === "NU" || normalized === "NỮ" || normalized === "FEMALE") {
+    return "NU";
   }
 
-  if (normalized === "OTHER") {
-    return "OTHER";
+  if (normalized === "KHAC" || normalized === "KHÁC" || normalized === "OTHER") {
+    return "KHAC";
   }
 
-  if (normalized === "PREFER_NOT_TO_SAY") {
-    return "PREFER_NOT_TO_SAY";
+  if (normalized === "KHONG_TIET_LO" || normalized === "KHÔNG_TIẾT_LỘ" || normalized === "PREFER_NOT_TO_SAY") {
+    return "KHONG_TIET_LO";
   }
 
-  return "OTHER";
+  return "KHAC";
 }
 
 /**
- * Display gender - now returns the same value since we use Vietnamese directly
+ * Display gender - returns the public API value.
  */
 export function displayGender(gender: Gender): DisplayGender {
   return gender;

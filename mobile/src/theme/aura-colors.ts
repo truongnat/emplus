@@ -102,8 +102,50 @@ export const auraPalette = {
   coral800: "#72402D",
   /** @deprecated Use terracotta900 */
   coral900: "#563123",
+  /** @deprecated Use cream50 */
+  taupe50: "#F2EBE3",
+  /** @deprecated Use cream100 */
+  taupe100: "#E8DFD5",
+  /** @deprecated Use cream200 */
+  taupe200: "#DCD1C5",
+  /** @deprecated Use cream300 */
+  taupe300: "#CDBBA9",
+  /** @deprecated Use cream400 */
+  taupe400: "#B8A692",
+  /** @deprecated Use cream500 */
+  taupe500: "#9A8976",
+  /** @deprecated Use cream600 */
+  taupe600: "#7D6E5C",
+  /** @deprecated Use cream700 */
+  taupe700: "#62564A",
+  /** @deprecated Use cream800 */
+  taupe800: "#4A4036",
+  /** @deprecated Use cream900 */
+  taupe900: "#302A24",
+  /** @deprecated Use terracotta50 */
+  rose50: "#F5E6DC",
+  /** @deprecated Use terracotta100 */
+  rose100: "#EAD5C6",
+  /** @deprecated Use terracotta200 */
+  rose200: "#DFC9B5",
+  /** @deprecated Use terracotta300 */
+  rose300: "#D4BAA4",
+  /** @deprecated Use terracotta400 */
+  rose400: "#C9A890",
+  /** @deprecated Use terracotta500 */
+  rose500: "#B86A4A",
+  /** @deprecated Use terracotta600 */
+  rose600: "#A95E40",
+  /** @deprecated Use terracotta700 */
+  rose700: "#8F4E36",
+  /** @deprecated Use terracotta800 */
+  rose800: "#72402D",
+  /** @deprecated Use terracotta900 */
+  rose900: "#563123",
   /** @deprecated Use gradTerracotta */
   gradCoral: ["#C9A890", "#A95E40"] as [string, string],
+  /** @deprecated Use gradTerracotta */
+  gradRose: ["#C9A890", "#A95E40"] as [string, string],
   /** @deprecated Use gradWarmBrown */
   gradIndigo: ["#C9B7A3", "#766252"] as [string, string],
   /** @deprecated Use gradSage */

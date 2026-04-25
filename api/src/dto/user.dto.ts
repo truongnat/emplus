@@ -2,7 +2,8 @@ import { z } from "zod";
 import { GENDER_VALUES } from "../constants/index.ts";
 import { isoDateString, optionalTrimmedString, parseWithSchema } from "../shared/validators/zod.ts";
 
-const acceptedGenderValues = [...GENDER_VALUES, "MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"] as const;
+const legacyGenderValues = ["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"] as const;
+const acceptedGenderValues = [...GENDER_VALUES, ...legacyGenderValues] as const;
 
 const normalizedGenderSchema = z.preprocess((value) => {
   if (typeof value !== "string") {

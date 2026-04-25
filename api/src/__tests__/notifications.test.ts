@@ -90,7 +90,7 @@ describe("Notifications (in-app)", () => {
       id: partnerId,
       email: partnerEmail,
       fullName: "Partner Reminder",
-      gender: "MALE",
+      gender: "NAM",
       authProvider: "LOCAL",
       authId: partnerEmail,
       passwordHash: hashPassword("password123"),

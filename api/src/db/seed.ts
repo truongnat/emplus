@@ -2,12 +2,12 @@ import postgres from "postgres";
 import type { Sql } from "postgres";
 import { env } from "../config/env.ts";
 import { hashPassword } from "../utils/password.ts";
-import type { BudgetItem } from "../types.ts";
+import type { BudgetItem, Gender } from "../types.ts";
 
 interface SeedUser {
   fullName: string;
   email: string;
-  gender: "MALE" | "FEMALE";
+  gender: Gender;
   password: string;
   nickname?: string;
   dob?: string;
@@ -551,7 +551,7 @@ async function run(): Promise<void> {
     const maleId = await upsertUser(sql, {
       fullName: "Nguyen Quang Minh",
       email: "seed.minh@emplus.local",
-      gender: "MALE",
+      gender: "NAM",
       password: "Seed@123456",
       nickname: "Minh",
       dob: "1997-04-18",
@@ -560,7 +560,7 @@ async function run(): Promise<void> {
     const femaleId = await upsertUser(sql, {
       fullName: "Tran Ngoc Anh",
       email: "seed.ngoc@emplus.local",
-      gender: "FEMALE",
+      gender: "NU",
       password: "Seed@123456",
       nickname: "Ngoc",
       dob: "1998-09-27",
@@ -605,7 +605,7 @@ async function run(): Promise<void> {
         ${"Admin User"},
         ${"Admin"},
         ${null},
-        ${"MALE"},
+        ${"NAM"},
         ${"LOCAL"},
         ${"admin@emplus.local"},
         ${hashPassword("Admin@123456")},
