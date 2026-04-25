@@ -204,7 +204,7 @@ export async function verifyOtpAndLogin(email: string, otp: string): Promise<Aut
 
   let user = await store.findUserByEmail(email);
   if (!user) {
-    user = await createUser(email, password, email.split("@")[0], "KHONG_TIET_LO");
+    user = await createUser(email, password, email.split("@")[0], "PREFER_NOT_TO_SAY");
     await store.saveUser(user);
     void sendNewSignupAlertMail({
       userEmail: user.email,

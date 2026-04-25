@@ -5,7 +5,7 @@ const { store } = await import("../store.ts");
 
 async function registerAndGetAccessToken(profile: {
   fullName: string;
-  gender: "NAM" | "NU";
+  gender: "MALE" | "FEMALE";
   email: string;
   password: string;
 }): Promise<string> {
@@ -57,7 +57,7 @@ describe("Backend Zod validation", () => {
   it("returns 403 for male user accessing female cycle endpoint", async () => {
     const accessToken = await registerAndGetAccessToken({
       fullName: "Minh",
-      gender: "NAM",
+      gender: "MALE",
       email: "cycle.validation@example.com",
       password: "Minh@123456",
     });
@@ -84,7 +84,7 @@ describe("Backend Zod validation", () => {
   it("returns 400 for invalid timeline memory payload", async () => {
     const accessToken = await registerAndGetAccessToken({
       fullName: "Timeline User",
-      gender: "NAM",
+      gender: "MALE",
       email: "timeline.validation@example.com",
       password: "Timeline@123456",
     });
@@ -111,7 +111,7 @@ describe("Backend Zod validation", () => {
   it("returns 400 for invalid budget payload", async () => {
     const accessToken = await registerAndGetAccessToken({
       fullName: "Budget User",
-      gender: "NAM",
+      gender: "MALE",
       email: "budget.validation@example.com",
       password: "Budget@123456",
     });

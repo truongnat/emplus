@@ -2,15 +2,12 @@ import { z } from "zod";
 import { GENDER_VALUES } from "../constants/index.ts";
 import { isoDateString, optionalTrimmedString, parseWithSchema } from "../shared/validators/zod.ts";
 
-const legacyGenderValues = ["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"] as const;
-const acceptedGenderValues = [...GENDER_VALUES, ...legacyGenderValues] as const;
-
 const normalizedGenderSchema = z.preprocess((value) => {
   if (typeof value !== "string") {
     return value;
   }
   return value.trim().toUpperCase();
-}, z.enum(acceptedGenderValues));
+}, z.enum(GENDER_VALUES));
 
 /**
  * URL tuyệt đối http(s) cho ảnh đã upload (MinIO).

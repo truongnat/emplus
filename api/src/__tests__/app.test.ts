@@ -15,7 +15,7 @@ function uniqueEmail(seed: string): string {
 
 async function register(profile: {
   fullName: string;
-  gender: "NAM" | "NU";
+  gender: "MALE" | "FEMALE";
   email: string;
   password: string;
 }) {
@@ -56,7 +56,7 @@ describe("Em+ API MVP", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         fullName: "TTL User",
-        gender: "NAM",
+        gender: "MALE",
         email: ttlEmail,
         password: "Ttl@123456",
       }),
@@ -97,7 +97,7 @@ describe("Em+ API MVP", () => {
 
     await register({
       fullName: "Login User",
-      gender: "NAM",
+      gender: "MALE",
       email: loginEmail,
       password: "Login@123456",
     });
@@ -120,7 +120,7 @@ describe("Em+ API MVP", () => {
   it("returns a solo-safe dashboard payload before pairing", async () => {
     const tokens = await register({
       fullName: "Solo User",
-      gender: "NU",
+      gender: "FEMALE",
       email: uniqueEmail("solo.dashboard"),
       password: "Solo@123456",
     });
@@ -145,7 +145,7 @@ describe("Em+ API MVP", () => {
   it("supports partner notes CRUD before pairing", async () => {
     const tokens = await register({
       fullName: "Notes User",
-      gender: "NU",
+      gender: "FEMALE",
       email: uniqueEmail("partner.notes"),
       password: "Notes@123456",
     });
@@ -217,7 +217,7 @@ describe("Em+ API MVP", () => {
   it("refreshes token and rejects reused refresh token", async () => {
     const initialTokens = await register({
       fullName: "Refresh User",
-      gender: "NAM",
+      gender: "MALE",
       email: uniqueEmail("refresh.user"),
       password: "Refresh@123456",
     });
@@ -259,7 +259,7 @@ describe("Em+ API MVP", () => {
 
     const maleTokens = await register({
       fullName: "Minh",
-      gender: "NAM",
+      gender: "MALE",
       email: maleEmail,
       password: "Minh@123456",
     });
@@ -267,7 +267,7 @@ describe("Em+ API MVP", () => {
 
     const femaleTokens = await register({
       fullName: "Ngoc",
-      gender: "NU",
+      gender: "FEMALE",
       email: femaleEmail,
       password: "Ngoc@123456",
     });
@@ -431,7 +431,7 @@ describe("Em+ API MVP", () => {
 
     const maleTokens = await register({
       fullName: "Minh Invite",
-      gender: "NAM",
+      gender: "MALE",
       email: maleInviteEmail,
       password: "MinhInvite@123",
     });
@@ -439,7 +439,7 @@ describe("Em+ API MVP", () => {
 
     const femaleTokens = await register({
       fullName: "Ngoc Invite",
-      gender: "NU",
+      gender: "FEMALE",
       email: femaleInviteEmail,
       password: "NgocInvite@123",
     });

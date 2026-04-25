@@ -44,7 +44,7 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
       schemas: {
         Gender: {
           type: "string",
-          enum: ["NAM", "NU", "KHAC", "KHONG_TIET_LO"],
+          enum: ["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"],
         },
         User: {
           type: "object",

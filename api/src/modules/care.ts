@@ -45,7 +45,7 @@ careRoutes.use("*", requireAuth);
 
 careRoutes.post("/female-cycle", async (context) => {
   const user = context.get("user");
-  if (user.gender !== "NU") {
+  if (user.gender !== "FEMALE") {
     throw new AppError(403, "FORBIDDEN", "API này chỉ dành cho nữ giới.");
   }
 
@@ -125,7 +125,7 @@ careRoutes.put("/mood", async (context) => {
 careRoutes.get("/male-suggestions", async (context) => {
   const user = context.get("user");
 
-  if (user.gender !== "NAM") {
+  if (user.gender !== "MALE") {
     throw new AppError(403, "FORBIDDEN", "API này chỉ dành cho nam giới.");
   }
 

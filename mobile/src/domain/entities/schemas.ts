@@ -1597,7 +1597,7 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /** @enum {string} */
-        Gender: "NAM" | "NU" | "KHAC" | "KHONG_TIET_LO";
+        Gender: "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY";
         User: {
             /** Format: uuid */
             id: string;

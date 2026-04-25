@@ -51,10 +51,10 @@
       "Gender": {
         "type": "string",
         "enum": [
-          "NAM",
-          "NU",
-          "KHAC",
-          "KHONG_TIET_LO"
+          "MALE",
+          "FEMALE",
+          "OTHER",
+          "PREFER_NOT_TO_SAY"
         ]
       },
       "User": {

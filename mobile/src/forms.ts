@@ -25,7 +25,7 @@ export const RegisterSchema = z
     email: z.string().trim().min(1, "Email là bắt buộc").email("Email không hợp lệ"),
     password: z.string().min(8, "Mật khẩu phải có ít nhất 8 ký tự"),
     confirmPassword: z.string().min(8, "Xác nhận mật khẩu là bắt buộc"),
-    gender: z.enum(["NAM", "NU", "KHAC", "KHONG_TIET_LO"], {
+    gender: z.enum(["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"], {
       message: "Vui lòng chọn giới tính",
     }),
     policyAccepted: z.boolean().refine((val) => val === true, {

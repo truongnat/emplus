@@ -429,7 +429,7 @@ export default function CareScreen() {
   }, [notice]);
 
   const user = session?.user;
-  const isMale = user?.gender === "NAM";
+  const isMale = user?.gender === "MALE";
   const isPaired = Boolean(user?.coupleId);
 
   const { data, error } = useQuery({

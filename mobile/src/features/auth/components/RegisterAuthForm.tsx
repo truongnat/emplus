@@ -32,10 +32,10 @@ import { loginScreenStyles as shellStyles } from "../loginScreen.styles";
 import { registerScreenStyles as regStyles } from "../registerScreen.styles";
 
 const GENDERS: { value: RegisterFields["gender"]; label: string }[] = [
-  { value: "NAM", label: "Nam" },
-  { value: "NU", label: "Nữ" },
-  { value: "KHAC", label: "Khác" },
-  { value: "KHONG_TIET_LO", label: "Riêng tư" },
+  { value: "MALE", label: "Nam" },
+  { value: "FEMALE", label: "Nữ" },
+  { value: "OTHER", label: "Khác" },
+  { value: "PREFER_NOT_TO_SAY", label: "Riêng tư" },
 ];
 
 export function RegisterAuthForm() {
@@ -65,7 +65,7 @@ export function RegisterAuthForm() {
       email: "",
       password: "",
       confirmPassword: "",
-      gender: "NAM",
+      gender: "MALE",
       policyAccepted: false,
     },
     mode: "onChange",

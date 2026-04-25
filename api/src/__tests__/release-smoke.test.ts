@@ -9,7 +9,7 @@ function uniqueEmail(seed: string): string {
 
 async function register(profile: {
   fullName: string;
-  gender: "NAM" | "NU";
+  gender: "MALE" | "FEMALE";
   email: string;
   password: string;
 }) {
@@ -44,7 +44,7 @@ describe("Release smoke", () => {
 
     const ownerTokens = await register({
       fullName: "Smoke Owner",
-      gender: "NAM",
+      gender: "MALE",
       email: ownerEmail,
       password,
     });
@@ -97,7 +97,7 @@ describe("Release smoke", () => {
 
     const partnerTokens = await register({
       fullName: "Smoke Partner",
-      gender: "NU",
+      gender: "FEMALE",
       email: partnerEmail,
       password,
     });

@@ -1,4 +1,4 @@
-export type Gender = "NAM" | "NU" | "KHAC" | "KHONG_TIET_LO";
+export type Gender = "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY";
 export type AuthProvider = "LOCAL" | "GOOGLE" | "APPLE";
 export type CoupleStatus = "PENDING" | "DATING" | "MARRIED" | "SEPARATED";
 export type AnniversaryCategory = "LOVE" | "BIRTHDAY" | "CUSTOM" | "HOLIDAY";

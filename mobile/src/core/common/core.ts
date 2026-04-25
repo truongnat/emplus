@@ -1,8 +1,8 @@
 export const GENDER = {
-  NAM: "NAM",
-  NU: "NU",
-  KHAC: "KHAC",
-  KHONG_TIET_LO: "KHONG_TIET_LO",
+  MALE: "MALE",
+  FEMALE: "FEMALE",
+  OTHER: "OTHER",
+  PREFER_NOT_TO_SAY: "PREFER_NOT_TO_SAY",
 } as const;
 
 export type Gender = (typeof GENDER)[keyof typeof GENDER];

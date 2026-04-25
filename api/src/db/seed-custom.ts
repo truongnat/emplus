@@ -22,11 +22,11 @@ async function run() {
       INSERT INTO users (
         id, email, full_name, nickname, gender, auth_provider, auth_id, password_hash, is_active
       ) VALUES (
-        ${crypto.randomUUID()}, ${user1Email}, 'Truong DQ', 'Truong', 'NAM', 'LOCAL', ${user1Email}, ${user1Hash}, true
+        ${crypto.randomUUID()}, ${user1Email}, 'Truong DQ', 'Truong', 'MALE', 'LOCAL', ${user1Email}, ${user1Hash}, true
       )
       ON CONFLICT (email) DO UPDATE SET
         password_hash = EXCLUDED.password_hash,
-        gender = 'NAM',
+        gender = 'MALE',
         is_active = true
       RETURNING id
     `;
@@ -40,11 +40,11 @@ async function run() {
       INSERT INTO users (
         id, email, full_name, nickname, gender, auth_provider, auth_id, password_hash, is_active
       ) VALUES (
-        ${crypto.randomUUID()}, ${user2Email}, 'Trang PTT', 'Trang', 'NU', 'LOCAL', ${user2Email}, ${user2Hash}, true
+        ${crypto.randomUUID()}, ${user2Email}, 'Trang PTT', 'Trang', 'FEMALE', 'LOCAL', ${user2Email}, ${user2Hash}, true
       )
       ON CONFLICT (email) DO UPDATE SET
         password_hash = EXCLUDED.password_hash,
-        gender = 'NU',
+        gender = 'FEMALE',
         is_active = true
       RETURNING id
     `;

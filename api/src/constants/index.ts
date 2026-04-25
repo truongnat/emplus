@@ -52,7 +52,7 @@ export const BUDGET_STATUS_DISPLAY: Record<string, string> = {
 };
 
 // Gender values
-export const GENDER_VALUES = ["NAM", "NU", "KHAC", "KHONG_TIET_LO"] as const;
+export const GENDER_VALUES = ["MALE", "FEMALE", "OTHER", "PREFER_NOT_TO_SAY"] as const;
 
 // Auth providers
 export const AUTH_PROVIDER = {

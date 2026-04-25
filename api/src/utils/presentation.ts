@@ -5,28 +5,28 @@ export type DisplayCoupleStatus = "PENDING" | "DATING" | "MARRIED" | "SEPARATED"
 export type DisplayDependencyStatus = "ACTIVE" | "ERROR" | "SKIPPED";
 
 /**
- * Normalize gender input - accepts current Vietnamese values and legacy English values.
+ * Normalize gender input - returns the English public contract while accepting legacy Vietnamese values.
  */
 export function normalizeGenderInput(value: string | undefined): Gender {
   const normalized = (value ?? "").trim().toUpperCase();
 
-  if (normalized === "NAM" || normalized === "MALE") {
-    return "NAM";
+  if (normalized === "MALE" || normalized === "NAM") {
+    return "MALE";
   }
 
-  if (normalized === "NU" || normalized === "NỮ" || normalized === "FEMALE") {
-    return "NU";
+  if (normalized === "FEMALE" || normalized === "NU" || normalized === "NỮ") {
+    return "FEMALE";
   }
 
-  if (normalized === "KHAC" || normalized === "KHÁC" || normalized === "OTHER") {
-    return "KHAC";
+  if (normalized === "OTHER" || normalized === "KHAC" || normalized === "KHÁC") {
+    return "OTHER";
   }
 
-  if (normalized === "KHONG_TIET_LO" || normalized === "KHÔNG_TIẾT_LỘ" || normalized === "PREFER_NOT_TO_SAY") {
-    return "KHONG_TIET_LO";
+  if (normalized === "PREFER_NOT_TO_SAY" || normalized === "KHONG_TIET_LO" || normalized === "KHÔNG_TIẾT_LỘ") {
+    return "PREFER_NOT_TO_SAY";
   }
 
-  return "KHAC";
+  return "OTHER";
 }
 
 /**
@@ -37,7 +37,7 @@ export function displayGender(gender: Gender): DisplayGender {
 }
 
 /**
- * Display couple status - now returns the same value since we use Vietnamese directly
+ * Display couple status - returns the public API value.
  */
 export function displayCoupleStatus(status: CoupleStatus): DisplayCoupleStatus {
   return status;

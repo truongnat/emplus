@@ -551,7 +551,7 @@ async function run(): Promise<void> {
     const maleId = await upsertUser(sql, {
       fullName: "Nguyen Quang Minh",
       email: "seed.minh@emplus.local",
-      gender: "NAM",
+      gender: "MALE",
       password: "Seed@123456",
       nickname: "Minh",
       dob: "1997-04-18",
@@ -560,7 +560,7 @@ async function run(): Promise<void> {
     const femaleId = await upsertUser(sql, {
       fullName: "Tran Ngoc Anh",
       email: "seed.ngoc@emplus.local",
-      gender: "NU",
+      gender: "FEMALE",
       password: "Seed@123456",
       nickname: "Ngoc",
       dob: "1998-09-27",
@@ -605,7 +605,7 @@ async function run(): Promise<void> {
         ${"Admin User"},
         ${"Admin"},
         ${null},
-        ${"NAM"},
+        ${"MALE"},
         ${"LOCAL"},
         ${"admin@emplus.local"},
         ${hashPassword("Admin@123456")},
