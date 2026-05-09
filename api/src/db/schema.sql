@@ -109,6 +109,50 @@ CREATE TABLE IF NOT EXISTS memories (
 
 CREATE INDEX IF NOT EXISTS idx_memories_couple_date ON memories(couple_id, memory_date DESC);
 
+CREATE TABLE IF NOT EXISTS custom_milestones (
+  id UUID PRIMARY KEY,
+  couple_id UUID NOT NULL REFERENCES couples(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  milestone_date DATE NOT NULL,
+  type VARCHAR(20) NOT NULL DEFAULT 'CUSTOM',
+  category VARCHAR(30) NOT NULL DEFAULT 'OTHER',
+  remind_before_days INTEGER[] NOT NULL DEFAULT ARRAY[1,3,7],
+  is_important BOOLEAN NOT NULL DEFAULT false,
+  created_by_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT chk_custom_milestones_type CHECK (type IN ('CUSTOM')),
+  CONSTRAINT chk_custom_milestones_category CHECK (category IN ('ANNIVERSARY', 'DATE', 'MEMORY', 'GIFT', 'OTHER'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_custom_milestones_couple_date
+  ON custom_milestones(couple_id, milestone_date);
+
+CREATE INDEX IF NOT EXISTS idx_custom_milestones_couple_important
+  ON custom_milestones(couple_id, is_important);
+
+CREATE TABLE IF NOT EXISTS nudges (
+  id UUID PRIMARY KEY,
+  couple_id UUID NOT NULL REFERENCES couples(id) ON DELETE CASCADE,
+  from_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  to_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  type VARCHAR(30) NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  read_at TIMESTAMPTZ,
+  CONSTRAINT chk_nudges_type CHECK (
+    type IN ('POKE', 'HUG', 'MISS_YOU', 'KISS', 'ANGRY', 'MAKE_UP', 'EAT_TOGETHER', 'CALL_ME')
+  ),
+  CONSTRAINT chk_nudges_not_self CHECK (from_user_id IS DISTINCT FROM to_user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_nudges_to_user_created
+  ON nudges(to_user_id, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_nudges_couple_created
+  ON nudges(couple_id, created_at DESC);
+
 CREATE TABLE IF NOT EXISTS partner_notes (
   id UUID PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,

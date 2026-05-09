@@ -2,6 +2,26 @@ export type Gender = "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY";
 export type AuthProvider = "LOCAL" | "GOOGLE" | "APPLE";
 export type CoupleStatus = "PENDING" | "DATING" | "MARRIED" | "SEPARATED";
 export type AnniversaryCategory = "LOVE" | "BIRTHDAY" | "CUSTOM" | "HOLIDAY";
+export type MilestoneType = "AUTO" | "CUSTOM";
+export type MilestoneCategory = "ANNIVERSARY" | "DATE" | "MEMORY" | "GIFT" | "OTHER";
+export type NudgeType =
+  | "POKE"
+  | "HUG"
+  | "MISS_YOU"
+  | "KISS"
+  | "ANGRY"
+  | "MAKE_UP"
+  | "EAT_TOGETHER"
+  | "CALL_ME";
+export type GiftSuggestionCategory =
+  | "ANNIVERSARY"
+  | "BIRTHDAY"
+  | "APOLOGY"
+  | "RANDOM_SURPRISE"
+  | "COUPLE_ITEM"
+  | "HANDMADE";
+export type GiftBudgetRange = "UNDER_100K" | "FROM_100K_TO_300K" | "FROM_300K_TO_700K" | "ABOVE_700K";
+export type GiftPlatform = "TIKTOK" | "SHOPEE" | "OTHER";
 
 export interface User {
   id: string;
@@ -62,6 +82,57 @@ export interface MemoryItem {
   mediaUrls: string[];
   tags: string[];
   createdAt: string;
+}
+
+export interface AutoMilestone {
+  id: string;
+  title: string;
+  date: string;
+  type: "AUTO";
+  category: "ANNIVERSARY";
+  sourceKey: string;
+  isImportant: boolean;
+}
+
+export interface CustomMilestone {
+  id: string;
+  coupleId: string;
+  title: string;
+  description?: string;
+  milestoneDate: string;
+  type: "CUSTOM";
+  category: MilestoneCategory;
+  remindBeforeDays: number[];
+  isImportant: boolean;
+  createdById?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type Milestone = AutoMilestone | CustomMilestone;
+
+export interface Nudge {
+  id: string;
+  coupleId: string;
+  fromUserId: string;
+  toUserId: string;
+  type: NudgeType;
+  message: string;
+  createdAt: string;
+  readAt?: string;
+}
+
+export interface GiftSuggestion {
+  id: string;
+  title: string;
+  description: string;
+  category: GiftSuggestionCategory;
+  budgetRange: GiftBudgetRange;
+  platforms: GiftPlatform[];
+  url: string;
+  imageUrl?: string;
+  tags: string[];
+  suitableFor: string[];
 }
 
 export interface PartnerNote {

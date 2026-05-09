@@ -4,10 +4,12 @@ import type {
   AuthProvider,
   BudgetItem,
   Couple,
+  CustomMilestone,
   EmotionalCycle,
   InAppNotification,
   Invite,
   MemoryItem,
+  Nudge,
   PartnerNote,
   User,
   UserMoodState,
@@ -33,6 +35,8 @@ export class InMemoryStore implements DataStore {
   couples = new Map<string, Couple>();
   invites = new Map<string, Invite>();
   memories = new Map<string, MemoryItem>();
+  customMilestones = new Map<string, CustomMilestone>();
+  nudges = new Map<string, Nudge>();
   partnerNotes = new Map<string, PartnerNote>();
   userMoods = new Map<string, UserMoodState>();
   budgetItems = new Map<string, BudgetItem>();
@@ -53,6 +57,8 @@ export class InMemoryStore implements DataStore {
     this.couples.clear();
     this.invites.clear();
     this.memories.clear();
+    this.customMilestones.clear();
+    this.nudges.clear();
     this.partnerNotes.clear();
     this.userMoods.clear();
     this.budgetItems.clear();
@@ -301,6 +307,73 @@ export class InMemoryStore implements DataStore {
     if (!m || m.coupleId !== coupleId) return false;
     this.memories.delete(memoryId);
     return true;
+  }
+
+  async listCustomMilestonesByCouple(coupleId: string): Promise<CustomMilestone[]> {
+    return Array.from(this.customMilestones.values())
+      .filter((milestone) => milestone.coupleId === coupleId)
+      .sort((a, b) => a.milestoneDate.localeCompare(b.milestoneDate) || a.createdAt.localeCompare(b.createdAt));
+  }
+
+  async getCustomMilestoneByCouple(coupleId: string, milestoneId: string): Promise<CustomMilestone | undefined> {
+    const milestone = this.customMilestones.get(milestoneId);
+    if (!milestone || milestone.coupleId !== coupleId) {
+      return undefined;
+    }
+    return milestone;
+  }
+
+  async saveCustomMilestone(milestone: CustomMilestone): Promise<void> {
+    this.customMilestones.set(milestone.id, milestone);
+  }
+
+  async updateCustomMilestone(milestone: CustomMilestone): Promise<void> {
+    const existing = this.customMilestones.get(milestone.id);
+    if (!existing || existing.coupleId !== milestone.coupleId) {
+      return;
+    }
+    this.customMilestones.set(milestone.id, milestone);
+  }
+
+  async deleteCustomMilestone(coupleId: string, milestoneId: string): Promise<boolean> {
+    const milestone = this.customMilestones.get(milestoneId);
+    if (!milestone || milestone.coupleId !== coupleId) {
+      return false;
+    }
+    this.customMilestones.delete(milestoneId);
+    return true;
+  }
+
+  async createNudge(nudge: Nudge): Promise<void> {
+    this.nudges.set(nudge.id, nudge);
+  }
+
+  async listRecentNudgesForUser(userId: string, limit = 20): Promise<Nudge[]> {
+    const safeLimit = Math.min(50, Math.max(1, Math.floor(limit)));
+    return Array.from(this.nudges.values())
+      .filter((nudge) => nudge.toUserId === userId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .slice(0, safeLimit);
+  }
+
+  async getLatestNudgeFromUser(userId: string): Promise<Nudge | undefined> {
+    return Array.from(this.nudges.values())
+      .filter((nudge) => nudge.fromUserId === userId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+  }
+
+  async markNudgeReadForUser(userId: string, nudgeId: string): Promise<Nudge | undefined> {
+    const nudge = this.nudges.get(nudgeId);
+    if (!nudge || nudge.toUserId !== userId) {
+      return undefined;
+    }
+
+    const updated: Nudge = {
+      ...nudge,
+      readAt: nudge.readAt ?? new Date().toISOString(),
+    };
+    this.nudges.set(nudge.id, updated);
+    return updated;
   }
 
   async listPartnerNotesByUser(userId: string): Promise<PartnerNote[]> {

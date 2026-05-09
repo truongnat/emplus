@@ -27,6 +27,9 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
       { name: "Cặp đôi" },
       { name: "Trang chủ" },
       { name: "Kỷ niệm" },
+      { name: "Cột mốc" },
+      { name: "Nudge" },
+      { name: "Gợi ý quà" },
       { name: "Ghi nhớ" },
       { name: "Media" },
       { name: "Chăm sóc" },
@@ -278,6 +281,103 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             metadata: { type: "object", additionalProperties: true },
             readAt: { type: "string", format: "date-time" },
             createdAt: { type: "string", format: "date-time" },
+          },
+        },
+        AutoMilestone: {
+          type: "object",
+          required: ["id", "title", "date", "type", "category", "sourceKey", "isImportant"],
+          properties: {
+            id: { type: "string" },
+            title: { type: "string" },
+            date: { type: "string", format: "date" },
+            type: { type: "string", enum: ["AUTO"] },
+            category: { type: "string", enum: ["ANNIVERSARY"] },
+            sourceKey: { type: "string" },
+            isImportant: { type: "boolean" },
+          },
+        },
+        CustomMilestone: {
+          type: "object",
+          required: [
+            "id",
+            "coupleId",
+            "title",
+            "milestoneDate",
+            "type",
+            "category",
+            "remindBeforeDays",
+            "isImportant",
+            "createdAt",
+            "updatedAt",
+          ],
+          properties: {
+            id: { type: "string", format: "uuid" },
+            coupleId: { type: "string", format: "uuid" },
+            title: { type: "string", maxLength: 255 },
+            description: { type: "string" },
+            milestoneDate: { type: "string", format: "date" },
+            type: { type: "string", enum: ["CUSTOM"] },
+            category: { type: "string", enum: ["ANNIVERSARY", "DATE", "MEMORY", "GIFT", "OTHER"] },
+            remindBeforeDays: {
+              type: "array",
+              items: { type: "integer", enum: [1, 3, 7, 14, 30] },
+            },
+            isImportant: { type: "boolean" },
+            createdById: { type: "string", format: "uuid" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+          },
+        },
+        Nudge: {
+          type: "object",
+          required: ["id", "coupleId", "fromUserId", "toUserId", "type", "message", "createdAt"],
+          properties: {
+            id: { type: "string", format: "uuid" },
+            coupleId: { type: "string", format: "uuid" },
+            fromUserId: { type: "string", format: "uuid" },
+            toUserId: { type: "string", format: "uuid" },
+            type: {
+              type: "string",
+              enum: ["POKE", "HUG", "MISS_YOU", "KISS", "ANGRY", "MAKE_UP", "EAT_TOGETHER", "CALL_ME"],
+            },
+            message: { type: "string" },
+            createdAt: { type: "string", format: "date-time" },
+            readAt: { type: "string", format: "date-time" },
+          },
+        },
+        GiftSuggestion: {
+          type: "object",
+          required: [
+            "id",
+            "title",
+            "description",
+            "category",
+            "budgetRange",
+            "platforms",
+            "url",
+            "tags",
+            "suitableFor",
+          ],
+          properties: {
+            id: { type: "string" },
+            title: { type: "string" },
+            description: { type: "string" },
+            category: {
+              type: "string",
+              enum: ["ANNIVERSARY", "BIRTHDAY", "APOLOGY", "RANDOM_SURPRISE", "COUPLE_ITEM", "HANDMADE"],
+            },
+            budgetRange: {
+              type: "string",
+              enum: ["UNDER_100K", "FROM_100K_TO_300K", "FROM_300K_TO_700K", "ABOVE_700K"],
+            },
+            platforms: {
+              type: "array",
+              items: { type: "string", enum: ["TIKTOK", "SHOPEE", "OTHER"] },
+            },
+            url: { type: "string", format: "uri" },
+            imageUrl: { type: "string", format: "uri" },
+            tags: { type: "array", items: { type: "string" } },
+            suitableFor: { type: "array", items: { type: "string" } },
           },
         },
       },
@@ -633,6 +733,347 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
               },
             },
             401: { description: "Chưa xác thực" },
+          },
+        },
+      },
+      "/v1/milestones": {
+        get: {
+          tags: ["Cột mốc"],
+          summary: "Danh sách cột mốc của cặp đôi hiện tại",
+          security: [{ bearerAuth: [] }],
+          responses: {
+            200: {
+              description: "Cột mốc tự động, cột mốc tự tạo và cột mốc sắp tới",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["autoMilestones", "customMilestones", "nextMilestone"],
+                    properties: {
+                      autoMilestones: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/AutoMilestone" },
+                      },
+                      customMilestones: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/CustomMilestone" },
+                      },
+                      nextMilestone: {
+                        oneOf: [
+                          { $ref: "#/components/schemas/AutoMilestone" },
+                          { $ref: "#/components/schemas/CustomMilestone" },
+                          { type: "null" },
+                        ],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Chưa có cặp đôi đang hoạt động" },
+          },
+        },
+        post: {
+          tags: ["Cột mốc"],
+          summary: "Tạo cột mốc tự tạo",
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["title", "milestoneDate"],
+                  properties: {
+                    title: { type: "string", maxLength: 255 },
+                    description: { type: "string" },
+                    milestoneDate: { type: "string", format: "date" },
+                    category: { type: "string", enum: ["ANNIVERSARY", "DATE", "MEMORY", "GIFT", "OTHER"] },
+                    remindBeforeDays: {
+                      type: "array",
+                      items: { type: "integer", enum: [1, 3, 7, 14, 30] },
+                    },
+                    isImportant: { type: "boolean" },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Cột mốc đã tạo",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/CustomMilestone" },
+                },
+              },
+            },
+            400: { description: "Dữ liệu không hợp lệ" },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Chưa có cặp đôi đang hoạt động" },
+          },
+        },
+      },
+      "/v1/milestones/{id}": {
+        patch: {
+          tags: ["Cột mốc"],
+          summary: "Cập nhật cột mốc tự tạo",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: "id", in: "path", required: true, schema: { type: "string", format: "uuid" } },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string", maxLength: 255 },
+                    description: { type: "string" },
+                    milestoneDate: { type: "string", format: "date" },
+                    category: { type: "string", enum: ["ANNIVERSARY", "DATE", "MEMORY", "GIFT", "OTHER"] },
+                    remindBeforeDays: {
+                      type: "array",
+                      items: { type: "integer", enum: [1, 3, 7, 14, 30] },
+                    },
+                    isImportant: { type: "boolean" },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            200: {
+              description: "Cột mốc sau cập nhật",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/CustomMilestone" },
+                },
+              },
+            },
+            400: { description: "Dữ liệu không hợp lệ" },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Không tìm thấy" },
+          },
+        },
+        delete: {
+          tags: ["Cột mốc"],
+          summary: "Xóa cột mốc tự tạo",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: "id", in: "path", required: true, schema: { type: "string", format: "uuid" } },
+          ],
+          responses: {
+            200: {
+              description: "Đã xóa",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["ok"],
+                    properties: {
+                      ok: { type: "boolean" },
+                    },
+                  },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Không tìm thấy" },
+          },
+        },
+      },
+      "/v1/nudges": {
+        post: {
+          tags: ["Nudge"],
+          summary: "Gửi một nudge cho người ấy",
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["type"],
+                  properties: {
+                    type: {
+                      type: "string",
+                      enum: ["POKE", "HUG", "MISS_YOU", "KISS", "ANGRY", "MAKE_UP", "EAT_TOGETHER", "CALL_ME"],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Nudge đã tạo",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/Nudge" },
+                },
+              },
+            },
+            400: { description: "Dữ liệu không hợp lệ hoặc tự gửi cho chính mình" },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Chưa có cặp đôi/người ấy" },
+            429: { description: "Gửi quá nhanh" },
+          },
+        },
+      },
+      "/v1/nudges/recent": {
+        get: {
+          tags: ["Nudge"],
+          summary: "Danh sách nudge gần đây gửi đến người dùng hiện tại",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 50, default: 20 } },
+          ],
+          responses: {
+            200: {
+              description: "Danh sách nudge gần đây",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["items"],
+                    properties: {
+                      items: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/Nudge" },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Chưa có cặp đôi/người ấy" },
+          },
+        },
+      },
+      "/v1/nudges/{id}/read": {
+        post: {
+          tags: ["Nudge"],
+          summary: "Đánh dấu nudge đã đọc",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: "id", in: "path", required: true, schema: { type: "string", format: "uuid" } },
+          ],
+          responses: {
+            200: {
+              description: "Nudge sau khi cập nhật",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/Nudge" },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Không tìm thấy" },
+          },
+        },
+      },
+      "/v1/gift-suggestions": {
+        get: {
+          tags: ["Gợi ý quà"],
+          summary: "Danh sách gợi ý quà tĩnh cho cặp đôi hiện tại",
+          description:
+            "Trả về cấu hình gợi ý quà backend-owned cho MVP. Không scraping, không affiliate API, không lưu DB.",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              name: "category",
+              in: "query",
+              required: false,
+              schema: {
+                type: "string",
+                enum: ["ANNIVERSARY", "BIRTHDAY", "APOLOGY", "RANDOM_SURPRISE", "COUPLE_ITEM", "HANDMADE"],
+              },
+            },
+            {
+              name: "budgetRange",
+              in: "query",
+              required: false,
+              schema: {
+                type: "string",
+                enum: ["UNDER_100K", "FROM_100K_TO_300K", "FROM_300K_TO_700K", "ABOVE_700K"],
+              },
+            },
+            {
+              name: "milestoneId",
+              in: "query",
+              required: false,
+              schema: { type: "string" },
+              description:
+                "Nếu là custom milestone, backend dùng category/tags để ưu tiên gợi ý phù hợp. Auto milestone có thể dùng sourceKey/date sau.",
+            },
+          ],
+          responses: {
+            200: {
+              description: "Danh sách gợi ý quà",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["items"],
+                    properties: {
+                      items: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/GiftSuggestion" },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            400: { description: "Query không hợp lệ" },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Chưa có cặp đôi đang hoạt động" },
+          },
+        },
+      },
+      "/v1/gift-suggestions/categories": {
+        get: {
+          tags: ["Gợi ý quà"],
+          summary: "Danh mục và enum lọc gợi ý quà",
+          security: [{ bearerAuth: [] }],
+          responses: {
+            200: {
+              description: "Danh sách category, budget range và platform hỗ trợ",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["categories", "budgetRanges", "platforms"],
+                    properties: {
+                      categories: {
+                        type: "array",
+                        items: {
+                          type: "string",
+                          enum: ["ANNIVERSARY", "BIRTHDAY", "APOLOGY", "RANDOM_SURPRISE", "COUPLE_ITEM", "HANDMADE"],
+                        },
+                      },
+                      budgetRanges: {
+                        type: "array",
+                        items: {
+                          type: "string",
+                          enum: ["UNDER_100K", "FROM_100K_TO_300K", "FROM_300K_TO_700K", "ABOVE_700K"],
+                        },
+                      },
+                      platforms: {
+                        type: "array",
+                        items: { type: "string", enum: ["TIKTOK", "SHOPEE", "OTHER"] },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Chưa có cặp đôi đang hoạt động" },
           },
         },
       },

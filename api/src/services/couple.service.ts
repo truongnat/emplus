@@ -10,6 +10,7 @@ import { formatDate, todayUtc } from "../shared/date.ts";
 import { displayGender, displayCoupleStatus } from "../utils/presentation.ts";
 import { notify } from "./notification.service.ts";
 import { AppError } from "../utils/http.ts";
+import type { CreateCoupleDto, UpdateCoupleDto } from "../dto/couples.dto.ts";
 
 export interface InviteResponse {
   inviteCode: string;
@@ -130,4 +131,56 @@ export async function joinCouple(user: User, inviteCode: string): Promise<JoinRe
       gender: displayGender(inviter.gender),
     },
   };
+}
+
+/**
+ * Create a new couple with love start date
+ */
+export async function createCouple(userId: string, input: CreateCoupleDto): Promise<Couple> {
+  const existingCouple = await store.getActiveCoupleForUser(userId);
+  if (existingCouple) {
+    throw new AppError(409, "COUPLE_ALREADY_EXISTS", "Bạn đã tạo cặp đôi.");
+  }
+
+  const inviteCode = generateInviteCode();
+  const couple: Couple = {
+    id: crypto.randomUUID(),
+    partner1Id: userId,
+    status: "PENDING",
+    loveStartDate: input.loveStartDate,
+    inviteCode: inviteCode,
+    inviteExpiresAt: new Date(Date.now() + INVITE_CODE_TTL_SECONDS * 1000).toISOString(),
+    settings: {},
+    createdAt: new Date().toISOString(),
+  };
+
+  const user = await store.getUserById(userId);
+  if (!user) {
+    throw new AppError(404, "USER_NOT_FOUND", "Không tìm thấy người dùng.");
+  }
+
+  user.coupleId = couple.id;
+  user.updatedAt = new Date().toISOString();
+
+  await Promise.all([store.saveCouple(couple), store.saveUser(user)]);
+
+  return couple;
+}
+
+/**
+ * Update a couple's information
+ */
+export async function updateCouple(coupleId: string, input: UpdateCoupleDto): Promise<Couple> {
+  const couple = await store.getCoupleById(coupleId);
+  if (!couple) {
+    throw new AppError(404, "COUPLE_NOT_FOUND", "Không tìm thấy cặp đôi.");
+  }
+
+  if (input.loveStartDate) {
+    couple.loveStartDate = input.loveStartDate;
+  }
+
+  await store.updateCouple(couple);
+
+  return couple;
 }
