@@ -13,6 +13,15 @@ export type NudgeType =
   | "MAKE_UP"
   | "EAT_TOGETHER"
   | "CALL_ME";
+export type GiftSuggestionCategory =
+  | "ANNIVERSARY"
+  | "BIRTHDAY"
+  | "APOLOGY"
+  | "RANDOM_SURPRISE"
+  | "COUPLE_ITEM"
+  | "HANDMADE";
+export type GiftBudgetRange = "UNDER_100K" | "FROM_100K_TO_300K" | "FROM_300K_TO_700K" | "ABOVE_700K";
+export type GiftPlatform = "TIKTOK" | "SHOPEE" | "OTHER";
 
 export interface User {
   id: string;
@@ -111,6 +120,19 @@ export interface Nudge {
   message: string;
   createdAt: string;
   readAt?: string;
+}
+
+export interface GiftSuggestion {
+  id: string;
+  title: string;
+  description: string;
+  category: GiftSuggestionCategory;
+  budgetRange: GiftBudgetRange;
+  platforms: GiftPlatform[];
+  url: string;
+  imageUrl?: string;
+  tags: string[];
+  suitableFor: string[];
 }
 
 export interface PartnerNote {

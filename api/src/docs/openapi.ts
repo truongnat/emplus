@@ -29,6 +29,7 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
       { name: "Kỷ niệm" },
       { name: "Cột mốc" },
       { name: "Nudge" },
+      { name: "Gợi ý quà" },
       { name: "Ghi nhớ" },
       { name: "Media" },
       { name: "Chăm sóc" },
@@ -342,6 +343,41 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             message: { type: "string" },
             createdAt: { type: "string", format: "date-time" },
             readAt: { type: "string", format: "date-time" },
+          },
+        },
+        GiftSuggestion: {
+          type: "object",
+          required: [
+            "id",
+            "title",
+            "description",
+            "category",
+            "budgetRange",
+            "platforms",
+            "url",
+            "tags",
+            "suitableFor",
+          ],
+          properties: {
+            id: { type: "string" },
+            title: { type: "string" },
+            description: { type: "string" },
+            category: {
+              type: "string",
+              enum: ["ANNIVERSARY", "BIRTHDAY", "APOLOGY", "RANDOM_SURPRISE", "COUPLE_ITEM", "HANDMADE"],
+            },
+            budgetRange: {
+              type: "string",
+              enum: ["UNDER_100K", "FROM_100K_TO_300K", "FROM_300K_TO_700K", "ABOVE_700K"],
+            },
+            platforms: {
+              type: "array",
+              items: { type: "string", enum: ["TIKTOK", "SHOPEE", "OTHER"] },
+            },
+            url: { type: "string", format: "uri" },
+            imageUrl: { type: "string", format: "uri" },
+            tags: { type: "array", items: { type: "string" } },
+            suitableFor: { type: "array", items: { type: "string" } },
           },
         },
       },
@@ -937,6 +973,107 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             },
             401: { description: "Chưa xác thực" },
             404: { description: "Không tìm thấy" },
+          },
+        },
+      },
+      "/v1/gift-suggestions": {
+        get: {
+          tags: ["Gợi ý quà"],
+          summary: "Danh sách gợi ý quà tĩnh cho cặp đôi hiện tại",
+          description:
+            "Trả về cấu hình gợi ý quà backend-owned cho MVP. Không scraping, không affiliate API, không lưu DB.",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              name: "category",
+              in: "query",
+              required: false,
+              schema: {
+                type: "string",
+                enum: ["ANNIVERSARY", "BIRTHDAY", "APOLOGY", "RANDOM_SURPRISE", "COUPLE_ITEM", "HANDMADE"],
+              },
+            },
+            {
+              name: "budgetRange",
+              in: "query",
+              required: false,
+              schema: {
+                type: "string",
+                enum: ["UNDER_100K", "FROM_100K_TO_300K", "FROM_300K_TO_700K", "ABOVE_700K"],
+              },
+            },
+            {
+              name: "milestoneId",
+              in: "query",
+              required: false,
+              schema: { type: "string" },
+              description:
+                "Nếu là custom milestone, backend dùng category/tags để ưu tiên gợi ý phù hợp. Auto milestone có thể dùng sourceKey/date sau.",
+            },
+          ],
+          responses: {
+            200: {
+              description: "Danh sách gợi ý quà",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["items"],
+                    properties: {
+                      items: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/GiftSuggestion" },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            400: { description: "Query không hợp lệ" },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Chưa có cặp đôi đang hoạt động" },
+          },
+        },
+      },
+      "/v1/gift-suggestions/categories": {
+        get: {
+          tags: ["Gợi ý quà"],
+          summary: "Danh mục và enum lọc gợi ý quà",
+          security: [{ bearerAuth: [] }],
+          responses: {
+            200: {
+              description: "Danh sách category, budget range và platform hỗ trợ",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["categories", "budgetRanges", "platforms"],
+                    properties: {
+                      categories: {
+                        type: "array",
+                        items: {
+                          type: "string",
+                          enum: ["ANNIVERSARY", "BIRTHDAY", "APOLOGY", "RANDOM_SURPRISE", "COUPLE_ITEM", "HANDMADE"],
+                        },
+                      },
+                      budgetRanges: {
+                        type: "array",
+                        items: {
+                          type: "string",
+                          enum: ["UNDER_100K", "FROM_100K_TO_300K", "FROM_300K_TO_700K", "ABOVE_700K"],
+                        },
+                      },
+                      platforms: {
+                        type: "array",
+                        items: { type: "string", enum: ["TIKTOK", "SHOPEE", "OTHER"] },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Chưa có cặp đôi đang hoạt động" },
           },
         },
       },

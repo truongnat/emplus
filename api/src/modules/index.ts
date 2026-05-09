@@ -5,6 +5,7 @@ export { careRoutes } from "./care.ts";
 export { couplesRoutes } from "./couples.ts";
 export { dashboardRoutes } from "./dashboard.ts";
 export { debugRoutes } from "./debug.ts";
+export { giftSuggestionsRoutes } from "./gift-suggestions.ts";
 export { liveRoutes } from "./live.ts";
 export { mediaRoutes } from "./media.ts";
 export { milestonesRoutes } from "./milestones.ts";
