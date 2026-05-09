@@ -15,9 +15,9 @@ type ButtonProps =
       href: Route;
       type?: never;
     })
-  | (ButtonBaseProps & {
+  | (ButtonBaseProps &
+      React.ButtonHTMLAttributes<HTMLButtonElement> & {
       href?: never;
-      type?: "button" | "submit" | "reset";
     });
 
 const variantClass: Record<ButtonVariant, string> = {
@@ -36,6 +36,7 @@ export function Button({
 }: ButtonProps) {
   const classes = cn(
     "inline-flex min-h-12 items-center justify-center rounded-full px-5 text-sm font-black transition active:scale-[0.99]",
+    "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-60",
     variantClass[variant],
     className,
   );
@@ -49,7 +50,7 @@ export function Button({
   }
 
   return (
-    <button type={props.type ?? "button"} className={classes}>
+    <button {...props} type={props.type ?? "button"} className={classes}>
       {children}
     </button>
   );

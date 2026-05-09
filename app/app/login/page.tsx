@@ -1,7 +1,5 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { LoginForm } from "@/features/auth/login-form";
 
 export default function LoginPage() {
   return (
@@ -9,19 +7,10 @@ export default function LoginPage() {
       <PageHeader
         eyebrow="Đăng nhập"
         title="Chào mừng bạn quay lại."
-        description="Màn hình tĩnh để khóa hướng UI. Chưa có xử lý đăng nhập hoặc gọi API."
+        description="Nhập email và mật khẩu để trở về không gian riêng của hai người."
       />
 
-      <Card className="space-y-4">
-        <Input label="Email" placeholder="ban@example.com" type="email" />
-        <Input label="Mật khẩu" placeholder="Chưa xử lý xác thực" type="password" />
-        <Button type="button" className="w-full">
-          Xem giao diện
-        </Button>
-        <Button href="/register" variant="ghost" className="w-full">
-          Tạo tài khoản mới
-        </Button>
-      </Card>
+      <LoginForm />
     </>
   );
 }

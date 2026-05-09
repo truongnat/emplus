@@ -50,6 +50,11 @@ function normalizeErrorPayload(payload: unknown): ApiErrorEnvelope {
     return {};
   }
 
+  const maybeEnvelope = payload as { error?: ApiErrorEnvelope };
+  if (maybeEnvelope.error && typeof maybeEnvelope.error === "object") {
+    return maybeEnvelope.error;
+  }
+
   return payload as ApiErrorEnvelope;
 }
 

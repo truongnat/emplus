@@ -1,4 +1,5 @@
 export type ApiResponseEnvelope<TData> = {
+  success?: boolean;
   data: TData;
   message?: string;
   meta?: Record<string, unknown>;

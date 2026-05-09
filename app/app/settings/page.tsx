@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { SectionTitle } from "@/components/ui/section-title";
+import { LogoutButton } from "@/features/auth/logout-button";
 
 export default function SettingsPage() {
   return (
@@ -20,6 +21,7 @@ export default function SettingsPage() {
         <Button type="button" className="w-full">
           Lưu nháp giao diện
         </Button>
+        <LogoutButton />
       </Card>
 
       <section className="space-y-3">
