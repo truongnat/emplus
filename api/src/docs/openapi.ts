@@ -27,6 +27,7 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
       { name: "Cặp đôi" },
       { name: "Trang chủ" },
       { name: "Kỷ niệm" },
+      { name: "Cột mốc" },
       { name: "Ghi nhớ" },
       { name: "Media" },
       { name: "Chăm sóc" },
@@ -278,6 +279,51 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             metadata: { type: "object", additionalProperties: true },
             readAt: { type: "string", format: "date-time" },
             createdAt: { type: "string", format: "date-time" },
+          },
+        },
+        AutoMilestone: {
+          type: "object",
+          required: ["id", "title", "date", "type", "category", "sourceKey", "isImportant"],
+          properties: {
+            id: { type: "string" },
+            title: { type: "string" },
+            date: { type: "string", format: "date" },
+            type: { type: "string", enum: ["AUTO"] },
+            category: { type: "string", enum: ["ANNIVERSARY"] },
+            sourceKey: { type: "string" },
+            isImportant: { type: "boolean" },
+          },
+        },
+        CustomMilestone: {
+          type: "object",
+          required: [
+            "id",
+            "coupleId",
+            "title",
+            "milestoneDate",
+            "type",
+            "category",
+            "remindBeforeDays",
+            "isImportant",
+            "createdAt",
+            "updatedAt",
+          ],
+          properties: {
+            id: { type: "string", format: "uuid" },
+            coupleId: { type: "string", format: "uuid" },
+            title: { type: "string", maxLength: 255 },
+            description: { type: "string" },
+            milestoneDate: { type: "string", format: "date" },
+            type: { type: "string", enum: ["CUSTOM"] },
+            category: { type: "string", enum: ["ANNIVERSARY", "DATE", "MEMORY", "GIFT", "OTHER"] },
+            remindBeforeDays: {
+              type: "array",
+              items: { type: "integer", enum: [1, 3, 7, 14, 30] },
+            },
+            isImportant: { type: "boolean" },
+            createdById: { type: "string", format: "uuid" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
           },
         },
       },
@@ -633,6 +679,155 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
               },
             },
             401: { description: "Chưa xác thực" },
+          },
+        },
+      },
+      "/v1/milestones": {
+        get: {
+          tags: ["Cột mốc"],
+          summary: "Danh sách cột mốc của cặp đôi hiện tại",
+          security: [{ bearerAuth: [] }],
+          responses: {
+            200: {
+              description: "Cột mốc tự động, cột mốc tự tạo và cột mốc sắp tới",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["autoMilestones", "customMilestones", "nextMilestone"],
+                    properties: {
+                      autoMilestones: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/AutoMilestone" },
+                      },
+                      customMilestones: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/CustomMilestone" },
+                      },
+                      nextMilestone: {
+                        oneOf: [
+                          { $ref: "#/components/schemas/AutoMilestone" },
+                          { $ref: "#/components/schemas/CustomMilestone" },
+                          { type: "null" },
+                        ],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Chưa có cặp đôi đang hoạt động" },
+          },
+        },
+        post: {
+          tags: ["Cột mốc"],
+          summary: "Tạo cột mốc tự tạo",
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["title", "milestoneDate"],
+                  properties: {
+                    title: { type: "string", maxLength: 255 },
+                    description: { type: "string" },
+                    milestoneDate: { type: "string", format: "date" },
+                    category: { type: "string", enum: ["ANNIVERSARY", "DATE", "MEMORY", "GIFT", "OTHER"] },
+                    remindBeforeDays: {
+                      type: "array",
+                      items: { type: "integer", enum: [1, 3, 7, 14, 30] },
+                    },
+                    isImportant: { type: "boolean" },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Cột mốc đã tạo",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/CustomMilestone" },
+                },
+              },
+            },
+            400: { description: "Dữ liệu không hợp lệ" },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Chưa có cặp đôi đang hoạt động" },
+          },
+        },
+      },
+      "/v1/milestones/{id}": {
+        patch: {
+          tags: ["Cột mốc"],
+          summary: "Cập nhật cột mốc tự tạo",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: "id", in: "path", required: true, schema: { type: "string", format: "uuid" } },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string", maxLength: 255 },
+                    description: { type: "string" },
+                    milestoneDate: { type: "string", format: "date" },
+                    category: { type: "string", enum: ["ANNIVERSARY", "DATE", "MEMORY", "GIFT", "OTHER"] },
+                    remindBeforeDays: {
+                      type: "array",
+                      items: { type: "integer", enum: [1, 3, 7, 14, 30] },
+                    },
+                    isImportant: { type: "boolean" },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            200: {
+              description: "Cột mốc sau cập nhật",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/CustomMilestone" },
+                },
+              },
+            },
+            400: { description: "Dữ liệu không hợp lệ" },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Không tìm thấy" },
+          },
+        },
+        delete: {
+          tags: ["Cột mốc"],
+          summary: "Xóa cột mốc tự tạo",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: "id", in: "path", required: true, schema: { type: "string", format: "uuid" } },
+          ],
+          responses: {
+            200: {
+              description: "Đã xóa",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["ok"],
+                    properties: {
+                      ok: { type: "boolean" },
+                    },
+                  },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Không tìm thấy" },
           },
         },
       },

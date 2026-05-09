@@ -6,6 +6,7 @@ import type {
   AuthProvider,
   BudgetItem,
   Couple,
+  CustomMilestone,
   EmotionalCycle,
   InAppNotification,
   Invite,
@@ -150,6 +151,21 @@ type AnniversaryRow = {
   createdAt: string | Date;
 };
 
+type CustomMilestoneRow = {
+  id: string;
+  coupleId: string;
+  title: string;
+  description: string | null;
+  milestoneDate: string | Date;
+  type: string;
+  category: string;
+  remindBeforeDays: number[];
+  isImportant: boolean;
+  createdById: string | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+};
+
 function fromUserRow(row: UserRow): User {
   return {
     id: row.id,
@@ -282,6 +298,23 @@ function fromAnniversaryRow(row: AnniversaryRow): Anniversary {
     isSystemGenerated: row.isSystemGenerated,
     notifySettings: row.notifySettings,
     createdAt: asIso(row.createdAt) ?? new Date().toISOString(),
+  };
+}
+
+function fromCustomMilestoneRow(row: CustomMilestoneRow): CustomMilestone {
+  return {
+    id: row.id,
+    coupleId: row.coupleId,
+    title: row.title,
+    description: row.description ?? undefined,
+    milestoneDate: asDate(row.milestoneDate) ?? new Date().toISOString().slice(0, 10),
+    type: "CUSTOM",
+    category: row.category as CustomMilestone["category"],
+    remindBeforeDays: row.remindBeforeDays ?? [1, 3, 7],
+    isImportant: row.isImportant,
+    createdById: row.createdById ?? undefined,
+    createdAt: asIso(row.createdAt) ?? new Date().toISOString(),
+    updatedAt: asIso(row.updatedAt) ?? new Date().toISOString(),
   };
 }
 
@@ -1015,6 +1048,106 @@ export class PostgresStore implements DataStore {
       WHERE id = ${memoryId} AND couple_id = ${coupleId}
       RETURNING id
     `;
+    return rows.length > 0;
+  }
+
+  async listCustomMilestonesByCouple(coupleId: string): Promise<CustomMilestone[]> {
+    const rows = await this.sql<CustomMilestoneRow[]>`
+      SELECT id,
+             couple_id AS "coupleId",
+             title,
+             description,
+             milestone_date AS "milestoneDate",
+             type,
+             category,
+             remind_before_days AS "remindBeforeDays",
+             is_important AS "isImportant",
+             created_by_id AS "createdById",
+             created_at AS "createdAt",
+             updated_at AS "updatedAt"
+      FROM custom_milestones
+      WHERE couple_id = ${coupleId}
+      ORDER BY milestone_date ASC, created_at ASC
+    `;
+
+    return rows.map(fromCustomMilestoneRow);
+  }
+
+  async getCustomMilestoneByCouple(coupleId: string, milestoneId: string): Promise<CustomMilestone | undefined> {
+    const rows = await this.sql<CustomMilestoneRow[]>`
+      SELECT id,
+             couple_id AS "coupleId",
+             title,
+             description,
+             milestone_date AS "milestoneDate",
+             type,
+             category,
+             remind_before_days AS "remindBeforeDays",
+             is_important AS "isImportant",
+             created_by_id AS "createdById",
+             created_at AS "createdAt",
+             updated_at AS "updatedAt"
+      FROM custom_milestones
+      WHERE id = ${milestoneId} AND couple_id = ${coupleId}
+      LIMIT 1
+    `;
+
+    return rows[0] ? fromCustomMilestoneRow(rows[0]) : undefined;
+  }
+
+  async saveCustomMilestone(milestone: CustomMilestone): Promise<void> {
+    await this.sql`
+      INSERT INTO custom_milestones (
+        id,
+        couple_id,
+        title,
+        description,
+        milestone_date,
+        type,
+        category,
+        remind_before_days,
+        is_important,
+        created_by_id,
+        created_at,
+        updated_at
+      ) VALUES (
+        ${milestone.id},
+        ${milestone.coupleId},
+        ${milestone.title},
+        ${milestone.description ?? null},
+        ${milestone.milestoneDate},
+        ${milestone.type},
+        ${milestone.category},
+        ${milestone.remindBeforeDays},
+        ${milestone.isImportant},
+        ${milestone.createdById ?? null},
+        ${milestone.createdAt},
+        ${milestone.updatedAt}
+      )
+    `;
+  }
+
+  async updateCustomMilestone(milestone: CustomMilestone): Promise<void> {
+    await this.sql`
+      UPDATE custom_milestones
+      SET title = ${milestone.title},
+          description = ${milestone.description ?? null},
+          milestone_date = ${milestone.milestoneDate},
+          category = ${milestone.category},
+          remind_before_days = ${milestone.remindBeforeDays},
+          is_important = ${milestone.isImportant},
+          updated_at = ${milestone.updatedAt}
+      WHERE id = ${milestone.id} AND couple_id = ${milestone.coupleId}
+    `;
+  }
+
+  async deleteCustomMilestone(coupleId: string, milestoneId: string): Promise<boolean> {
+    const rows = await this.sql<{ id: string }[]>`
+      DELETE FROM custom_milestones
+      WHERE id = ${milestoneId} AND couple_id = ${coupleId}
+      RETURNING id
+    `;
+
     return rows.length > 0;
   }
 

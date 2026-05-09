@@ -53,7 +53,7 @@ dashboardRoutes.get("/home", async (context) => {
   const partnerId = couple.partner1Id === user.id ? couple.partner2Id : couple.partner1Id;
   const partner = partnerId ? await store.getUserById(partnerId) : undefined;
 
-  if (user.gender === "NAM" && partner) {
+  if (user.gender === "MALE" && partner) {
     const partnerCycle = await store.getCycleByUserId(partner.id);
     if (partnerCycle) {
       const phase = getEmotionalPhase(partnerCycle, today);

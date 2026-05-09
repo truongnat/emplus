@@ -3,6 +3,7 @@ import type {
   Anniversary,
   BudgetItem,
   Couple,
+  CustomMilestone,
   EmotionalCycle,
   UserMoodState,
   InAppNotification,
@@ -42,6 +43,11 @@ export interface DataStore {
   updateMemory(memory: MemoryItem): Promise<void>;
   getMemoryByCouple(coupleId: string, memoryId: string): Promise<MemoryItem | undefined>;
   deleteMemory(coupleId: string, memoryId: string): Promise<boolean>;
+  listCustomMilestonesByCouple(coupleId: string): Promise<CustomMilestone[]>;
+  getCustomMilestoneByCouple(coupleId: string, milestoneId: string): Promise<CustomMilestone | undefined>;
+  saveCustomMilestone(milestone: CustomMilestone): Promise<void>;
+  updateCustomMilestone(milestone: CustomMilestone): Promise<void>;
+  deleteCustomMilestone(coupleId: string, milestoneId: string): Promise<boolean>;
   listPartnerNotesByUser(userId: string): Promise<PartnerNote[]>;
   getPartnerNoteByUser(userId: string, noteId: string): Promise<PartnerNote | undefined>;
   savePartnerNote(note: PartnerNote): Promise<void>;

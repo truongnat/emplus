@@ -7,6 +7,7 @@ export { dashboardRoutes } from "./dashboard.ts";
 export { debugRoutes } from "./debug.ts";
 export { liveRoutes } from "./live.ts";
 export { mediaRoutes } from "./media.ts";
+export { milestonesRoutes } from "./milestones.ts";
 export { notificationRoutes } from "./notifications.ts";
 export { partnerNotesRoutes } from "./partner-notes.ts";
 export { systemRoutes } from "./system.ts";

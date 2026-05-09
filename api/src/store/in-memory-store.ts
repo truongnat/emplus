@@ -4,6 +4,7 @@ import type {
   AuthProvider,
   BudgetItem,
   Couple,
+  CustomMilestone,
   EmotionalCycle,
   InAppNotification,
   Invite,
@@ -33,6 +34,7 @@ export class InMemoryStore implements DataStore {
   couples = new Map<string, Couple>();
   invites = new Map<string, Invite>();
   memories = new Map<string, MemoryItem>();
+  customMilestones = new Map<string, CustomMilestone>();
   partnerNotes = new Map<string, PartnerNote>();
   userMoods = new Map<string, UserMoodState>();
   budgetItems = new Map<string, BudgetItem>();
@@ -53,6 +55,7 @@ export class InMemoryStore implements DataStore {
     this.couples.clear();
     this.invites.clear();
     this.memories.clear();
+    this.customMilestones.clear();
     this.partnerNotes.clear();
     this.userMoods.clear();
     this.budgetItems.clear();
@@ -300,6 +303,41 @@ export class InMemoryStore implements DataStore {
     const m = this.memories.get(memoryId);
     if (!m || m.coupleId !== coupleId) return false;
     this.memories.delete(memoryId);
+    return true;
+  }
+
+  async listCustomMilestonesByCouple(coupleId: string): Promise<CustomMilestone[]> {
+    return Array.from(this.customMilestones.values())
+      .filter((milestone) => milestone.coupleId === coupleId)
+      .sort((a, b) => a.milestoneDate.localeCompare(b.milestoneDate) || a.createdAt.localeCompare(b.createdAt));
+  }
+
+  async getCustomMilestoneByCouple(coupleId: string, milestoneId: string): Promise<CustomMilestone | undefined> {
+    const milestone = this.customMilestones.get(milestoneId);
+    if (!milestone || milestone.coupleId !== coupleId) {
+      return undefined;
+    }
+    return milestone;
+  }
+
+  async saveCustomMilestone(milestone: CustomMilestone): Promise<void> {
+    this.customMilestones.set(milestone.id, milestone);
+  }
+
+  async updateCustomMilestone(milestone: CustomMilestone): Promise<void> {
+    const existing = this.customMilestones.get(milestone.id);
+    if (!existing || existing.coupleId !== milestone.coupleId) {
+      return;
+    }
+    this.customMilestones.set(milestone.id, milestone);
+  }
+
+  async deleteCustomMilestone(coupleId: string, milestoneId: string): Promise<boolean> {
+    const milestone = this.customMilestones.get(milestoneId);
+    if (!milestone || milestone.coupleId !== coupleId) {
+      return false;
+    }
+    this.customMilestones.delete(milestoneId);
     return true;
   }
 
