@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
+import { AppShell } from "@/components/layout/app-shell";
 import "./globals.css";
 
 const appFont = Nunito({
@@ -25,11 +26,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={appFont.variable}>
+    <html lang="vi" className={appFont.variable}>
       <body>
-        <main className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col px-5 py-5">
+        <AppShell>
           {children}
-        </main>
+        </AppShell>
       </body>
     </html>
   );

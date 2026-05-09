@@ -6,9 +6,12 @@
   --surface: rgba(255, 255, 255, 0.78);
   --surface-strong: rgba(255, 250, 246, 0.94);
   --border: rgba(126, 53, 33, 0.16);
+  --border-strong: rgba(126, 53, 33, 0.28);
   --muted: #8d6358;
-  --accent: #d84f68;
-  --accent-strong: #aa2949;
+  --soft: #fff0ea;
+  --rose: #d44867;
+  --rose-deep: #9c2443;
+  --violet: #7b5bd6;
   --gold: #c58631;
 }
 
@@ -25,9 +28,10 @@ body {
   min-height: 100vh;
   margin: 0;
   background:
-    radial-gradient(circle at 12% 10%, rgba(255, 197, 156, 0.38), transparent 28rem),
-    radial-gradient(circle at 88% 4%, rgba(255, 144, 167, 0.22), transparent 24rem),
-    linear-gradient(145deg, #fff7f1 0%, #ffe9df 46%, #fff8ed 100%);
+    radial-gradient(circle at 12% 8%, rgba(255, 190, 150, 0.42), transparent 24rem),
+    radial-gradient(circle at 92% 0%, rgba(192, 146, 255, 0.2), transparent 20rem),
+    radial-gradient(circle at 76% 72%, rgba(255, 128, 156, 0.16), transparent 22rem),
+    linear-gradient(145deg, #fff8ef 0%, #ffece3 48%, #fff6f4 100%);
   color: var(--foreground);
   font-family:
     var(--font-app),
@@ -51,4 +55,16 @@ select {
 
 ::selection {
   background: rgba(216, 79, 104, 0.22);
+}
+
+body::before {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  content: "";
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
 }
