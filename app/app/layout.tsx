@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
 import { AppShell } from "@/components/layout/app-shell";
+import { QueryProvider } from "@/lib/query-client";
 import "./globals.css";
 
 const appFont = Nunito({
@@ -28,9 +29,9 @@ export default function RootLayout({
   return (
     <html lang="vi" className={appFont.variable}>
       <body>
-        <AppShell>
-          {children}
-        </AppShell>
+        <QueryProvider>
+          <AppShell>{children}</AppShell>
+        </QueryProvider>
       </body>
     </html>
   );
