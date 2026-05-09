@@ -4,6 +4,15 @@ export type CoupleStatus = "PENDING" | "DATING" | "MARRIED" | "SEPARATED";
 export type AnniversaryCategory = "LOVE" | "BIRTHDAY" | "CUSTOM" | "HOLIDAY";
 export type MilestoneType = "AUTO" | "CUSTOM";
 export type MilestoneCategory = "ANNIVERSARY" | "DATE" | "MEMORY" | "GIFT" | "OTHER";
+export type NudgeType =
+  | "POKE"
+  | "HUG"
+  | "MISS_YOU"
+  | "KISS"
+  | "ANGRY"
+  | "MAKE_UP"
+  | "EAT_TOGETHER"
+  | "CALL_ME";
 
 export interface User {
   id: string;
@@ -92,6 +101,17 @@ export interface CustomMilestone {
 }
 
 export type Milestone = AutoMilestone | CustomMilestone;
+
+export interface Nudge {
+  id: string;
+  coupleId: string;
+  fromUserId: string;
+  toUserId: string;
+  type: NudgeType;
+  message: string;
+  createdAt: string;
+  readAt?: string;
+}
 
 export interface PartnerNote {
   id: string;

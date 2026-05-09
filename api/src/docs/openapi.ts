@@ -28,6 +28,7 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
       { name: "Trang chủ" },
       { name: "Kỷ niệm" },
       { name: "Cột mốc" },
+      { name: "Nudge" },
       { name: "Ghi nhớ" },
       { name: "Media" },
       { name: "Chăm sóc" },
@@ -324,6 +325,23 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
             createdById: { type: "string", format: "uuid" },
             createdAt: { type: "string", format: "date-time" },
             updatedAt: { type: "string", format: "date-time" },
+          },
+        },
+        Nudge: {
+          type: "object",
+          required: ["id", "coupleId", "fromUserId", "toUserId", "type", "message", "createdAt"],
+          properties: {
+            id: { type: "string", format: "uuid" },
+            coupleId: { type: "string", format: "uuid" },
+            fromUserId: { type: "string", format: "uuid" },
+            toUserId: { type: "string", format: "uuid" },
+            type: {
+              type: "string",
+              enum: ["POKE", "HUG", "MISS_YOU", "KISS", "ANGRY", "MAKE_UP", "EAT_TOGETHER", "CALL_ME"],
+            },
+            message: { type: "string" },
+            createdAt: { type: "string", format: "date-time" },
+            readAt: { type: "string", format: "date-time" },
           },
         },
       },
@@ -823,6 +841,97 @@ export function buildOpenApiSpec(origin: string, docsPath: string): Record<strin
                       ok: { type: "boolean" },
                     },
                   },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Không tìm thấy" },
+          },
+        },
+      },
+      "/v1/nudges": {
+        post: {
+          tags: ["Nudge"],
+          summary: "Gửi một nudge cho người ấy",
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  required: ["type"],
+                  properties: {
+                    type: {
+                      type: "string",
+                      enum: ["POKE", "HUG", "MISS_YOU", "KISS", "ANGRY", "MAKE_UP", "EAT_TOGETHER", "CALL_ME"],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            201: {
+              description: "Nudge đã tạo",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/Nudge" },
+                },
+              },
+            },
+            400: { description: "Dữ liệu không hợp lệ hoặc tự gửi cho chính mình" },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Chưa có cặp đôi/người ấy" },
+            429: { description: "Gửi quá nhanh" },
+          },
+        },
+      },
+      "/v1/nudges/recent": {
+        get: {
+          tags: ["Nudge"],
+          summary: "Danh sách nudge gần đây gửi đến người dùng hiện tại",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 50, default: 20 } },
+          ],
+          responses: {
+            200: {
+              description: "Danh sách nudge gần đây",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["items"],
+                    properties: {
+                      items: {
+                        type: "array",
+                        items: { $ref: "#/components/schemas/Nudge" },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            401: { description: "Chưa xác thực" },
+            404: { description: "Chưa có cặp đôi/người ấy" },
+          },
+        },
+      },
+      "/v1/nudges/{id}/read": {
+        post: {
+          tags: ["Nudge"],
+          summary: "Đánh dấu nudge đã đọc",
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            { name: "id", in: "path", required: true, schema: { type: "string", format: "uuid" } },
+          ],
+          responses: {
+            200: {
+              description: "Nudge sau khi cập nhật",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/Nudge" },
                 },
               },
             },

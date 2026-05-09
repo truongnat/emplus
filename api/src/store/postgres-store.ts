@@ -11,6 +11,7 @@ import type {
   InAppNotification,
   Invite,
   MemoryItem,
+  Nudge,
   PartnerNote,
   User,
   UserMoodState,
@@ -166,6 +167,17 @@ type CustomMilestoneRow = {
   updatedAt: string | Date;
 };
 
+type NudgeRow = {
+  id: string;
+  coupleId: string;
+  fromUserId: string;
+  toUserId: string;
+  type: Nudge["type"];
+  message: string;
+  createdAt: string | Date;
+  readAt: string | Date | null;
+};
+
 function fromUserRow(row: UserRow): User {
   return {
     id: row.id,
@@ -315,6 +327,19 @@ function fromCustomMilestoneRow(row: CustomMilestoneRow): CustomMilestone {
     createdById: row.createdById ?? undefined,
     createdAt: asIso(row.createdAt) ?? new Date().toISOString(),
     updatedAt: asIso(row.updatedAt) ?? new Date().toISOString(),
+  };
+}
+
+function fromNudgeRow(row: NudgeRow): Nudge {
+  return {
+    id: row.id,
+    coupleId: row.coupleId,
+    fromUserId: row.fromUserId,
+    toUserId: row.toUserId,
+    type: row.type,
+    message: row.message,
+    createdAt: asIso(row.createdAt) ?? new Date().toISOString(),
+    readAt: row.readAt ? asIso(row.readAt) : undefined,
   };
 }
 
@@ -1149,6 +1174,87 @@ export class PostgresStore implements DataStore {
     `;
 
     return rows.length > 0;
+  }
+
+  async createNudge(nudge: Nudge): Promise<void> {
+    await this.sql`
+      INSERT INTO nudges (
+        id,
+        couple_id,
+        from_user_id,
+        to_user_id,
+        type,
+        message,
+        created_at,
+        read_at
+      ) VALUES (
+        ${nudge.id},
+        ${nudge.coupleId},
+        ${nudge.fromUserId},
+        ${nudge.toUserId},
+        ${nudge.type},
+        ${nudge.message},
+        ${nudge.createdAt},
+        ${nudge.readAt ?? null}
+      )
+    `;
+  }
+
+  async listRecentNudgesForUser(userId: string, limit = 20): Promise<Nudge[]> {
+    const safeLimit = Math.min(50, Math.max(1, Math.floor(limit)));
+    const rows = await this.sql<NudgeRow[]>`
+      SELECT id,
+             couple_id AS "coupleId",
+             from_user_id AS "fromUserId",
+             to_user_id AS "toUserId",
+             type,
+             message,
+             created_at AS "createdAt",
+             read_at AS "readAt"
+      FROM nudges
+      WHERE to_user_id = ${userId}
+      ORDER BY created_at DESC
+      LIMIT ${safeLimit}
+    `;
+
+    return rows.map(fromNudgeRow);
+  }
+
+  async getLatestNudgeFromUser(userId: string): Promise<Nudge | undefined> {
+    const rows = await this.sql<NudgeRow[]>`
+      SELECT id,
+             couple_id AS "coupleId",
+             from_user_id AS "fromUserId",
+             to_user_id AS "toUserId",
+             type,
+             message,
+             created_at AS "createdAt",
+             read_at AS "readAt"
+      FROM nudges
+      WHERE from_user_id = ${userId}
+      ORDER BY created_at DESC
+      LIMIT 1
+    `;
+
+    return rows[0] ? fromNudgeRow(rows[0]) : undefined;
+  }
+
+  async markNudgeReadForUser(userId: string, nudgeId: string): Promise<Nudge | undefined> {
+    const rows = await this.sql<NudgeRow[]>`
+      UPDATE nudges
+      SET read_at = COALESCE(read_at, NOW())
+      WHERE id = ${nudgeId} AND to_user_id = ${userId}
+      RETURNING id,
+                couple_id AS "coupleId",
+                from_user_id AS "fromUserId",
+                to_user_id AS "toUserId",
+                type,
+                message,
+                created_at AS "createdAt",
+                read_at AS "readAt"
+    `;
+
+    return rows[0] ? fromNudgeRow(rows[0]) : undefined;
   }
 
   async listPartnerNotesByUser(userId: string): Promise<PartnerNote[]> {

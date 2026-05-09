@@ -16,6 +16,7 @@ import {
   mediaRoutes,
   milestonesRoutes,
   notificationRoutes,
+  nudgesRoutes,
   partnerNotesRoutes,
   systemRoutes,
   timelineRoutes,
@@ -79,6 +80,7 @@ app.route("/v1/dashboard", dashboardRoutes);
 app.route("/v1/timeline", timelineRoutes);
 app.route("/v1/media", mediaRoutes);
 app.route("/v1/milestones", milestonesRoutes);
+app.route("/v1/nudges", nudgesRoutes);
 app.route("/v1/care", careRoutes);
 app.route("/v1/partner-notes", partnerNotesRoutes);
 app.route("/v1/system", systemRoutes);

@@ -9,6 +9,7 @@ import type {
   InAppNotification,
   Invite,
   MemoryItem,
+  Nudge,
   PartnerNote,
   User,
 } from "../types.ts";
@@ -48,6 +49,10 @@ export interface DataStore {
   saveCustomMilestone(milestone: CustomMilestone): Promise<void>;
   updateCustomMilestone(milestone: CustomMilestone): Promise<void>;
   deleteCustomMilestone(coupleId: string, milestoneId: string): Promise<boolean>;
+  createNudge(nudge: Nudge): Promise<void>;
+  listRecentNudgesForUser(userId: string, limit?: number): Promise<Nudge[]>;
+  getLatestNudgeFromUser(userId: string): Promise<Nudge | undefined>;
+  markNudgeReadForUser(userId: string, nudgeId: string): Promise<Nudge | undefined>;
   listPartnerNotesByUser(userId: string): Promise<PartnerNote[]>;
   getPartnerNoteByUser(userId: string, noteId: string): Promise<PartnerNote | undefined>;
   savePartnerNote(note: PartnerNote): Promise<void>;

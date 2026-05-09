@@ -9,6 +9,7 @@ import type {
   InAppNotification,
   Invite,
   MemoryItem,
+  Nudge,
   PartnerNote,
   User,
   UserMoodState,
@@ -35,6 +36,7 @@ export class InMemoryStore implements DataStore {
   invites = new Map<string, Invite>();
   memories = new Map<string, MemoryItem>();
   customMilestones = new Map<string, CustomMilestone>();
+  nudges = new Map<string, Nudge>();
   partnerNotes = new Map<string, PartnerNote>();
   userMoods = new Map<string, UserMoodState>();
   budgetItems = new Map<string, BudgetItem>();
@@ -56,6 +58,7 @@ export class InMemoryStore implements DataStore {
     this.invites.clear();
     this.memories.clear();
     this.customMilestones.clear();
+    this.nudges.clear();
     this.partnerNotes.clear();
     this.userMoods.clear();
     this.budgetItems.clear();
@@ -339,6 +342,38 @@ export class InMemoryStore implements DataStore {
     }
     this.customMilestones.delete(milestoneId);
     return true;
+  }
+
+  async createNudge(nudge: Nudge): Promise<void> {
+    this.nudges.set(nudge.id, nudge);
+  }
+
+  async listRecentNudgesForUser(userId: string, limit = 20): Promise<Nudge[]> {
+    const safeLimit = Math.min(50, Math.max(1, Math.floor(limit)));
+    return Array.from(this.nudges.values())
+      .filter((nudge) => nudge.toUserId === userId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .slice(0, safeLimit);
+  }
+
+  async getLatestNudgeFromUser(userId: string): Promise<Nudge | undefined> {
+    return Array.from(this.nudges.values())
+      .filter((nudge) => nudge.fromUserId === userId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+  }
+
+  async markNudgeReadForUser(userId: string, nudgeId: string): Promise<Nudge | undefined> {
+    const nudge = this.nudges.get(nudgeId);
+    if (!nudge || nudge.toUserId !== userId) {
+      return undefined;
+    }
+
+    const updated: Nudge = {
+      ...nudge,
+      readAt: nudge.readAt ?? new Date().toISOString(),
+    };
+    this.nudges.set(nudge.id, updated);
+    return updated;
   }
 
   async listPartnerNotesByUser(userId: string): Promise<PartnerNote[]> {
