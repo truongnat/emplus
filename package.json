@@ -5,17 +5,20 @@
   "workspaces": [
     "mobile",
     "api",
+    "app",
     "design-builder",
     "web"
   ],
   "scripts": {
     "dev": "bash ./scripts/dev.sh",
     "dev:api": "bun run --cwd api dev",
+    "dev:app": "bun run --cwd app dev",
     "dev:local": "bash ./scripts/dev-local.sh",
     "dev:all": "bash ./api/scripts/dev-all.sh",
     "dev:mobile": "bun run --cwd mobile dev",
     "dev:builder": "bun run --cwd design-builder dev",
     "dev:web": "bun run --cwd web dev",
+    "build:app": "bun run --cwd app build",
     "build:builder": "bun run --cwd design-builder build",
     "build:web": "bun run --cwd web build",
     "start:api": "bun run --cwd api start",
@@ -25,6 +28,7 @@
     "db:seed": "bun run --cwd api db:seed",
     "db:up": "docker compose -f docker-compose.yml up -d postgres postgres-slave redis minio minio-init mailpit",
     "db:down": "docker compose -f docker-compose.yml down",
+    "typecheck:app": "bun run --cwd app typecheck",
     "typecheck:mobile": "bun run --cwd mobile typecheck",
     "typecheck:builder": "bun run --cwd design-builder typecheck",
     "typecheck:web": "bun run --cwd web check",
